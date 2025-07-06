@@ -1,0 +1,17 @@
+- find webhost
+-daily mode 
+-setting for stat tracking across days (streaks, averages, etc.)
+-add multiplayer functionality
+-Setting to switch between Venn Diagram and Grid displays
+-audio feedback
+-drag-and-drop
+-setting to change number of circles (2-4)
+-setting to change categories on circles (let's do 3 Wordplay categories today, because why not)
+-option to change the number of hand cards (but remember that Dailies should always use the same number)
+-Game End Condition: When currentWordPool is empty, you might want to consider this a state where the game can either:
+
+End immediately: If the player has no more words to draw and can't make progress.
+
+Enter a "final hand" mode: Allow the player to finish placing any remaining cards in their hand without drawing new ones. Once their hand is empty and the pool is empty, the game ends.
+
+You would implement a checkGameEndCondition() function that looks at currentWordPool.length and currentHand.length to determine if the game should end.

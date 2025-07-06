@@ -1,0 +1,3 @@
+2025-06-12 - I'm starting a new Venn Diagram game. I could code it by hand, but I've written my previous games by hand, and that process takes months; this time I'm using Google Gemini to do most of my coding for me.
+2025-06-14 - At some point, Gemini went off the rails and introduced a problem that it couldn't fix, so after dozens of frustrating attempts to fix the problem, I just asked it to revert back to 20 versions in the past and start another branch. That's why there are versions named v0.47b and similar.
+2025-06-22 - I got fed up with Gemini, and now I'm working with ChatGPT. It's still slow going, but progress is being made. I've spent the last few days trying to get the word distribution more even. I also moved rules.js into its own file.

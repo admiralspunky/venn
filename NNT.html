@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<script>
+	const GAME_TITLE = "No Not There"
+    const TUTORIAL_TEXT = `There are three broad categories, Location, Characteristic, and Wordplay. In each game, each of those categories contains some hidden rule. You can mouseover each category to find example rules. Your mission is to figure out the rules for each category, and play cards from Your Hand where they're supposed to go. If you play a card in the wrong category, you have to draw a card to replace it. You're trying to empty your hand of cards.`;
+	const ABOUT_TEXT = "I want to thank Ken Wickle, for bringing Things in Rings to our board game group, which led me to write this game."
+	const BYLINE = "© 2025 Justin Smith. All Rights Reserved admiralspunky@gmail.com"
+</script>
+<script src="game-logic.js" defer></script>
+<script src="rules.js"> </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venn Diagram Game</title>
+
+    <!-- Removed external font link to avoid external dependencies -->
+    <style>
+        /* Base colors (light mode) */
+        :root {
+            --bg-body: #f0f4f8;
+            --bg-container: #ffffff;
+            --text-primary: #1a202c; /* for h1 */
+            --text-secondary: #6b7280; /* for turns, version, modal close btn */
+            --bg-rule-box-default: #e2e8f0;
+            --border-rule-box-default: #cbd5e1;
+            --text-rule-box-default: #334155;
+            --bg-word-card-hand: #4f46e5; /* Indigo-600 for hand cards */
+            --text-word-card-hand: white;
+
+            /* Specific zone colors - Light Mode */
+            --zone1-bg: #fee2e2; --zone1-border: #ef4444; --zone1-text: #991b1b;
+            --zone2-bg: #dbeafe; --zone2-border: #3b82f6; --zone2-text: #1e40af;
+            --zone3-bg: #fefce8; --zone3-border: #facc15; --zone3-text: #92400e;
+            --zone12-bg: #ede9fe; --zone12-border: #a855f7; --zone12-text: #581c87;
+            --zone13-bg: #fff7ed; --zone13-border: #f97316; --zone13-text: #9a3412;
+            --zone23-bg: #ecfdf5; --zone23-border: #10b981; --zone23-text: #047857;
+            --zone123-bg: #f0f4f8; --zone123-border: #64748b; --zone123-text: #334155;
+            --zone0-bg: #e2e8f0; --zone0-border: #94a3b8; --zone0-text: #475569;
+            --zoneHand-bg: #e0f2fe; --zoneHand-border: #94a3b8; --zoneHand-text: #334155;
+
+            /* Placed word card colors (text color based on zone's text color) */
+            --placed-card-text-color: var(--text-rule-box-default);
+            --zone1-placed-card-text: var(--zone1-text);
+            --zone2-placed-card-text: var(--zone2-text);
+            --zone3-placed-card-text: var(--zone3-text);
+            --zone12-placed-card-text: var(--zone12-text);
+            --zone13-placed-card-text: var(--zone13-text);
+            --zone23-placed-card-text: var(--zone23-text);
+            --zone123-placed-card-text: var(--zone123-text);
+            --zone0-placed-card-text: var(--zone0-text);
+        }
+
+        /* Dark mode colors */
+        html.dark {
+            --bg-body: #0F172A; /* Dark slate */
+            --bg-container: #1E293B; /* Dark darker slate */
+            --text-primary: #cbd5e1; /* Light gray */
+            --text-secondary: #94a3b8; /* Lighter gray */
+            --bg-rule-box-default: #2F3B4D;
+            --border-rule-box-default: #475569;
+            --text-rule-box-default: #cbd5e1;
+            --bg-word-card-hand: #6366F1; /* Brighter indigo for contrast */
+            --text-word-card-hand: white;
+
+            /* Specific zone colors - Dark Mode */
+            --zone1-bg: #7f1d1d; --zone1-border: #b91c1c; --zone1-text: #fecaca; /* Red-900 / Red-700 / Red-200 */
+            --zone2-bg: #1e3a8a; --zone2-border: #2563eb; --zone2-text: #bfdbfe; /* Blue-900 / Blue-700 / Blue-200 */
+            --zone3-bg: #78350f; --zone3-border: #d97706; --zone3-text: #fed7aa; /* Orange-900 / Orange-600 / Orange-200 - adjusted for better contrast */
+            --zone12-bg: #581c87; --zone12-border: #7e22ce; --zone12-text: #e9d5ff; /* Purple-900 / Purple-700 / Purple-200 */
+            --zone13-bg: #7c2d12; --zone13-border: #c2410c; --zone13-text: #fed7aa; /* Deep Orange-900 / Orange-700 / Orange-200 */
+            --zone23-bg: #064e3b; --zone23-border: #059669; --zone23-text: #a7f3d0; /* Emerald-900 / Emerald-700 / Emerald-200 */
+            --zone23-bg: #064e3b; --zone23-border: #059669; --zone23-text: #a7f3d0; /* Emerald-900 / Emerald-700 / Emerald-200 */
+            --zone123-bg: #334155; --zone123-border: #64748b; --zone123-text: #cbd5e1; /* Slate-700 / Slate-500 / Slate-300 */
+            --zone0-bg: #1f2937; --zone0-border: #4b5563; --zone0-text: #d1d5db; /* Gray-800 / Gray-600 / Gray-300 */
+            --zoneHand-bg: #172554; --zoneHand-border: #3b82f6; --zoneHand-text: #bfdbfe; /* Blue-950 / Blue-500 / Blue-200 */
+
+            /* Placed word card colors (text color based on zone's text color) */
+            --placed-card-text-color: var(--text-rule-box-default);
+            --zone1-placed-card-text: var(--zone1-text);
+            --zone2-placed-card-text: var(--zone2-text);
+            --zone3-placed-card-text: var(--zone3-text);
+            --zone12-placed-card-text: var(--zone12-text);
+            --zone13-placed-card-text: var(--zone13-text);
+            --zone23-placed-card-text: var(--zone23-text);
+            --zone123-placed-card-text: var(--zone123-text);
+            --zone0-placed-card-text: var(--zone0-text);
+        }
+
+		body {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            height: 100vh;
+            margin: 0;
+            overflow-y: auto; 
+            font-family: sans-serif; /* Changed to generic sans-serif */
+            background-color: var(--bg-body);
+            color: var(--text-secondary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+		}
+
+        .game-container {
+            background-color: var(--bg-container);
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column; 
+            gap: 2rem;
+            padding: 3rem;
+            width: 100%; 
+            height: 100vh; 
+            box-sizing: border-box;
+            position: relative;
+            margin: 0 auto; 
+            transition: background-color 0.3s ease;
+            align-items: center; 
+        }
+
+
+        .main-game-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 100%; 
+            /* align-items: center; Removed as title moved out */
+        }
+
+        /* .main-game-area h1 { Removed, as h1 moved out of main-game-area } */
+
+        .top-left-ui, .top-right-ui {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+		
+		.top-left-ui {
+			font-size: 1rem;
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;            /* optional: vertical spacing between rows */
+			 text-align: center; /* Ensure text inside is centered */
+		}
+
+        .top-bar { 
+            display: flex;
+            justify-content: space-between;
+            width: 100%; 
+            margin-bottom: 1rem;
+            align-items: center; /* Vertically align items in top-bar */
+        }
+
+        .top-bar-title {
+            flex-grow: 1; /* Allow it to take up available space */
+            text-align: center; /* Ensure text inside is centered */
+            margin: 0 auto; /* Ensures it pushes itself to the center */
+            color: var(--text-primary); /* Inherit primary text color */
+            font-size: 2.25rem; /* Equivalent to text-3xl */
+            font-weight: 700; /* Equivalent to font-bold */
+            transition: color 0.3s ease;
+            line-height: 1; /* Adjust line height to prevent extra space */
+        }
+
+
+        .icon-btn {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 1.25rem;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: white; 
+            background-color: var(--text-secondary); 
+            transition: background-color 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            background-color: var(--text-primary); 
+        }
+
+        #settings-btn {
+            padding: 0.875rem 1.125rem;
+            font-size: 1.5rem;
+        }
+        
+        #new-game-modal-btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.125rem;
+            border-radius: 0.75rem;
+            background-color: #4f46e5;
+            color: white;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+        #new-game-modal-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .share-results-btn {
+            padding: 0.6rem 0.9rem;
+            font-size: 0.95rem;
+        }
+
+        /* #version-display { REMOVED from main screen } */
+
+        .rule-box {
+            border: 2px solid var(--border-rule-box-default);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+            background-color: var(--bg-rule-box-default);
+            color: var(--text-rule-box-default);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            position: relative;
+            min-height: 150px;
+            box-sizing: border-box;
+            z-index: 1;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        .rule-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+        }
+
+        /* Specific rule box styling based on data-zone-key using CSS variables */
+        #zone-1 { background-color: var(--zone1-bg); border-color: var(--zone1-border); color: var(--zone1-text); }
+        #zone-2 { background-color: var(--zone2-bg); border-color: var(--zone2-border); color: var(--zone2-text); }
+        #zone-3 { background-color: var(--zone3-bg); border-color: var(--zone3-border); color: var(--zone3-text); }
+        #zone-1-2 { background-color: var(--zone12-bg); border-color: var(--zone12-border); color: var(--zone12-text); }
+        #red-yellow-overlap-container { background-color: var(--zone13-bg); border-color: var(--zone13-border); color: var(--zone13-text); }
+        #zone-2-3 { background-color: var(--zone23-bg); border-color: var(--zone23-border); color: var(--zone23-text); }
+        #zone-1-2-3 { background-color: var(--zone123-bg); border-color: var(--zone123-border); color: var(--zone123-text); }
+        #none-container { background-color: var(--zone0-bg); border-color: var(--zone0-border); color: var(--zone0-text); }
+        #hand-container { background-color: var(--zoneHand-bg); border-color: var(--zoneHand-border); color: var(--zoneHand-text); }
+
+        .box-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            width: 100%;
+        }
+
+        .box-header .box-label {
+            font-weight: 700;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .box-icons-container {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+
+        .rule-icon {
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            fill: currentColor; 
+        }
+
+        .word-cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            justify-content: center;
+            align-items: flex-start;
+            flex-grow: 1;
+            width: 100%;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-rule-box-default) var(--bg-rule-box-default); 
+        }
+
+        /* Webkit scrollbar for Chrome/Safari */
+        .word-cards-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .word-cards-container::-webkit-scrollbar-track {
+            background: var(--bg-rule-box-default);
+            border-radius: 10px;
+        }
+
+        .word-cards-container::-webkit-scrollbar-thumb {
+            background-color: var(--border-rule-box-default);
+            border-radius: 10px;
+            border: 2px solid var(--bg-rule-box-default);
+        }
+
+        .word-card {
+            padding: 0.35rem 0.6rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.2s ease, color 0.2s ease;
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            background-color: var(--bg-word-card-hand); 
+            color: var(--text-word-card-hand); 
+        }
+
+        .word-card.placed-card {
+            color: inherit;
+        }
+
+        .word-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .word-card.selected {
+            outline-color: #f97316;
+            outline-style: dashed;
+            outline-width: 2px;
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .rule-hint {
+            position: absolute;
+            background-color: var(--bg-container);
+            color: var(--text-primary);
+            border: 1px solid var(--border-rule-box-default);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            bottom: 100%;
+            top: auto;
+            left: 50%;
+            transform: translateX(-50%) translateY(-0.5rem);
+            z-index: 100;
+            white-space: pre-wrap;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            width: max-content;
+            max-width: 200px;
+            box-sizing: border-box;
+        }
+
+        .rule-hint.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .message-box {
+            background-color: #d1fae5;
+            color: #065f46;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-weight: 500;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            min-height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message-box.visible {
+            opacity: 1;
+        }
+
+        .message-box.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--bg-container);
+            color: var(--text-primary);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            position: relative;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .modal-content p {
+            color: var(--text-secondary);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* Ensure the grid fills available width */
+        #rules-grid-container {
+            width: 100%;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767px) {
+            body {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: stretch;
+                height: 100vh;
+                margin: 0;
+                overflow-y: auto;
+                font-family: sans-serif; /* Changed to generic sans-serif */
+                background-color: var(--bg-body);
+                color: var(--text-secondary);
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+            .game-container {
+                flex-direction: column; 
+                height: auto;
+                width: 95%;
+                max-width: 500px;
+                padding: 1.5rem;
+                gap: 1rem;
+                margin: 1rem auto;
+            }
+            .main-game-area {
+                width: 100%;
+                padding-top: 2rem;
+                gap: 1rem;
+            }
+            .rules-layout-grid { /* This class is no longer explicitly used, but kept for reference */
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                max-width: 100%;
+                height: auto;
+                min-height: auto;
+            }
+            .rules-layout-grid > div {
+                grid-column: auto;
+                grid-row: auto;
+            }
+            .hand-container {
+                max-height: 180px;
+            }
+            .top-left-ui, .top-right-ui {
+                position: static; 
+                width: auto; 
+                display: flex; 
+                justify-content: flex-start; 
+                align-items: center;
+                padding: 0; 
+                margin: 0; 
+            }
+            .top-bar { 
+                width: 100%;
+                padding: 0 0.75rem; /* Reduced horizontal padding for mobile */
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+            .top-right-ui {
+                gap: 0.5rem;
+                justify-content: flex-end; 
+            }
+            .game-container {
+                padding-top: 1rem;
+            }
+            .icon-btn { 
+                padding: 0.6rem 0.9rem;
+                font-size: 1.2rem;
+            }
+
+            .rule-box {
+                min-height: 120px;
+                padding: 0.5rem;
+            }
+            .rule-box .box-header .box-label {
+                font-size: 0.9rem;
+            }
+            .word-card {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.5rem;
+            }
+            .top-bar-title {
+                font-size: 1.5rem; /* Smaller font size for mobile */
+            }
+            #daily-badge {
+                display: none; /* Hide daily badge on mobile to save space */
+            }
+        }
+		
+		.end-buttons-row {
+			display: none;
+		}
+
+		.end-buttons-row.visible {
+			  display: flex;
+			  justify-content: center;
+			  gap: 1rem;
+			  margin-top: 1rem;
+		}
+		
+		/* prettifying the settings modal */
+		
+		.settings-button-row {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 1rem;
+			margin-bottom: 1.5rem;
+		}
+		
+		.settings-button-row button {
+			width: 48px;
+			height: 48px;
+			font-size: 1.5rem;
+			border-radius: 0.5rem;
+		}
+		
+		#new-game-modal-btn {
+			background-color: #4f46e5;  /* Indigo */
+			color: white;
+			font-size: 1.75rem;         /* Bigger icon */
+			padding: 0.75rem;
+			width: 3.25rem;
+			height: 3.25rem;
+			border: none;
+			border-radius: 0.75rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+			transition: background-color 0.2s ease;
+			outline: none;
+		}
+		
+		#new-game-modal-btn:focus {
+			outline: none;
+			box-shadow: none;
+		}
+
+		#new-game-modal-btn:hover {
+			background-color: #4338ca;
+		}
+		
+		.word-card.incorrect {
+			border: 2px dashed red;
+			opacity: 0.7;
+		}
+
+
+
+		
+		/* Replacing Tailwind */
+		
+		#zone-feedback-bubble {
+			position: fixed;
+			color: white;
+			padding: 6px 12px;
+			border-radius: 4px;
+			font-size: 0.875rem;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+			opacity: 0;
+			transition: opacity 0.3s ease;
+			pointer-events: none;
+			z-index: 1001;
+		}
+
+		#zone-feedback-bubble.success {
+			background-color: #16a34a; /* green-600 */
+		}
+
+		#zone-feedback-bubble.error {
+			background-color: #dc2626; /* red-600 */
+		}
+		
+		/* Light mode (default) */
+		html.light {
+			background-color: white;
+			color: black;
+		}
+
+		/* Dark mode override */
+		html.dark {
+			background-color: #111;
+			color: white;
+		}
+
+		/* Desktop 3x3 grid, mobile fallback */
+		#rules-grid-container {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1rem;
+			width: 100%;
+		}
+
+		@media (max-width: 767px) {
+			#rules-grid-container {
+				grid-template-columns: 1fr;
+			}
+		}
+
+        /* NEW CSS FOR DIFFICULTY SLIDER */
+        .modal-setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-rule-box-default);
+        }
+
+        .modal-setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            flex-shrink: 0;
+            margin-right: 1rem;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            gap: 0.75rem;
+        }
+
+        #difficulty-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: var(--border-rule-box-default);
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+            border-radius: 4px;
+        }
+
+        #difficulty-slider:hover {
+            opacity: 1;
+        }
+
+        #difficulty-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #difficulty-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 20px;
+            text-align: center;
+        }
+        /* END NEW CSS */
+
+        /* BYLINE STYLES */
+        #byline-display {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.5rem 1rem;
+            background-color: var(--bg-container); /* Match container background */
+            color: var(--text-secondary); /* Match secondary text color */
+            font-size: 0.75rem;
+            text-align: center;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); /* Subtle shadow at the top */
+            z-index: 999; /* Ensure it's above most content but below modals */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        @media (max-width: 767px) {
+            #byline-display {
+                font-size: 0.65rem; /* Slightly smaller on mobile */
+                padding: 0.4rem 0.75rem;
+            }
+        }
+        /* END BYLINE STYLES */
+
+    </style>
+
+</head>
+<body>
+    <div class="game-container">
+        <div class="top-bar">
+            <div class="top-left-ui">
+                <span>Turns: <span id="turns-display">0</span></span>
+                <span>Lives: <span id="lives-display">3</span></span>
+            </div>
+            <h1 class="top-bar-title">
+                <span id="game-title-text">Venn Diagram Word Game</span>
+                <span id="daily-badge" class="ml-2 px-2 py-0.5 bg-green-600 text-white text-xs font-semibold rounded hidden align-middle whitespace-nowrap">DAILY</span>
+            </h1>
+            <div class="top-right-ui">
+                <button id="settings-btn" class="icon-btn">
+                    &#x2699;
+                </button>
+            </div>
+        </div>
+         <div class="main-game-area">
+            <div id="message-box" class="message-box"></div>
+
+            <div id="rules-grid-container">
+                <div id="zone-1" class="rule-box" data-zone-key="1">
+                    <div class="box-header">
+                        <span class="box-label"></span>
+                        <div class="box-icons-container"></div>
+                    </div>
+                    <div class="word-cards-container"></div>
+                    <div class="rule-hint"></div>
+                </div>
+                <div id="zone-2" class="rule-box" data-zone-key="2">
+                    <div class="box-header">
+                        <span class="box-label"></span>
+                        <div class="box-icons-container"></div>
+                    </div>
+                    <div class="word-cards-container"></div>
+                    <div class="rule-hint"></div>
+                </div>
+                <div id="zone-3" class="rule-box" data-zone-key="3">
+                    <div class="box-header">
+                        <span class="box-label"></span>
+                        <div class="box-icons-container"></div>
+                    </div>
+                    <div class="word-cards-container"></div>
+                    <div class="rule-hint"></div>
+                </div>
+
+                <div id="zone-1-2" class="rule-box" data-zone-key="1-2">
+                    <div class="box-header">
+                        <span class="box-label"></span>
+                        <div class="box-icons-container"></div>
+                    </div>
+                    <div class="word-cards-container"></div>
+                    <div class="rule-hint"></div>
+                </div>
+                <div id="red-yellow-overlap-container" class="rule-box" data-zone-key="1-3">
+                    <div class="box-header">
+                        <span class="box-label"></span>
+                        <div class="box-icons-container"></div>
+                    </div>
+                    <div class="word-cards-container"></div>
+                    <div class="rule-hint"></div>
+                </div>
+                <div id="zone-2-3" class="rule-box" data-zone-key="2-3">
+                    <div class="box-header">
+                        <span class="box-label"></span>
+                        <div class="box-icons-container"></div>
+                    </div>
+                    <div class="word-cards-container"></div>
+                    <div class="rule-hint"></div>
+                </div>
+
+                <div id="none-container" class="rule-box" data-zone-key="0">
+                    <div class="box-header">
+                        <span class="box-label"></span>
+                        <div class="box-icons-container"></div>
+                    </div>
+                    <div class="word-cards-container"></div>
+                    <div class="rule-hint"></div>
+                </div>
+                <div id="zone-1-2-3" class="rule-box" data-zone-key="1-2-3">
+                    <div class="box-header">
+                        <span class="box-label"></span>
+                        <div class="box-icons-container"></div>
+                    </div>
+                    <div class="word-cards-container"></div>
+                    <div class="rule-hint"></div>
+                </div>
+                <div id="hand-container" class="rule-box">
+                    <div class="box-header">
+                        <span class="box-label">Your Hand:</span>
+                        </div>
+                    <div class="word-cards-container"></div>
+					<div id="end-screen-buttons" class="end-buttons-row hidden">
+						<!-- Buttons will be inserted here -->
+					</div>
+                    <div class="rule-hint"></div> </div>
+            </div>
+        
+            </div>
+    </div>
+
+<!-- SETTINGS -->
+    <div id="settings-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+            <h2 class="text-2xl font-bold mb-4" style="text-align:center;">settings and such</h2>
+
+			<div class="settings-button-row">
+				<button id="dark-mode-toggle-btn" class="icon-btn" title="Toggle Dark Mode">&#9728;</button>
+				<button id="new-game-modal-btn" title="Start New Game">&#x21BB;</button>
+				<!--<button id="about-btn" title="About and Acknowledgements">&#x21BB;</button> -->
+			</div>
+
+            <!-- Difficulty Slider -->
+            <div class="modal-setting-item">
+                <label for="difficulty-slider" class="setting-label">Lives:</label>
+                <div class="slider-container">
+                    <input type="range" id="difficulty-slider" min="1" max="5" value="3">
+                    <span id="lives-display-modal" class="slider-value">3</span>
+                </div>
+            </div>
+			
+			<p class="mt-4 mb-6" id="settings-tutorial-text"></p>
+			
+			<p class="mt-4 mb-6" id="about-text"></p>
+				<script>
+					document.getElementById('settings-tutorial-text').textContent = TUTORIAL_TEXT;
+				</script>
+				<script>
+					document.getElementById('about-text').textContent = ABOUT_TEXT;
+				</script>
+            <div id="version-display">v0.XX</div> </div>
+    </div>
+
+    
+<div id="tutorial-modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+        <button id="tutorial-close-btn" class="modal-close-btn">&times;</button>
+        <h2 class="text-2xl font-bold mb-4">How to Play</h2>
+        <p id="tutorial-text" class="mb-4"></p>
+        <div class="flex justify-center">
+            <button id="tutorial-ok-btn" class="btn bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Got it!</button>
+        
+            </div>
+    </div>
+</div>
+
+<div id="zone-feedback-bubble" class="fixed text-white px-3 py-2 rounded shadow-lg text-sm z-[1001] transition-opacity duration-300 hidden pointer-events-none"></div>
+
+<!-- BYLINE Display at the bottom of the screen -->
+<div id="byline-display"></div>
+
+</body>
+<script>
+// Tutorial Modal Logic
+const tutorialModalOverlay = document.getElementById('tutorial-modal-overlay');
+const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
+const tutorialOkBtn = document.getElementById('tutorial-ok-btn');
+const tutorialTextElement = document.getElementById('tutorial-text');
+const bylineDisplayElement = document.getElementById('byline-display'); // Get the BYLINE element
+
+if (tutorialTextElement && typeof TUTORIAL_TEXT !== 'undefined') {
+    tutorialTextElement.textContent = TUTORIAL_TEXT;
+}
+
+if (bylineDisplayElement && typeof BYLINE !== 'undefined') {
+    bylineDisplayElement.textContent = BYLINE;
+}
+
+
+if (!localStorage.getItem('hasSeenTutorial')) {
+    setTimeout(() => {
+        tutorialModalOverlay.classList.add('visible');
+    }, 500);
+}
+
+function hideTutorial() {
+    tutorialModalOverlay.classList.remove('visible');
+    localStorage.setItem('hasSeenTutorial', 'true');
+}
+
+tutorialCloseBtn?.addEventListener('click', hideTutorial);
+tutorialOkBtn?.addEventListener('click', hideTutorial);
+</script>
+
+
+</html>

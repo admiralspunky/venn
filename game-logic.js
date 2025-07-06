@@ -1,0 +1,1145 @@
+// game-logic.js
+
+// Global Variables
+const CURRENT_VERSION = "0.64";
+let dailyMode = false;
+let todayStr = "";
+let wordsInPlay = [];
+let currentWordPool = [];
+let currentHand = [];
+let turns = 0;
+let selectedWordId = null;
+const genericLabels = ["Location", "Characteristic", "Wordplay"];
+let isDarkMode = localStorage.getItem('theme') === 'dark';
+let activeRules = [];
+// User's selected lives, retrieved from localStorage or defaulting to 3
+let userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
+// Current lives remaining in the game
+let livesRemaining = 0; 
+
+
+document.title = GAME_TITLE;
+
+//This will assign .exampleHints to all rules
+for (const rule of allPossibleRules) {
+    if (!rule.exampleHints || !Array.isArray(rule.exampleHints)) {
+        rule.exampleHints = generateExampleHintsFor(rule, allPossibleRules);
+    }
+}
+
+function getTodayDateString() {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+}
+
+function getDailySeed() {
+    const today = getTodayDateString().replace(/-/g, '');
+    return parseInt(today, 10);
+}
+
+//utility function, because some rules have a test function, but most don't
+function doesWordMatchRule(word, rule) {
+  if (typeof rule.test === 'function') {
+    return rule.test(word);
+  } else if (Array.isArray(rule.words)) {
+    return rule.words.includes(word);
+  }
+  return false;
+}
+
+
+// Utility to calculate a word's zone key based on which rules it matches
+function getZoneKey(word, ruleResults) {
+    const keys = [];
+    if (doesWordMatchRule(word, ruleResults[0])) keys.push("1");
+    if (doesWordMatchRule(word, ruleResults[1])) keys.push("2");
+    if (doesWordMatchRule(word, ruleResults[2])) keys.push("3");
+    return keys.length === 0 ? "0" : keys.join("-");
+}
+
+
+// Weighted random draw utility using a provided seedable RNG
+function weightedRandomPick(weights, rng) {
+    const total = Object.values(weights).reduce((sum, w) => sum + w, 0);
+    const roll = rng() * total;
+    let cumulative = 0;
+    for (const key in weights) {
+        cumulative += weights[key];
+        if (roll < cumulative) return key;
+    }
+    return Object.keys(weights)[0]; // fallback
+}
+
+// Main generator function
+function generateWordPoolWithProbabilities(ruleResults, wordPool, count, rng) {
+    const zoneProbabilities = {
+        "1-2-3": 5,
+        "1-2": 10,
+        "1-3": 10,
+        "2-3": 10,
+        "1": 20,
+        "2": 20,
+        "3": 20,
+        "0": 5
+    };
+    
+    const zoneBuckets = {};
+    
+    // Group words by their zone key
+    for (const word of wordPool) {
+        const zoneKey = getZoneKey(word, ruleResults);
+        if (!zoneBuckets[zoneKey]) zoneBuckets[zoneKey] = [];
+        zoneBuckets[zoneKey].push(word);
+    }
+    
+    // Shuffle each bucket to randomize word order
+    for (const key in zoneBuckets) {
+        zoneBuckets[key] = shuffleArray(zoneBuckets[key], rng());
+    }
+    
+    const selected = [];
+    const used = new Set();
+    
+    // Flatten all zone keys in weighted order
+    const weightedZoneKeys = Object.keys(zoneProbabilities).sort(
+    (a, b) => zoneProbabilities[b] - zoneProbabilities[a]
+    );
+    
+    // Main loop
+    while (selected.length < count) {
+        const zoneKey = weightedRandomPick(zoneProbabilities, rng);
+        const bucket = zoneBuckets[zoneKey] || [];
+        
+        // Find first unused word from the bucket
+        const candidate = bucket.find(word => !used.has(word));
+        
+        if (candidate) {
+            selected.push(candidate);
+            used.add(candidate);
+        } else {
+            // Fallback: check all buckets for unused words
+            const fallback = Object.values(zoneBuckets)
+            .flat()
+            .find(word => !used.has(word));
+            
+            if (!fallback) break; // No words left at all
+            selected.push(fallback);
+            used.add(fallback);
+        }
+    }
+    // 🔍 Add this debug block here
+    for (const word of selected) {
+        console.log('generateWordPoolWithProbabilities ', word, '→', getZoneKey(word, ruleResults));
+    }
+    
+    return selected;
+}
+
+console.log("Venn Diagram Game script loaded." + CURRENT_VERSION);
+document.getElementById('version-display').textContent = 'Version ' + CURRENT_VERSION;
+document.getElementById('game-title-text').textContent = GAME_TITLE;
+
+const INITIAL_HAND_SIZE = 5;
+const MESSAGE_DISPLAY_TIME = 5000;
+const TOTAL_WORDS_IN_POOL = 200;
+const MIN_RULE_MATCHING_WORDS_PER_CATEGORY = 3;
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Safe DOM setup
+    const versionEl = document.getElementById('version-display');
+    const titleEl = document.getElementById('game-title-text');
+    if (versionEl) versionEl.textContent = 'Version ' + CURRENT_VERSION;
+    if (titleEl) titleEl.textContent = GAME_TITLE;
+    
+    // Safe theme setup
+    applyTheme();
+
+    // Initialize difficulty slider and display
+    if (difficultySlider && livesDisplayModal) {
+        userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
+        difficultySlider.value = userSetLives;
+        livesDisplayModal.textContent = userSetLives;
+
+        difficultySlider.addEventListener('input', (event) => {
+            updateLivesSetting(parseInt(event.target.value, 10));
+        });
+    }
+
+    // Existing DOMContentLoaded logic for starting game
+    const today = getTodayDateString();
+    const lastPlayed = localStorage.getItem("lastDailyDate");
+    if (lastPlayed !== today) {
+        localStorage.setItem("lastDailyDate", today);
+        console.log("Starting Daily Game for", today);
+        startGame(true);
+    } else {
+        console.log("Starting regular game");
+        startGame(false);
+    }
+});
+
+
+const iconSVGs = {
+    'location': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
+    'characteristic': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L23.725 9.17l-6.104 5.952 1.442 8.45L12 18.295l-7.063 3.794 1.442-8.45L.275 9.17l8.057-1.015L12 .587z"/></svg>`,
+    'wordplay': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7h5.5L13 3.5V9z"/></svg>`
+};
+
+const turnsDisplay = document.getElementById('turns-display');
+// Get the lives display element on the main game screen
+const livesDisplay = document.getElementById('lives-display'); 
+const settingsBtn = document.getElementById('settings-btn'); // This is now just the settings opener
+const messageBox = document.getElementById('message-box');
+const handContainer = document.getElementById('hand-container');
+
+const settingsModalOverlay = document.getElementById('settings-modal-overlay');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+const newGameModalBtn = document.getElementById('new-game-modal-btn');
+const darkModeToggleBtn = document.getElementById('dark-mode-toggle-btn'); // New dark mode toggle button
+const aboutBtn = document.getElementById('about-btn');
+
+// NEW: Get the difficulty slider and display elements inside the modal
+const difficultySlider = document.getElementById('difficulty-slider');
+const livesDisplayModal = document.getElementById('lives-display-modal');
+
+
+const zoneElements = {
+    '1': { container: document.getElementById('zone-1'), wordsDiv: document.getElementById('zone-1').querySelector('.word-cards-container') },
+    '2': { container: document.getElementById('zone-2'), wordsDiv: document.getElementById('zone-2').querySelector('.word-cards-container') },
+    '3': { container: document.getElementById('zone-3'), wordsDiv: document.getElementById('zone-3').querySelector('.word-cards-container') },
+    '1-2': { container: document.getElementById('zone-1-2'), wordsDiv: document.getElementById('zone-1-2').querySelector('.word-cards-container') },
+    '1-3': { container: document.getElementById('red-yellow-overlap-container'), wordsDiv: document.getElementById('red-yellow-overlap-container').querySelector('.word-cards-container') },
+    '2-3': { container: document.getElementById('zone-2-3'), wordsDiv: document.getElementById('zone-2-3').querySelector('.word-cards-container') },
+    '1-2-3': { container: document.getElementById('zone-1-2-3'), wordsDiv: document.getElementById('zone-1-2-3').querySelector('.word-cards-container') },
+    '0': { container: document.getElementById('none-container'), wordsDiv: document.getElementById('none-container').querySelector('.word-cards-container') },
+    'hand': { container: document.getElementById('hand-container'), wordsDiv: document.getElementById('hand-container').querySelector('.word-cards-container') }
+};
+
+
+
+
+const zoneConfigs = {
+    '1': { id: 'zone-1', colorVar: '--zone1-bg', genericLabelIndex: 0, ruleIndices: [0], categoryTypes: ['location'] },
+    '2': { id: 'zone-2', colorVar: '--zone2-bg', genericLabelIndex: 1, ruleIndices: [1], categoryTypes: ['characteristic'] },
+    '3': { id: 'zone-3', colorVar: '--zone3-bg', genericLabelIndex: 2, ruleIndices: [2], categoryTypes: ['wordplay'] },
+    '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: 'Location & Characteristic', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
+    '1-3': { id: 'red-yellow-overlap-container', colorVar: '--zone13-bg', customLabel: 'Location & Wordplay', ruleIndices: [0, 2], categoryTypes: ['location', 'wordplay'] },
+    '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: 'Characteristic & Wordplay', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'wordplay'] },
+    '1-2-3': { id: 'zone-1-2-3', colorVar: '--zone123-bg', customLabel: 'All Three', ruleIndices: [0, 1, 2], categoryTypes: ['location', 'characteristic', 'wordplay'] },
+    '0': { id: 'none-container', colorVar: '--zone0-bg', customLabel: 'None of the above', ruleIndices: [], categoryTypes: [] }
+};
+
+function createSeededRandom(seed) {
+    let s = seed % 2147483647;
+    if (s <= 0) s += 2147483646;
+    
+    return function() {
+        s = (s * 16807) % 2147483647;
+        return (s - 1) / 2147483646;
+    };
+}
+
+function shuffleArray(array, seed = null) {
+    const random = seed !== null ? createSeededRandom(seed) : Math.random;
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function getBoxIconsSVG(categoryTypes) {
+    let iconsHtml = '';
+    categoryTypes.forEach(type => {
+        iconsHtml += iconSVGs[type] || '';
+    });
+    return iconsHtml;
+}
+
+function matchesOnlyOneRule(wordText, targetRuleIndex) {
+    let matchCount = 0;
+    let matchedTargetRule = false;
+    
+    for (let i = 0; i < activeRules.length; i++) {
+        const rule = activeRules[i];
+        if (doesWordMatchRule(wordText, rule)) {
+            matchCount++;
+            if (i === targetRuleIndex) {
+                matchedTargetRule = true;
+            }
+        }
+    }
+    
+    return matchedTargetRule && matchCount === 1;
+}
+
+//each rule displays the names of 3 other rules in that category
+function generateExampleHintsFor(rule, allRules, count = 3) {
+    const sameCategory = allRules.filter(r =>
+    r.categoryType === rule.categoryType && r.name !== rule.name
+    );
+    
+    const shuffled = [...sameCategory].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count).map(r => r.name);
+}
+
+function getCorrectZoneKeyForWord(word, rules) {
+    let matchedZones = [];
+
+    rules.forEach((rule, index) => {
+        if (doesWordMatchRule(word, rule)) {
+            matchedZones.push(index + 1);
+        }
+    });
+
+    return matchedZones.length ? matchedZones.join('-') : '0';
+}
+
+
+
+function getZoneDisplayName(zoneKey, revealRules = false) {
+    const zoneConfig = zoneConfigs[zoneKey];
+    if (!zoneConfig) {
+        console.error(`Attempted to get display name for unknown zoneKey: ${zoneKey}`);
+        return "Unknown Category";
+    }
+    
+    if (revealRules && ['1', '2', '3'].includes(zoneKey) && zoneConfig.genericLabelIndex !== null && activeRules[zoneConfig.genericLabelIndex]) {
+        return activeRules[zoneConfig.genericLabelIndex].name;
+    }
+    
+    if (zoneConfig.customLabel) {
+        return zoneConfig.customLabel;
+    }
+    
+    if (zoneConfig.genericLabelIndex !== null && genericLabels[zoneConfig.genericLabelIndex]) {
+        return genericLabels[zoneConfig.genericLabelIndex];
+    }
+    
+    return "General Category";
+}
+
+// =========================================
+// getWeightedWordList(rules)
+// -----------------------------------------
+// Called by: buildDeliberateWordPool()
+// Calls: getZoneKey(word, rules), shuffleArray()
+// 
+// Purpose:
+// Groups all words from the current active rules into buckets
+// according to their zone (e.g., "1", "1-2", "1-2-3", or "0" for unmatched).
+// Returns an object: { "1": [...], "2-3": [...], "0": [...] }
+// =========================================
+function getWeightedWordList(rules) {
+    const allWords = new Set();
+    const zoneBuckets = {};
+
+    // Collect all words from all rules
+    for (const rule of rules) {
+        for (const word of rule.words) {
+            allWords.add(word);
+        }
+    }
+
+    // Classify each word into a zone
+    for (const word of allWords) {
+        const zoneKey = getZoneKey(word, rules);
+        if (!zoneBuckets[zoneKey]) zoneBuckets[zoneKey] = [];
+        zoneBuckets[zoneKey].push(word);
+
+        if (zoneKey === "0") {
+            console.log(`🟨 "${word}" is unmatched and placed in Zone 0`);
+        }
+    }
+
+    // Log full zone distribution
+    console.log("🔎 zoneBuckets (raw counts):");
+    Object.entries(zoneBuckets).forEach(([key, val]) => {
+        console.log(`  Zone ${key}: ${val.length} word(s)`);
+    });
+
+    return zoneBuckets;
+}
+
+//Apparently the Math.Random in js isn't seedable for some reason
+function mulberry32(seed) {
+    return function() {
+        let t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+// =========================================
+// buildDeliberateWordPool()
+// -----------------------------------------
+// Called by: generateCurrentWordPool()
+// Returns: an array of words with guaranteed zone coverage
+// Ensures at least 1 Zone 0 word, even if all 3 rules are broad
+// =========================================
+
+function buildDeliberateWordPool(rules, seed) {
+    const rng = mulberry32(seed || Date.now());
+
+    const desiredCounts = {
+        '1': 3,
+        '2': 3,
+        '3': 3,
+        '1-2': 3,
+        '1-3': 3,
+        '2-3': 3,
+        '1-2-3': 3,
+        '0': 3,
+    };
+
+    // Get all words used by the current active rules
+    const usedRuleWords = new Set();
+    for (const rule of rules) {
+        if (Array.isArray(rule.words)) {
+            rule.words.forEach(w => usedRuleWords.add(w));
+        }
+    }
+
+    // Get all words across all rules
+    const allRuleWords = new Set();
+    for (const rule of allPossibleRules) {
+        if (Array.isArray(rule.words)) {
+            rule.words.forEach(w => allRuleWords.add(w));
+        }
+    }
+
+    // Words not used in current rules
+    const neutralWords = [...allRuleWords].filter(w => !usedRuleWords.has(w));
+    const allWords = [...usedRuleWords, ...neutralWords];
+
+    const shuffledWords = allWords
+        .map(word => ({ word, sortKey: rng() }))
+        .sort((a, b) => a.sortKey - b.sortKey)
+        .map(obj => obj.word);
+
+    const zoneBuckets = {};
+    const selected = [];
+
+    for (const word of shuffledWords) {
+        const zoneKey = getCorrectZoneKeyForWord(word, rules);
+
+        if (!(zoneKey in desiredCounts)) continue;
+
+        if (!zoneBuckets[zoneKey]) {
+            zoneBuckets[zoneKey] = [];
+        }
+
+        if (zoneBuckets[zoneKey].length < desiredCounts[zoneKey]) {
+            zoneBuckets[zoneKey].push(word);
+            selected.push(word);
+        }
+
+        const allZonesFilled = Object.entries(desiredCounts).every(([zone, count]) =>
+            (zoneBuckets[zone] || []).length >= count
+        );
+        if (allZonesFilled) break;
+    }
+
+    console.log("✅ buildDeliberateWordPool complete. Zone distribution:");
+    for (const [zone, target] of Object.entries(desiredCounts)) {
+        const actual = (zoneBuckets[zone] || []).length;
+        console.log(`  Zone ${zone}: ${actual} / ${target}`);
+    }
+
+    return selected;
+}
+
+
+// =========================================
+// generateCurrentWordPool()
+// -----------------------------------------
+// This is the top-level function that assembles the game's word pool.
+// It delegates selection to buildDeliberateWordPool(), then tracks
+// and logs the zone distribution for the selected words.
+// =========================================
+function generateCurrentWordPool(seed) {
+    const pool = buildDeliberateWordPool(activeRules, seed);
+    
+    const zoneCount = {};
+    pool.forEach(word => {
+        const z = getZoneKey(word, activeRules);
+        zoneCount[z] = (zoneCount[z] || 0) + 1;
+    });
+    console.log("✅ Final WordPool distribution:", zoneCount);
+    
+    return pool;
+}
+
+function showMessage(message, isError = false) {
+    messageBox.innerHTML = message;
+    messageBox.classList.remove("error");
+    if (isError) {
+        messageBox.classList.add("error");
+    }
+    messageBox.classList.add("visible");
+    
+    clearTimeout(messageBox.timeoutId);
+    messageBox.timeoutId = setTimeout(() => {
+        messageBox.classList.remove("visible");
+    }, MESSAGE_DISPLAY_TIME);
+}
+
+function renderHand() {
+    const handWordsDiv = zoneElements['hand'].wordsDiv;
+    handWordsDiv.innerHTML = '';
+    
+    zoneElements['hand'].container.classList.remove("game-over-summary");
+    
+    currentHand.forEach(wordObj => {
+        const card = document.createElement('div');
+        card.classList.add("word-card");
+        card.id = `card-${wordObj.id}`;
+        card.innerHTML = `<span class="word-text">${wordObj.text}</span>`;
+        card.addEventListener('click', () => selectWord(wordObj.id));
+        handWordsDiv.appendChild(card);
+    });
+}
+
+function createWordCard(wordText, id, zoneKey) {
+    const card = document.createElement('div');
+    card.classList.add('word-card', 'placed-card');
+    card.id = `card-${id}`;
+    card.innerHTML = `<span class="word-text">${wordText}</span>`;
+
+    const zoneConfig = zoneConfigs[zoneKey];
+    if (zoneConfig?.colorVar) {
+        card.style.backgroundColor = `var(${zoneConfig.colorVar})`;
+    }
+
+    // Use matching text color for that zone
+    const zoneClassName = `--zone${String(zoneKey).replace(/-/g, '')}-text`;
+
+    card.style.color = `var(${zoneClassName})`;
+
+    return card;
+}
+
+
+function renderWordsInRegions() {
+    // Step 1: Clear previous placed cards
+    for (const key in zoneConfigs) {
+        const zoneWordsDiv = zoneElements[key]?.wordsDiv;
+        if (zoneWordsDiv) {
+            zoneWordsDiv.querySelectorAll('.word-card.placed-card').forEach(card => card.remove());
+        }
+    }
+
+    // Step 2: Add each placed word (those with a correctZoneKey)
+    const playedWords = wordsInPlay.filter(wordObj => wordObj.correctZoneKey !== null);
+
+    playedWords.forEach(wordObj => {
+        const zoneKey = wordObj.correctZoneKey;
+        const zoneElement = zoneElements[zoneKey];
+        if (zoneElement && zoneElement.wordsDiv) {
+            const card = createWordCard(wordObj.text, wordObj.id, zoneKey);
+            zoneElement.wordsDiv.appendChild(card);
+        } else {
+            console.warn(`❗ No valid zone element for key "${zoneKey}" when rendering word "${wordObj.text}".`);
+        }
+    });
+}
+
+
+function selectWord(id) {
+    if (selectedWordId) {
+        document.getElementById(`card-${selectedWordId}`)?.classList.remove("selected");
+    }
+    
+    selectedWordId = id;
+    document.getElementById(`card-${selectedWordId}`).classList.add("selected");
+    showMessage(`Selected: ${wordsInPlay.find(w => w.id === id).text}. Now click a box to place it.`);
+}
+
+// Show a feedback bubble near a zone or element
+function showZoneFeedback(message, targetElement, isError = false) {
+    const bubble = document.getElementById('zone-feedback-bubble');
+    if (!bubble || !targetElement) return;
+
+    bubble.textContent = message;
+
+    // Apply plain CSS classes instead of Tailwind
+    bubble.className = isError ? 'zone-feedback-bubble error' : 'zone-feedback-bubble success';
+
+    const rect = targetElement.getBoundingClientRect();
+    bubble.style.top = `${rect.top + window.scrollY + rect.height / 2}px`;
+    bubble.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
+    bubble.style.opacity = '1';
+
+    setTimeout(() => {
+        bubble.style.opacity = '0';
+    }, 1500);
+}
+
+function placeWordInRegion(targetZoneKeyString) {
+    if (!selectedWordId) {
+        showMessage('Please select a word first!', true);
+        return;
+    }
+
+    if (targetZoneKeyString === 'hand') {
+        showMessage('You cannot place words into your hand. Select a rule box or "None"!', true);
+        return;
+    }
+
+    turns++;
+    turnsDisplay.textContent = turns;
+
+    const selectedWordObj = wordsInPlay.find(w => w.id === selectedWordId);
+    const correctZoneKey = getCorrectZoneKeyForWord(selectedWordObj.text, activeRules);
+    const correctZoneElement = zoneElements[correctZoneKey]?.container;
+    const targetZoneElement = zoneElements[targetZoneKeyString]?.container;
+
+    currentHand = currentHand.filter(w => w.id !== selectedWordId);
+    const cardElement = document.getElementById(`card-${selectedWordId}`);
+    if (cardElement) {
+        cardElement.classList.remove("selected");
+        cardElement.style.opacity = "0";  // <- visual feedback for removal
+
+        setTimeout(() => {
+            if (cardElement.parentNode === zoneElements['hand'].wordsDiv) {
+                cardElement.remove();
+            }
+        }, 300);
+    } else {
+        console.warn(`[Place Word Debug] Card element with ID ${selectedWordId} not found for removal from hand.`);
+    }
+
+    let isCorrectPlacement = false;
+    let message = '';
+
+    if (correctZoneKey === targetZoneKeyString) {
+        isCorrectPlacement = true;
+        selectedWordObj.correctZoneKey = correctZoneKey;
+        message = `Correct! '${selectedWordObj.text}' belongs in this category.`;
+
+        showZoneFeedback(`Correct! '${selectedWordObj.text}' fits here.`, targetZoneElement, false);
+	
+    } else {
+        isCorrectPlacement = false;
+        selectedWordObj.correctZoneKey = correctZoneKey;
+
+        console.log("Incorrect placement detected. Attempting to draw card...");
+        console.log("Current Word Pool BEFORE draw attempt:", currentWordPool);
+        console.log("Word being placed:", selectedWordObj.text);
+        console.log("Correct zone for word:", correctZoneKey);
+        console.log("Target zone where word was placed:", targetZoneKeyString);
+		
+        // Decrement lives if placement is incorrect
+        livesRemaining--; 
+        updateLivesDisplay(); // Update the display
+        
+		drawCard();
+		
+        const correctCategoryName = getZoneDisplayName(correctZoneKey, false);
+        message = `Oops! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
+        if (currentWordPool.length <= 3) {
+            message += `   Only ${currentWordPool.length} card${currentWordPool.length === 1 ? '' : 's'} left!`;
+        }
+        // Add lives remaining to the message
+        message += ` Lives left: ${livesRemaining}.`; 
+
+        showZoneFeedback(message, targetZoneElement, true);
+    }
+	
+	//regardless of whether the attempted placement was correct, play the card anyway
+	const placedCard = createWordCard(selectedWordObj.text, selectedWordObj.id, true);
+	if (isCorrectPlacement == false) placedCard.classList.add("incorrect"); //if you screw up, make it pop visually
+	correctZoneElement.querySelector('.word-cards-container').appendChild(placedCard);
+
+    showMessage(message, !isCorrectPlacement);
+
+    selectedWordId = null;
+    renderHand();
+    //renderWordsInRegions();
+
+    // Check for win or lose condition
+    checkGameEndCondition(); 
+}
+
+
+function drawCard() {
+    if (currentWordPool.length > 0) {
+		//console.log("currentWordPool before pop:", [...currentWordPool]); // Log a copy before pop
+        const newWordText = currentWordPool.pop();
+		//console.log("Word drawn:", newWordText); // Log the word being drawn
+        const newWordObj = { id: crypto.randomUUID(), text: newWordText, correctZoneKey: null };
+        currentHand.push(newWordObj);
+        wordsInPlay.push(newWordObj);
+    } else {
+        showMessage('No more cards to draw from the pool! Try to clear your hand.', true);
+    }
+}
+
+function copyToClipboard(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        showMessage('Results copied to clipboard!');
+    } catch (err) {
+        console.error('Failed to copy text: ', err);
+        showMessage('Failed to copy results. Please try again or copy manually.', true);
+    }
+    document.body.removeChild(textarea);
+}
+
+// NEW: Function to check for win or loss
+async function checkGameEndCondition() { 
+    if (currentHand.length === 0) {
+        // Win condition (all cards placed correctly)
+        endGame(true);
+    } else if (livesRemaining <= 0) { // Loss condition: lives run out
+        endGame(false);
+    }
+}
+
+// NEW: Consolidated End Game Function
+// ✅ FIXED: Consolidated End Game Function
+async function endGame(isWin) {
+    const endButtonsContainer = document.getElementById('end-screen-buttons');
+
+    // ✅ Show message box
+    const messageText = isWin
+        ? `🎉 You Win! Game Over in ${turns} turns!`
+        : `💀 Game Over! You ran out of guesses. Total turns: ${turns}`;
+    messageBox.textContent = messageText;
+    messageBox.classList.add("visible");
+
+    // ✅ Clear hand visually
+    zoneElements['hand'].wordsDiv.textContent = '';
+    zoneElements['hand'].container.classList.add("game-over-summary");
+
+    // ✅ Optional: also show message in hand area
+    const summaryHeader = document.createElement('div');
+    summaryHeader.classList.add("summary-header");
+    summaryHeader.textContent = messageText;
+    zoneElements['hand'].wordsDiv.appendChild(summaryHeader);
+
+    // ✅ Build share button
+    const shareButton = document.createElement('button');
+    shareButton.classList.add("icon-btn", "share-results-btn");
+    shareButton.textContent = `📤`;
+    shareButton.title = "Share Results";
+    shareButton.addEventListener('click', () => {
+        console.log("share button clicked, dailyMode =", dailyMode);
+        const dateLabel = dailyMode ? ` – ${todayStr}` : " (Random Game)";
+        const gameLabel = GAME_TITLE + dateLabel;
+        const winLossStatus = isWin ? "Won" : "Lost";
+        const fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns! Can you beat my score? #VennDiagramGame`;
+        copyToClipboard(fullShareText);
+    });
+
+    // ✅ Build new game button
+    const newGameButton = document.createElement('button');
+    newGameButton.classList.add("btn");
+    newGameButton.textContent = `🔄`;
+    newGameButton.title = "Start New Game";
+    newGameButton.addEventListener('click', () => {
+        endButtonsContainer.classList.remove("visible"); // hide buttons
+        startGame(dailyMode);
+    });
+
+    // ✅ Insert buttons into #end-screen-buttons and show it
+    endButtonsContainer.innerHTML = '';
+    endButtonsContainer.appendChild(newGameButton);
+    endButtonsContainer.appendChild(shareButton);
+    endButtonsContainer.classList.add("visible"); // ✅ Show buttons now
+
+    // ✅ Update rule box labels and clear hints
+    const singleCategoryKeys = ['1', '2', '3'];
+    for (const key in zoneConfigs) {
+        const zoneConfig = zoneConfigs[key];
+        const targetElement = zoneElements[key].container;
+
+        if (targetElement) {
+            const labelSpan = targetElement.querySelector('.box-label');
+            const hintDiv = targetElement.querySelector('.rule-hint');
+
+            if (labelSpan) {
+                if (singleCategoryKeys.includes(key) && zoneConfig.genericLabelIndex !== null) {
+                    labelSpan.textContent = activeRules[zoneConfig.genericLabelIndex].name;
+                    labelSpan.style.fontSize = '0.8rem';
+                } else {
+                    labelSpan.textContent = zoneConfig.customLabel || genericLabels[zoneConfig.genericLabelIndex];
+                    labelSpan.style.fontSize = '';
+                }
+            }
+
+            if (hintDiv) {
+                hintDiv.textContent = '';
+                hintDiv.classList.remove("visible");
+            }
+        }
+    }
+
+    // ✅ Also clear hint from hand container
+    const handHintDiv = zoneElements['hand'].container.querySelector('.rule-hint');
+    if (handHintDiv) {
+        handHintDiv.textContent = '';
+        handHintDiv.classList.remove("visible");
+    }
+}
+
+
+
+
+function updateGameTitle(isDaily) {
+    const titleTextElement = document.getElementById("game-title-text");
+
+    if (titleTextElement) {
+        let fullTitleString;
+
+        if (isDaily) {
+            fullTitleString = `${GAME_TITLE} - ${getTodayDateString()}`;
+        } else {
+            fullTitleString = GAME_TITLE;
+        }
+
+        // --- Start of the secure line break insertion logic ---
+
+        // Clear any existing content within the title element
+        // This is important if updateGameTitle can be called multiple times
+        titleTextElement.textContent = ''; // Safely clear all child nodes
+
+        // Split the full title string into parts where you want line breaks
+        const parts = fullTitleString.split(' - ');
+
+        parts.forEach((part, index) => {
+            // Create a text node for each part of the title
+            const textNode = document.createTextNode(part.trim()); // .trim() to clean up whitespace
+
+            // Append the text node to the title element
+            titleTextElement.appendChild(textNode);
+
+            // Add a <br> tag after each part except the very last one
+            if (index < parts.length - 1) {
+                const brElement = document.createElement('br');
+                titleTextElement.appendChild(brElement);
+            }
+        });
+
+        // --- End of the secure line break insertion logic ---
+    }
+}
+
+function updateDailyBadge(isDaily) {
+    const badge = document.getElementById("daily-badge");
+    if (badge) {
+        badge.style.display = isDaily ? 'inline-block' : 'none';
+    }
+}
+
+function resetGameState() {
+	document.querySelectorAll('.word-cards-container').forEach(container => { container.replaceChildren(); });
+    turns = 0;
+    selectedWordId = null;
+    turnsDisplay.textContent = turns;
+    // Initialize lives and update display using userSetLives
+    livesRemaining = userSetLives; 
+    updateLivesDisplay(); 
+    messageBox.classList.remove("visible");
+    messageBox.style.height = '';
+    messageBox.style.minHeight = '';
+    messageBox.style.whiteSpace = '';
+    messageBox.style.textAlign = '';
+    hideModal();
+    updateRuleBoxLabelsAndHints();
+    wordsInPlay = [];
+    currentHand = [];
+    renderWordsInRegions();
+}
+
+// Function to update the lives display on the main game screen
+function updateLivesDisplay() { 
+    if (livesDisplay) {
+        livesDisplay.textContent = livesRemaining;
+    }
+}
+
+// Function to update the lives setting and save to local storage
+function updateLivesSetting(value) {
+    userSetLives = value;
+    livesDisplayModal.textContent = userSetLives;
+    localStorage.setItem('userSetLives', userSetLives);
+}
+
+
+function seedInitialZones(pool) {
+    const initialZoneKeys = ['1', '2', '3'];
+    const wordsPlaced = new Set();
+    for (let i = 0; i < initialZoneKeys.length; i++) {
+        const targetZoneKey = initialZoneKeys[i];
+        const targetRuleIndex = parseInt(targetZoneKey) - 1;
+        const candidates = pool.filter(w => !wordsPlaced.has(w));
+        const shuffled = shuffleArray([...candidates], 20 + i);
+        let chosenWord = shuffled.find(word => matchesOnlyOneRule(word, targetRuleIndex))
+            || shuffled.find(word => activeRules[targetRuleIndex].test(word));
+
+        if (chosenWord) {
+            wordsPlaced.add(chosenWord);
+            wordsInPlay.push({
+                id: crypto.randomUUID(),
+                text: chosenWord,
+                correctZoneKey: targetZoneKey
+            });
+        } else {
+            console.warn(`[startGame] Could not find word for Rule ${targetZoneKey} (${activeRules[targetRuleIndex]?.name || 'N/A'})`);
+        }
+        console.log(`rule ${i + 1} : ${activeRules[i]?.name}`);
+    }
+}
+
+async function startGame(isDaily) {
+    console.log("startGame(isDaily)", isDaily);
+    dailyMode = isDaily;
+
+    const seed = isDaily ? getDailySeed() : Math.floor(Math.random() * 100000);
+    activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
+
+    updateGameTitle(isDaily);
+    updateDailyBadge(isDaily);
+    resetGameState(); // resetGameState will now also set initial lives and update display
+
+    const initialFullWordPool = generateCurrentWordPool(Math.random() * 100000);
+    console.log("Initial Full Word Pool:", initialFullWordPool);
+    seedInitialZones(initialFullWordPool);
+    renderWordsInRegions();
+
+    currentWordPool = initialFullWordPool.filter(w => !wordsInPlay.some(obj => obj.text === w));
+    shuffleArray(currentWordPool, seed + 40);
+
+    const required = INITIAL_HAND_SIZE;
+    if (currentWordPool.length < required) {
+        showMessage("Critical Error: Not enough unique words for game. Please refresh.", true);
+        return;
+    }
+
+    const weightedHand = generateWordPoolWithProbabilities(
+        activeRules,
+        currentWordPool,
+        required,
+        createSeededRandom(seed + 999)
+    );
+    console.log("Weighted Hand GENERATED:", weightedHand);
+
+    if (weightedHand.length < required) {
+        showMessage("Critical Error: Not enough unique words for game. Please refresh.", true);
+        return;
+    }
+
+    const selectedSet = new Set(weightedHand);
+    currentWordPool = currentWordPool.filter(w => !selectedSet.has(w));
+
+    for (const wordText of weightedHand) {
+        const wordObj = { id: crypto.randomUUID(), text: wordText, correctZoneKey: null };
+        currentHand.push(wordObj);
+        wordsInPlay.push(wordObj);
+    }
+
+    renderHand();
+}
+
+
+function generateActiveRules(gameSeed) {
+    const locationCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'location')], gameSeed + 1);
+    const characteristicCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'characteristic')], gameSeed + 2);
+    const wordplayCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'wordplay')], gameSeed + 3);
+    
+	return [
+	  locationCandidates.length > 0 ? locationCandidates[0] : fallbackLocationRule,
+	  characteristicCandidates.length > 0 ? characteristicCandidates[0] : fallbackCharacteristicRule,
+	  wordplayCandidates.length > 0 ? wordplayCandidates[0] : fallbackWordplayRule
+	];
+}
+
+// =========================================
+// generateActiveRulesWithOverlap()
+// -----------------------------------------
+// Called by: startGame()
+// Returns: an array of 3 rules [location, characteristic, wordplay]
+// Ensures sufficient pairwise and triple overlaps before accepting
+// =========================================
+function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 3, minTripleOverlap = 1, maxAttempts = 1000) {
+    const locationRules = allRules.filter(r => r.categoryType === 'location');
+    const characteristicRules = allRules.filter(r => r.categoryType === 'characteristic');
+    const wordplayRules = allRules.filter(r => r.categoryType === 'wordplay');
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const loc = shuffleArray([...locationRules], seed + attempt * 3 + 1)[0];
+        const chr = shuffleArray([...characteristicRules], seed + attempt * 3 + 2)[0];
+        const wrd = shuffleArray([...wordplayRules], seed + attempt * 3 + 3)[0];
+
+        const candidateSet = [loc, chr, wrd];
+        const zoneBuckets = getWeightedWordList(candidateSet);
+
+        const sharedZones = ['1-2', '1-3', '2-3', '1-2-3'];
+        const totalSharedCount = sharedZones.reduce((sum, zone) => sum + (zoneBuckets[zone]?.length || 0), 0);
+        const tripleOverlapCount = zoneBuckets['1-2-3']?.length || 0;
+
+        if (tripleOverlapCount >= minTripleOverlap && totalSharedCount >= minSharedWords) {
+            console.log(`✅ Found overlapping rules on attempt ${attempt + 1}`);
+
+            // Debug: print zone distribution
+            const zoneKeys = ["0", "1", "2", "3", "1-2", "1-3", "2-3", "1-2-3"];
+            console.log("🔎 Potential word distribution for selected rules (pre-weighted):");
+            for (const key of zoneKeys) {
+                const count = zoneBuckets[key]?.length || 0;
+                console.log(`  Zone ${key}: ${count} word(s)`);
+            }
+
+            return candidateSet;
+        }
+    }
+
+    console.warn("⚠️ No sufficiently overlapping rule trio found after max attempts. Falling back.");
+    return generateActiveRules(seed); // fallback to simpler selection
+}
+
+
+
+function updateRuleBoxLabelsAndHints(isGameOver = false) {
+    for (const key in zoneConfigs) {
+        const zoneConfig = zoneConfigs[key];
+        const targetElement = zoneElements[key].container;
+        
+        if (targetElement) {
+            let labelSpan = targetElement.querySelector('.box-label');
+            let hintDiv = targetElement.querySelector('.rule-hint');
+            let iconsContainer = targetElement.querySelector('.box-icons-container');
+            
+            if (labelSpan) {
+                labelSpan.textContent = getZoneDisplayName(key, isGameOver);
+                if (isGameOver && ['1', '2', '3'].includes(key)) {
+                    labelSpan.style.fontSize = '0.8rem';
+                } else {
+                    labelSpan.style.fontSize = '';
+                }
+            }
+            
+            if (hintDiv) {
+                let hintText = '';
+                if (!isGameOver) {
+                    const numRulesMatched = zoneConfig.ruleIndices.length;
+                    
+                    if (numRulesMatched === 1) {
+                        let relevantCategoryType = zoneConfig.categoryTypes[0];
+                        let candidateHints = [];
+                        let currentActiveRuleName = activeRules[zoneConfig.ruleIndices[0]].name;
+                        
+                        allPossibleRules.forEach(rule => {
+                            if (rule.categoryType === relevantCategoryType && rule.name !== currentActiveRuleName) {
+                                candidateHints.push(rule.name);
+                            }
+                        });
+                        
+                        const uniqueHints = Array.from(new Set(shuffleArray(candidateHints, Date.now() + key.length))).slice(0, 3);
+                        hintText = uniqueHints.length > 0 ? "Other rules of this type:\n" + uniqueHints.join('\n') : 'No other rules of this type available.';
+                    } else if (numRulesMatched === 2) {
+                        hintText = "Words in this category meet exactly 2 rules.";
+                    } else if (numRulesMatched === 3) {
+                        hintText = "Words in this category meet all three rules.";
+                    } else if (key === '0') {
+                        hintText = 'Words that do not fit any of the rules provided.';
+                    }
+                }
+                hintDiv.textContent = hintText;
+                if (isGameOver) {
+                    hintDiv.classList.remove("visible");
+                }
+            }
+            
+            if (iconsContainer && zoneConfig.categoryTypes) {
+                iconsContainer.innerHTML = getBoxIconsSVG(zoneConfig.categoryTypes);
+            }
+            
+            if (targetElement && !targetElement.hasAttribute('data-hint-listeners-added')) {
+                targetElement.addEventListener('mouseover', () => { if (!isGameOver) hintDiv.classList.add("visible"); });
+                targetElement.addEventListener('mouseout', () => { if (!isGameOver) hintDiv.classList.remove("visible"); });
+                targetElement.setAttribute('data-hint-listeners-added', 'true');
+            }
+        }
+    }
+    const handLabel = zoneElements['hand'].container.querySelector('.box-label');
+    if (handLabel) handLabel.textContent = 'Your Hand:';
+    const handHint = zoneElements['hand'].container.querySelector('.rule-hint');
+    if (handHint) {
+        handHint.textContent = '';
+        handHint.classList.remove("visible");
+    }
+}
+
+function showModal() {
+    settingsModalOverlay.style.display = 'flex';
+    setTimeout(() => {
+        settingsModalOverlay.classList.add("visible");
+    }, 10);
+    applyThemeToggleIcon(); // Update the icon when modal is opened
+}
+
+function hideModal() {
+    settingsModalOverlay.classList.remove("visible");
+    setTimeout(() => {
+        settingsModalOverlay.style.display = 'none';
+    }, 300);
+}
+
+function applyTheme() {
+    const htmlElement = document.documentElement;
+
+    if (isDarkMode) {
+        htmlElement.classList.add('dark');
+        htmlElement.classList.remove('light');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        htmlElement.classList.add('light');
+        htmlElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    }
+
+    applyThemeToggleIcon(); // Update the icon after applying theme
+}
+
+
+// New function to update the moon/sun icon in the modal
+function applyThemeToggleIcon() {
+    if (darkModeToggleBtn) { // Check if the button exists before trying to update its innerHTML
+        darkModeToggleBtn.innerHTML = isDarkMode ? '&#9728;' : '&#127769;'; // Sun for dark, Moon for light
+    }
+}
+
+function toggleDarkMode() {
+    isDarkMode = !isDarkMode;
+    applyTheme();
+}
+
+// Event Listeners
+settingsBtn.addEventListener('click', showModal); // Gear icon now opens settings modal
+modalCloseBtn.addEventListener('click', hideModal);
+newGameModalBtn.addEventListener('click', () => {
+    startGame(false); //start a new game, but not in Daily mode
+});
+// Event listener for the new dark mode toggle button inside the modal
+if (darkModeToggleBtn) {
+    darkModeToggleBtn.addEventListener('click', toggleDarkMode);
+}
+
+settingsModalOverlay.addEventListener('click', (event) => {
+    if (event.target === settingsModalOverlay) {
+        hideModal();
+    }
+});
+
+for (const key in zoneElements) {
+    const element = zoneElements[key].container;
+    if (element && key !== 'hand') {
+        element.addEventListener('click', () => placeWordInRegion(key));
+    }
+}
