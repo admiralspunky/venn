@@ -730,7 +730,7 @@ async function endGame(isWin) {
     shareButton.title = "Share Results";
     shareButton.addEventListener('click', () => {
         console.log("share button clicked, dailyMode =", dailyMode);
-        const dateLabel = dailyMode ? ` – ${todayStr}` : " (Random Game)";
+        const dateLabel = dailyMode ? ` – getTodayDateString()` : " (Random Game)";
         const gameLabel = GAME_TITLE + dateLabel;
         const winLossStatus = isWin ? "Won" : "Lost";
         const fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns! Can you beat my score? #VennDiagramGame`;
