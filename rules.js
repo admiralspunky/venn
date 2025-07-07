@@ -142,7 +142,7 @@ const allPossibleRules = [
     words: [
   'car', 'building', 'phone', 'computer', 'chair', 'table', 'road', 'bridge', 'light',
   'bottle', 'cup', 'book', 'watch', 'robot', 'tool', 'machine', 'brick', 'cement',
-  'microwave', 'remote', 'stapler', 'ladder', 'vacuum', 'rope'
+  'microwave', 'remote', 'stapler', 'ladder', 'vacuum', 'rope',
   'airplane', 'ticket', 'passport', 'terminal', 'runway', 'scanner', 'gate', 'alarm',
   'announcement', 'security', 'luggage', 'boarding', 'receipt',
   'clock', 'projector', 'keyboard', 'mouse', 'notebook', 'whiteboard', 'clipboard',
