@@ -746,7 +746,7 @@ async function endGame(isWin) {
     newGameButton.title = "Start New Game";
     newGameButton.addEventListener('click', () => {
         endButtonsContainer.classList.remove("visible"); // hide buttons
-        startGame(dailyMode);
+        startGame(false);
     });
 
     // ✅ Insert buttons into #end-screen-buttons and show it
