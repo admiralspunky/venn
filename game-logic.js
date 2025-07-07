@@ -903,20 +903,25 @@ async function startGame(isDaily) {
     console.log("startGame(isDaily)", isDaily);
     dailyMode = isDaily;
 
+    // Use the daily seed for ALL randomization steps in daily mode
     const seed = isDaily ? getDailySeed() : Math.floor(Math.random() * 100000);
     activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
 
     updateGameTitle(isDaily);
     updateDailyBadge(isDaily);
-    resetGameState(); // resetGameState will now also set initial lives and update display
+    resetGameState();
 
-    const initialFullWordPool = generateCurrentWordPool(Math.random() * 100000);
+    // Use deterministic seed for the full word pool
+    const initialFullWordPool = generateCurrentWordPool(seed + 1);
     console.log("Initial Full Word Pool:", initialFullWordPool);
+
+    // Use deterministic seed for initial zone seeding
     seedInitialZones(initialFullWordPool);
     renderWordsInRegions();
 
+    // Remove seeded (already placed) words from pool, deterministic shuffle for remaining pool
     currentWordPool = initialFullWordPool.filter(w => !wordsInPlay.some(obj => obj.text === w));
-    shuffleArray(currentWordPool, seed + 40);
+    shuffleArray(currentWordPool, seed + 2);
 
     const required = INITIAL_HAND_SIZE;
     if (currentWordPool.length < required) {
@@ -924,11 +929,12 @@ async function startGame(isDaily) {
         return;
     }
 
+    // Use deterministic seed for hand selection
     const weightedHand = generateWordPoolWithProbabilities(
         activeRules,
         currentWordPool,
         required,
-        createSeededRandom(seed + 999)
+        createSeededRandom(seed + 3)
     );
     console.log("Weighted Hand GENERATED:", weightedHand);
 
@@ -937,6 +943,7 @@ async function startGame(isDaily) {
         return;
     }
 
+    // Remove these words from the pool
     const selectedSet = new Set(weightedHand);
     currentWordPool = currentWordPool.filter(w => !selectedSet.has(w));
 
@@ -948,7 +955,6 @@ async function startGame(isDaily) {
 
     renderHand();
 }
-
 
 function generateActiveRules(gameSeed) {
     const locationCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'location')], gameSeed + 1);
