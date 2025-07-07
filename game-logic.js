@@ -16,6 +16,8 @@ let activeRules = [];
 let userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
 // Current lives remaining in the game
 let livesRemaining = 0; 
+// The address to the game, so we can post it in the Share dialog
+let URL = "https://admiralspunky.github.io/venn/"
 
 
 document.title = GAME_TITLE;
@@ -730,10 +732,10 @@ async function endGame(isWin) {
     shareButton.title = "Share Results";
     shareButton.addEventListener('click', () => {
         console.log("share button clicked, dailyMode =", dailyMode);
-    const dateLabel = dailyMode ? ` – ${getTodayDateString()}` : " (Random Game)";
+ 	const dateLabel = dailyMode ? ` – ${getTodayDateString()}` : " (Random Game)";
         const gameLabel = GAME_TITLE + dateLabel;
         const winLossStatus = isWin ? "Won" : "Lost";
-        const fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns! Can you beat my score? #VennDiagramGame`;
+        const fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns! Can you beat my score? ${URL}`;
         copyToClipboard(fullShareText);
     });
 
