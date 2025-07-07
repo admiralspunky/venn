@@ -1,7 +1,7 @@
 // game-logic.js
 
 // Global Variables
-const CURRENT_VERSION = "0.64";
+const CURRENT_VERSION = "1.00";
 let dailyMode = false;
 let todayStr = "";
 let wordsInPlay = [];
