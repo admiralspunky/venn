@@ -3,7 +3,7 @@ const allPossibleRules = [
   {
     name: 'You expect to find it in an office',
     categoryType: 'location',
-	words: [
+    words: [
       'computer', 'pen', 'paper', 'stapler', 'printer', 'desk', 'folder', 'calendar',
       'mouse', 'keyboard', 'chair', 'mug', 'lamp', 'phone', 'whiteboard', 'projector',
       'clipboard', 'calculator', 'scanner', 'notebook', 'monitor', 'envelope', 'briefcase',
@@ -34,12 +34,11 @@ const allPossibleRules = [
 	  "paperclip", "stapler", "homework", "semester", "notepad", "lunchbox",
 	  "classmate", "education", "study", "lecture", "syllabus", "library", "dictionary"
 	]
-
   },
   {
-	  name: 'You expect to find it in a hospital',
-	  categoryType: 'location',
-	  words: [
+	name: 'You expect to find it in a hospital',
+	categoryType: 'location',
+	words: [
 		  "bed", "nurse", "doctor", "patient", "gown", "mask", "gloves", "syringe",
 		  "scalpel", "stethoscope", "bandage", "wheelchair", "gurney", "monitor",
 		  "clipboard", "chart", "prescription", "vitals", "injection", "anesthesia",
@@ -90,7 +89,7 @@ const allPossibleRules = [
 		  'vacuum', 'box', 'bench', 'shelf', 'oil', 'rags', 'funnel', 'gloves', 'paint',
 		  'chainsaw', 'hammer', 'pliers', 'screwdriver', 'garage', 'door', 'motor', 'engine',
 		  'belt', 'brake', 'gasoline', 'filter', 'battery', 'air compressor', 'grease',
-		  'wheel', 'trolley', 'extension cord', 'lightbulb', 'radio', 'tape', 'measuring tape',
+		  'wheel', 'lightbulb', 'radio', 'tape', 'measuring tape',
 		  'workbench', 'vise', 'spray paint', 'scraper', 'fan', 'light', 'canister', 'nails',
 		  'bolts', 'nuts', 'sander', 'mask', 'goggles', 'earmuffs'
 		],
@@ -131,7 +130,7 @@ const allPossibleRules = [
 	  'apple', 'apricot', 'avocado', 'banana', 'blackberry', 'blueberry', 'boysenberry',
 	  'cantaloupe', 'cherry', 'coconut', 'cranberry', 'currant', 'date', 'dragonfruit',
 	  'durian', 'elderberry', 'fig', 'gooseberry', 'grape', 'grapefruit', 'guava',
-		  'honeydew', 'jackfruit', 'kiwi', 'kumquat', 'lemon', 'lime', 'lychee', 'mango',
+	  'honeydew', 'jackfruit', 'kiwi', 'kumquat', 'lemon', 'lime', 'lychee', 'mango',
 	  'mulberry', 'nectarine', 'olive', 'orange', 'papaya', 'passionfruit', 'peach',
 	  'pear', 'persimmon', 'pineapple', 'plum', 'pomegranate', 'quince', 'raisin',
 	  'raspberry', 'rhubarb', 'starfruit', 'strawberry', 'tangerine', 'tomato', 'watermelon'
@@ -143,7 +142,7 @@ const allPossibleRules = [
     words: [
   'car', 'building', 'phone', 'computer', 'chair', 'table', 'road', 'bridge', 'light',
   'bottle', 'cup', 'book', 'watch', 'robot', 'tool', 'machine', 'brick', 'cement',
-  'microwave', 'remote', 'stapler', 'ladder', 'vacuum',
+  'microwave', 'remote', 'stapler', 'ladder', 'vacuum', 'rope'
   'airplane', 'ticket', 'passport', 'terminal', 'runway', 'scanner', 'gate', 'alarm',
   'announcement', 'security', 'luggage', 'boarding', 'receipt',
   'clock', 'projector', 'keyboard', 'mouse', 'notebook', 'whiteboard', 'clipboard',
