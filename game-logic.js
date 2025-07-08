@@ -703,8 +703,47 @@ async function checkGameEndCondition() {
     }
 }
 
-// NEW: Consolidated End Game Function
-// ✅ FIXED: Consolidated End Game Function
+/**
+ * @brief Manages the display and user interaction for the game over state.
+ *
+ * This asynchronous function is called when the game concludes, either due to a
+ * win condition or a loss condition. It's typically invoked by the core game
+ * logic after determining the game's outcome (e.g., when the player
+ * successfully sorts all items, or when they run out of guesses/turns).
+ *
+ * @param {boolean} isWin - A boolean indicating whether the player won (true)
+ * or lost (false) the game.
+ *
+ * The function performs the following actions:
+ *
+ * 1.  **Displays Game Outcome Message**: It updates `messageBox` with a
+ * "You Win!" or "Game Over!" message, including the total `turns` taken,
+ * and makes the message visible.
+ *
+ * 2.  **Clears and Summarizes Hand Area**: The visual representation of the
+ * player's hand (`zoneElements['hand'].wordsDiv`) is cleared, and its
+ * container is styled for the game-over summary. The game outcome message
+ * is also optionally displayed within this area.
+ *
+ * 3.  **Constructs End Game Buttons**:
+ * * A **Share Button** is created, allowing users to copy their game
+ * results (win/loss, turns, and a game URL) to the clipboard. The
+ * share text adjusts for `dailyMode` games.
+ * * A **New Game Button** is created, which, when clicked, hides the
+ * end-game buttons and calls `startGame(false)` to initiate a new game.
+ *
+ * 4.  **Renders Buttons**: Both the Share and New Game buttons are inserted
+ * into the `end-screen-buttons` container, which is then made visible.
+ *
+ * 5.  **Updates Rule Box Labels**: It iterates through `zoneConfigs` to
+ * update the `.box-label` for each game zone. For specific single-category
+ * zones ('1', '2', '3'), it displays the `name` of the `activeRules`. For
+ * other zones, it uses their `customLabel` or a `genericLabel`.
+ *
+ * 6.  **Clears Hints**: All `.rule-hint` elements across all game zones,
+ * including the hand container, are cleared of text and hidden, ensuring
+ * no hints remain from the active game.
+ */
 async function endGame(isWin) {
     const endButtonsContainer = document.getElementById('end-screen-buttons');
 
@@ -735,7 +774,10 @@ async function endGame(isWin) {
  	const dateLabel = dailyMode ? ` – ${getTodayDateString()}` : " (Random Game)";
         const gameLabel = GAME_TITLE + dateLabel;
         const winLossStatus = isWin ? "Won" : "Lost";
-        const fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns! Can you beat my score? ${URL}`;
+	// Calculate incorrect guesses directly from lives (I'm assuming that these two variables actually represent their names)
+        const incorrectGuessesMade = userSetLives - livesRemaining;
+	    
+        const fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns, with ${incorrectGuessesMade} incorrect guesses! Can you beat my score? ${URL}`;
         copyToClipboard(fullShareText);
     });
 
