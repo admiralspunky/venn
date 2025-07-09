@@ -1,7 +1,7 @@
 // game-logic.js
 
 // Global Variables
-const CURRENT_VERSION = "1.00";
+const CURRENT_VERSION = "1.01";
 let dailyMode = false;
 let todayStr = "";
 let wordsInPlay = [];
@@ -21,6 +21,64 @@ let URL = "https://admiralspunky.github.io/venn/"
 
 
 document.title = GAME_TITLE;
+
+async function startGame(isDaily) {
+    console.log("startGame(isDaily)", isDaily);
+    dailyMode = isDaily;
+
+    // Use the daily seed for ALL randomization steps in daily mode
+    const seed = isDaily ? getDailySeed() : Math.floor(Math.random() * 100000);
+    activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
+
+    updateGameTitle(isDaily);
+    updateDailyBadge(isDaily);
+    resetGameState();
+
+    // Use deterministic seed for the full word pool
+    const initialFullWordPool = generateCurrentWordPool(seed + 1);
+    console.log("Initial Full Word Pool:", initialFullWordPool);
+
+    // Use deterministic seed for initial zone seeding
+    seedInitialZones(initialFullWordPool);
+    renderWordsInRegions();
+
+    // Remove seeded (already placed) words from pool, deterministic shuffle for remaining pool
+    currentWordPool = initialFullWordPool.filter(w => !wordsInPlay.some(obj => obj.text === w));
+    shuffleArray(currentWordPool, seed + 2);
+
+    const required = INITIAL_HAND_SIZE;
+    if (currentWordPool.length < required) {
+        showMessage("Critical Error: Not enough unique words for game. Please refresh.", true);
+        return;
+    }
+
+    // Use deterministic seed for hand selection
+    const weightedHand = generateWordPoolWithProbabilities(
+        activeRules,
+        currentWordPool,
+        required,
+        createSeededRandom(seed + 3)
+    );
+    console.log("Weighted Hand GENERATED:", weightedHand);
+
+    if (weightedHand.length < required) {
+        showMessage("Critical Error: Not enough unique words for game. Please refresh.", true);
+        return;
+    }
+
+    // Remove these words from the pool
+    const selectedSet = new Set(weightedHand);
+    currentWordPool = currentWordPool.filter(w => !selectedSet.has(w));
+
+    for (const wordText of weightedHand) {
+        const wordObj = { id: crypto.randomUUID(), text: wordText, correctZoneKey: null };
+        currentHand.push(wordObj);
+        wordsInPlay.push(wordObj);
+    }
+
+    renderHand();
+}//async function startGame(isDaily)
+
 
 //This will assign .exampleHints to all rules
 for (const rule of allPossibleRules) {
@@ -941,62 +999,6 @@ function seedInitialZones(pool) {
     }
 }
 
-async function startGame(isDaily) {
-    console.log("startGame(isDaily)", isDaily);
-    dailyMode = isDaily;
-
-    // Use the daily seed for ALL randomization steps in daily mode
-    const seed = isDaily ? getDailySeed() : Math.floor(Math.random() * 100000);
-    activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
-
-    updateGameTitle(isDaily);
-    updateDailyBadge(isDaily);
-    resetGameState();
-
-    // Use deterministic seed for the full word pool
-    const initialFullWordPool = generateCurrentWordPool(seed + 1);
-    console.log("Initial Full Word Pool:", initialFullWordPool);
-
-    // Use deterministic seed for initial zone seeding
-    seedInitialZones(initialFullWordPool);
-    renderWordsInRegions();
-
-    // Remove seeded (already placed) words from pool, deterministic shuffle for remaining pool
-    currentWordPool = initialFullWordPool.filter(w => !wordsInPlay.some(obj => obj.text === w));
-    shuffleArray(currentWordPool, seed + 2);
-
-    const required = INITIAL_HAND_SIZE;
-    if (currentWordPool.length < required) {
-        showMessage("Critical Error: Not enough unique words for game. Please refresh.", true);
-        return;
-    }
-
-    // Use deterministic seed for hand selection
-    const weightedHand = generateWordPoolWithProbabilities(
-        activeRules,
-        currentWordPool,
-        required,
-        createSeededRandom(seed + 3)
-    );
-    console.log("Weighted Hand GENERATED:", weightedHand);
-
-    if (weightedHand.length < required) {
-        showMessage("Critical Error: Not enough unique words for game. Please refresh.", true);
-        return;
-    }
-
-    // Remove these words from the pool
-    const selectedSet = new Set(weightedHand);
-    currentWordPool = currentWordPool.filter(w => !selectedSet.has(w));
-
-    for (const wordText of weightedHand) {
-        const wordObj = { id: crypto.randomUUID(), text: wordText, correctZoneKey: null };
-        currentHand.push(wordObj);
-        wordsInPlay.push(wordObj);
-    }
-
-    renderHand();
-}
 
 function generateActiveRules(gameSeed) {
     const locationCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'location')], gameSeed + 1);
