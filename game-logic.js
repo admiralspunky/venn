@@ -201,10 +201,10 @@ async function endGame(isWin) {
     shareButton.title = "Share Results";
     shareButton.addEventListener('click', () => {
         console.log("share button clicked, dailyMode =", dailyMode);
- 	const dateLabel = dailyMode ? ` – ${getTodayDateString()}` : " (Random Game)";
+ 	    const dateLabel = dailyMode ? ` – ${getTodayDateString()}` : " (Random Game)";
         const gameLabel = GAME_TITLE + dateLabel;
         const winLossStatus = isWin ? "Won" : "Lost";
-	// Calculate incorrect guesses directly from lives (I'm assuming that these two variables actually represent their names)
+	    // Calculate incorrect guesses directly from lives (I'm assuming that these two variables actually represent their names)
         const incorrectGuessesMade = userSetLives - livesRemaining;
 	    
         const fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns, with ${incorrectGuessesMade} incorrect guesses! Can you beat my score? ${URL}`;
@@ -944,6 +944,101 @@ async function checkGameEndCondition() {
     }
 }
 
+<<<<<<< HEAD
+// NEW: Consolidated End Game Function
+// ✅ FIXED: Consolidated End Game Function
+async function endGame(isWin) {
+    const endButtonsContainer = document.getElementById('end-screen-buttons');
+
+    // ✅ Show message box
+    const messageText = isWin
+        ? `🎉 You Win! Game Over in ${turns} turns!`
+        : `💀 Game Over! You ran out of guesses. Total turns: ${turns}`;
+    messageBox.textContent = messageText;
+    messageBox.classList.add("visible");
+
+    // ✅ Clear hand visually
+    zoneElements['hand'].wordsDiv.textContent = '';
+    zoneElements['hand'].container.classList.add("game-over-summary");
+
+    // ✅ Optional: also show message in hand area
+    const summaryHeader = document.createElement('div');
+    summaryHeader.classList.add("summary-header");
+    summaryHeader.textContent = messageText;
+    zoneElements['hand'].wordsDiv.appendChild(summaryHeader);
+
+    // ✅ Build share button
+    const shareButton = document.createElement('button');
+    shareButton.classList.add("icon-btn", "share-results-btn");
+    shareButton.textContent = `📤`;
+    shareButton.title = "Share Results";
+    shareButton.addEventListener('click', () => {
+        console.log("share button clicked, dailyMode =", dailyMode);
+        const dateLabel = dailyMode ? ` – ${getTodayDateString()}` : " (Random Game)";
+        const gameLabel = GAME_TITLE + dateLabel;
+        const winLossStatus = isWin ? "Won" : "Lost";
+        const fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns! Can you beat my score? #VennDiagramGame`;
+        copyToClipboard(fullShareText);
+    });
+
+    // ✅ Build new game button
+    const newGameButton = document.createElement('button');
+    newGameButton.classList.add("btn");
+    newGameButton.textContent = `🔄`;
+    newGameButton.title = "Start New Game";
+    newGameButton.addEventListener('click', () => {
+        endButtonsContainer.classList.remove("visible"); // hide buttons
+        startGame(dailyMode);
+    });
+
+    // ✅ Insert buttons into #end-screen-buttons and show it
+    endButtonsContainer.innerHTML = '';
+    endButtonsContainer.appendChild(newGameButton);
+    endButtonsContainer.appendChild(shareButton);
+    endButtonsContainer.classList.add("visible"); // ✅ Show buttons now
+
+    // ✅ Update rule box labels and clear hints
+    const singleCategoryKeys = ['1', '2', '3'];
+    for (const key in zoneConfigs) {
+        const zoneConfig = zoneConfigs[key];
+        const targetElement = zoneElements[key].container;
+
+        if (targetElement) {
+            const labelSpan = targetElement.querySelector('.box-label');
+            const hintDiv = targetElement.querySelector('.rule-hint');
+
+            if (labelSpan) {
+                if (singleCategoryKeys.includes(key) && zoneConfig.genericLabelIndex !== null) {
+                    labelSpan.textContent = activeRules[zoneConfig.genericLabelIndex].name;
+                    labelSpan.style.fontSize = '0.8rem';
+                } else {
+                    labelSpan.textContent = zoneConfig.customLabel || genericLabels[zoneConfig.genericLabelIndex];
+                    labelSpan.style.fontSize = '';
+                }
+            }
+
+            if (hintDiv) {
+                hintDiv.textContent = '';
+                hintDiv.classList.remove("visible");
+            }
+        }
+    }
+
+    // ✅ Also clear hint from hand container
+    const handHintDiv = zoneElements['hand'].container.querySelector('.rule-hint');
+    if (handHintDiv) {
+        handHintDiv.textContent = '';
+        handHintDiv.classList.remove("visible");
+    }
+
+    
+}
+
+
+
+
+=======
+>>>>>>> 79924563fe2ff0d572b6fff2412b6fb0386fb3d5
 function updateGameTitle(isDaily) {
     const titleTextElement = document.getElementById("game-title-text");
 
