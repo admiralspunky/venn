@@ -21,6 +21,60 @@ const URL = "https://admiralspunky.github.io/venn/"
 
 document.title = GAME_TITLE;
 
+/**
+ * Asynchronously initializes and starts a new game session, supporting both
+ * standard and daily challenge modes.
+ *
+ * This function is typically invoked by a user interface event, such as clicking
+ * a "Start Game" or "Play Daily" button. It orchestrates the entire game setup
+ * process, ensuring a consistent and reproducible game state, especially in daily mode.
+ *
+ * @param {boolean} isDaily - True if starting a daily challenge, false for a regular game.
+ * In daily mode, game generation is deterministic based on the day's seed.
+ *
+ * The function performs the following steps:
+ * 1.  Sets the `dailyMode` flag based on the `isDaily` parameter.
+ * 2.  Determines a **deterministic seed** for game generation:
+ * - For daily mode, it uses `getDailySeed()`.
+ * - For regular mode, it generates a random seed.
+ * 3.  Generates `activeRules` for the current game using the main seed, potentially
+ * creating overlaps based on `allPossibleRules`.
+ * 4.  Updates the game's visual title and daily badge according to `isDaily`.
+ * 5.  Resets all global game state variables to their initial values via `resetGameState()`.
+ * 6.  Generates the `initialFullWordPool` using a **seeded random number generator**
+ * (main seed + 1) to ensure the full list of available words is deterministic.
+ * 7.  **Seeds initial words into specific zones** on the game board using `seedInitialZones()`,
+ * drawing from the `initialFullWordPool`. This process also makes sure these
+ * words are immediately rendered in their respective regions using `renderWordsInRegions()`.
+ * 8.  Filters out words already placed on the board from `initialFullWordPool` to create
+ * `currentWordPool`, then **deterministically shuffles** the remaining words
+ * (main seed + 2).
+ * 9.  Performs a critical check to ensure enough unique words are available for the initial hand.
+ * 10. Selects the initial `weightedHand` of words, applying probabilities based on `activeRules`
+ * and using a **deterministic seeded random generator** (main seed + 3) to ensure
+ * hand selection is reproducible.
+ * 11. Performs another critical check for sufficient words in the `weightedHand`.
+ * 12. Removes the selected hand words from `currentWordPool`.
+ * 13. Assigns unique IDs to each word in the `weightedHand`, adds them to `currentHand`
+ * and `wordsInPlay`.
+ * 14. Finally, renders the `currentHand` to the user interface using `renderHand()`.
+ *
+ * This function calls:
+ * - `getDailySeed()`: To retrieve the daily deterministic seed (if `isDaily` is true).
+ * - `generateActiveRulesWithOverlap()`: To determine the rules for the current game.
+ * - `updateGameTitle()`: To update the display based on game mode.
+ * - `updateDailyBadge()`: To show/hide the daily badge.
+ * - `resetGameState()`: To clear previous game data.
+ * - `generateCurrentWordPool()`: To create the initial set of available words.
+ * - `seedInitialZones()`: To place words on the board at the start.
+ * - `renderWordsInRegions()`: To display the pre-seeded words.
+ * - `shuffleArray()`: To deterministically shuffle the word pool.
+ * - `createSeededRandom()`: To get a seeded random number generator for deterministic processes.
+ * - `generateWordPoolWithProbabilities()`: To select words for the hand based on rules.
+ * - `showMessage()`: To display critical error messages to the user.
+ * - `crypto.randomUUID()`: To generate unique IDs for words.
+ * - `renderHand()`: To display the player's initial hand.
+ */
 async function startGame(isDaily) {
     console.log("startGame(isDaily)", isDaily);
     dailyMode = isDaily;
