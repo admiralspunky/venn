@@ -3,7 +3,6 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 const CURRENT_VERSION = "1.01";
 let dailyMode = false;
-let todayStr = "";
 let wordsInPlay = [];
 let currentWordPool = [];
 let currentHand = [];
