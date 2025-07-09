@@ -1,6 +1,6 @@
 // game-logic.js
 
-// Global Variables
+// Global Variables ('let' can be reassigned later; 'const' cannot)
 const CURRENT_VERSION = "1.01";
 let dailyMode = false;
 let todayStr = "";
@@ -17,8 +17,7 @@ let userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
 // Current lives remaining in the game
 let livesRemaining = 0; 
 // The address to the game, so we can post it in the Share dialog
-let URL = "https://admiralspunky.github.io/venn/"
-
+const URL = "https://admiralspunky.github.io/venn/"
 
 document.title = GAME_TITLE;
 
