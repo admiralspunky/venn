@@ -1215,7 +1215,7 @@ function applyTheme() {
 // New function to update the moon/sun icon in the modal
 function applyThemeToggleIcon() {
     if (darkModeToggleBtn) { // Check if the button exists before trying to update its innerHTML
-        darkModeToggleBtn.innerHTML = isDarkMode ? '&#9728;' : '&#127769;'; // Sun for dark, Moon for light
+        darkModeToggleBtn.textContent = isDarkMode ? '☀️' : '🌙'; // Sun for dark, Moon for light
     }
 }
 
