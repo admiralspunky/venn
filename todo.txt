@@ -1,4 +1,4 @@
--setting for stat tracking across days (streaks, averages, etc.)
+-stat tracking across days (maybe just as simple as "N in a row!" after the Share message)
 -add multiplayer functionality
 -Setting to switch between Venn Diagram and Grid displays
 -audio feedback
