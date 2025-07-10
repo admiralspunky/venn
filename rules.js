@@ -149,7 +149,7 @@ const allPossibleRules = [
   'calculator', 'envelope', 'printer', 'scanner', 'monitor', 'suitcase', 'badge',
   'cashier', 'register', 'credit', 'label', 'barcode', 'shelf', 'basket', 'bag',
   'container', 'helmet', 'net', 'glove', 'backpack', 'tray', 'remote', 'engine',
-  'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile'
+  'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter'
 ] },
   {
     name: 'Dangerous',
