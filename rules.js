@@ -140,7 +140,7 @@ const allPossibleRules = [
     name: 'Mostly man-made',
     categoryType: 'characteristic',
     words: [
-  'car', 'building', 'phone', 'computer', 'chair', 'table', 'road', 'bridge', 'light',
+  'car', 'building', 'phone', 'computer', 'chair', 'table', 'road', 'bridge',
   'bottle', 'cup', 'book', 'watch', 'robot', 'tool', 'machine', 'brick', 'cement',
   'microwave', 'remote', 'stapler', 'ladder', 'vacuum', 'rope',
   'airplane', 'ticket', 'passport', 'terminal', 'runway', 'scanner', 'gate', 'alarm',
