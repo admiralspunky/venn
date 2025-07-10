@@ -144,7 +144,7 @@ const allPossibleRules = [
   'bottle', 'cup', 'book', 'watch', 'robot', 'tool', 'machine', 'brick', 'cement',
   'microwave', 'remote', 'stapler', 'ladder', 'vacuum', 'rope', 'chainsaw',
   'airplane', 'ticket', 'passport', 'terminal', 'runway', 'scanner', 'gate', 'alarm',
-  'announcement', 'security', 'luggage', 'boarding', 'receipt',
+  'announcement', 'security', 'luggage', 'boarding', 'receipt', 'screwdriver',
   'clock', 'projector', 'keyboard', 'mouse', 'notebook', 'whiteboard', 'clipboard',
   'calculator', 'envelope', 'printer', 'scanner', 'monitor', 'suitcase', 'badge',
   'cashier', 'register', 'credit', 'label', 'barcode', 'shelf', 'basket', 'bag',
