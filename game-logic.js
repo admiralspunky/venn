@@ -1,7 +1,7 @@
 // game-logic.js
 
 // Global Variables ('let' can be reassigned later; 'const' cannot)
-const CURRENT_VERSION = "1.01";
+const CURRENT_VERSION = "1.02";
 let dailyMode = false;
 let wordsInPlay = [];
 let currentWordPool = [];
@@ -17,6 +17,10 @@ let userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
 let livesRemaining = 0; 
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/"
+
+// New: Daily streak variables
+let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || '0', 10);
+let lastDailyCompletionDate = localStorage.getItem('lastDailyCompletionDate') || '';
 
 document.title = GAME_TITLE;
 
@@ -176,6 +180,28 @@ async function startGame(isDaily) {
 async function endGame(isWin) {
     const endButtonsContainer = document.getElementById('end-screen-buttons');
 
+    // Handle daily streak logic
+    if (dailyMode) {
+        const today = getTodayDateString();
+        if (isWin) {
+            if (lastDailyCompletionDate !== today) {
+                dailyStreak++;
+                localStorage.setItem('dailyStreak', dailyStreak);
+                localStorage.setItem('lastDailyCompletionDate', today);
+                console.log(`Daily streak incremented to: ${dailyStreak}`);
+            } else {
+                console.log("Daily puzzle already completed today. Streak not incremented.");
+            }
+        } else {
+            // If daily puzzle failed, reset streak
+            dailyStreak = 0;
+            localStorage.setItem('dailyStreak', dailyStreak);
+            localStorage.setItem('lastDailyCompletionDate', ''); // Clear last completion date
+            console.log("Daily puzzle failed. Streak reset to 0.");
+        }
+    }
+
+
     // ✅ Show message box
     const messageText = isWin
         ? `🎉 You Win! Game Over in ${turns} turns!`
@@ -206,7 +232,11 @@ async function endGame(isWin) {
 	    // Calculate incorrect guesses directly from lives (I'm assuming that these two variables actually represent their names)
         const incorrectGuessesMade = userSetLives - livesRemaining;
 	    
-        const fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns, with ${incorrectGuessesMade} incorrect guesses! Can you beat my score? ${URL}`;
+        let fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns, with ${incorrectGuessesMade} incorrect guesses!`;
+        if (dailyMode && isWin) {
+            fullShareText += ` ${dailyStreak} in a row!`;
+        }
+        fullShareText += ` Can you beat my score? ${URL}`;
         copyToClipboard(fullShareText);
     });
 
@@ -410,6 +440,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // Existing DOMContentLoaded logic for starting game
     const today = getTodayDateString();
     const lastPlayed = localStorage.getItem("lastDailyDate");
+
+    // Check for missed daily puzzle and reset streak if necessary
+    if (lastPlayed && lastPlayed !== today) {
+        const lastDate = new Date(lastPlayed);
+        const currentDate = new Date(today);
+        const diffTime = Math.abs(currentDate - lastDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 1) { // If more than one day has passed since last play
+            dailyStreak = 0;
+            localStorage.setItem('dailyStreak', dailyStreak);
+            console.log("Missed a day. Daily streak reset to 0.");
+        }
+    }
+
     if (lastPlayed !== today) {
         localStorage.setItem("lastDailyDate", today);
         console.log("Starting Daily Game for", today);
