@@ -1,4 +1,4 @@
--stat tracking across days (maybe just as simple as "N in a row!" after the Share message)
+-partial credit for near answers (maybe just lose 0.5 points?)
 -add multiplayer functionality
 -Setting to switch between Venn Diagram and Grid displays
 -audio feedback
