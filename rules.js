@@ -59,7 +59,9 @@ const allPossibleRules = [
 	{
 	  name: 'You expect to find it in a store',
 	  categoryType: 'location',
-	  words: ["shelf", "cart", "bag", "receipt", "aisle", "counter", "barcode", "pricetag", "cashier", "sign", "display", "product", "clothing", "food", "grocery", "produce", "box", "basket", "scale", "coupon", "sale", "door", "window", "advertisement", "customer", "employee", "manager", "cleaner", "floor", "ceiling", "lighting", "cash", "scanner", "stockroom", "inventory", "locker", "stall", "trolley", "lanes"]
+	  words: ["shelf", "cart", "bag", "receipt", "aisle", "counter", "barcode", "pricetag", "cashier", "sign", "display", "product", "clothing", "food", "grocery", "produce", "box", "basket", "scale",
+		  "coupon", "sale", "door", "window", "advertisement", "customer", "employee", "manager", "cleaner", "floor", "ceiling", "lighting", "cash", "scanner", "stockroom", "inventory", "locker",
+		  "stall", "trolley", "lanes"]
 
 	},
 
@@ -67,13 +69,15 @@ const allPossibleRules = [
 	  name: 'You expect to find it at an airport',
 	  categoryType: 'location',
 	  words: [
-		  'plane', 'airplane', 'luggage', 'ticket', 'passport', 'terminal', 'runway', 'gate','boarding', 'security', 'baggage', 'arrival', 'departure', 'flight','pilot', 'steward', 'customs','engine', 'alarm', 'announcement', 'siren', 'bell', 'beep', 'scanner', 'bag'
+		  'plane', 'airplane', 'luggage', 'ticket', 'passport', 'terminal', 'runway', 'gate','boarding', 'security', 'baggage', 'arrival', 'departure', 'flight','pilot', 'steward', 'customs',
+		  'engine', 'alarm', 'announcement', 'siren', 'bell', 'beep', 'scanner', 'bag'
 		]
 	},
 	{
 	  name: 'You expect to find it in a bathroom',
 	  categoryType: 'location',
-	  words: ["toilet", "sink", "shower", "bathtub", "mirror", "towel", "soap", "brush", "razor", "comb", "toothbrush", "toothpaste", "shampoo", "conditioner", "faucet", "drain", "mat", "curtain", "lotion", "scale", "floss", "deodorant", "candle", "plunger"]
+	  words: ["toilet", "sink", "shower", "bathtub", "mirror", "towel", "soap", "brush", "razor", "comb", "toothbrush", "toothpaste", "shampoo", "conditioner", 
+		  "faucet", "drain", "mat", "curtain", "lotion", "scale", "floss", "deodorant", "candle", "plunger"]
 
 	},
 	{
