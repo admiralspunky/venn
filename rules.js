@@ -193,15 +193,15 @@ const allPossibleRules = [
 	    'lamp', 'monitor', 'sink', 'sun', 'moon', 'star', 'river', 'pond', 'sky', 'scanner', 'faucet', 'television', 'light'],
   },
 
-	{
-	  name: 'Has a point or spike',
-	  categoryType: 'characteristic',
-	  words: [
-		'knife', 'needle', 'thorn', 'pin', 'pencil', 'nail', 'screw', 'star', 'mountain', 'tooth', 'horn', 'arrow', 'spear', 'branch', 'icicle', 'cactus', 'rose', 'shark',
-		'fang', 'claw', 'sting', 'bee', 'scorpion', 'pinecone', 'leaf', 'spike', 'twig', 'sword', 'dagger', 'razor', 'scalpel', 'blade', 'dart', 'awl', 'pineapple',
-		'icepick', 'pickaxe', 'hook', 'peg', 'spur'
-	  ],
-	},
+{
+  name: 'Has a point or spike',
+  categoryType: 'characteristic',
+  words: [
+	'knife', 'needle', 'thorn', 'pin', 'pencil', 'nail', 'screw', 'star', 'mountain', 'tooth', 'horn', 'arrow', 'spear', 'branch', 'icicle', 'cactus', 'rose', 'shark',
+	'fang', 'claw', 'sting', 'bee', 'scorpion', 'pinecone', 'leaf', 'spike', 'twig', 'sword', 'dagger', 'razor', 'scalpel', 'blade', 'dart', 'awl', 'pineapple',
+	'icepick', 'pickaxe', 'hook', 'peg', 'spur'
+  ],
+},
 
  {
     name: 'Flammable',
@@ -224,9 +224,9 @@ const allPossibleRules = [
     words: ['money', 'door', 'phone', 'keyboard', 'pen', 'paper', 'book', 'fabric', 'skin', 'water', 'food', 'glass', 'wood', 'metal', 'plastic', 'coin', 'shoes', 'handle', 'button', 'screen', 'table', 'chair'],
   },
   {
-    name: 'Expected to last 100 years',
+    name: 'Expected to last more than 100 years',
     categoryType: 'characteristic',
-    words: ['mountain', 'river', 'rock', 'building', 'tree', 'diamond', 'gold', 'pyramid', 'statue', 'fortress', 'lighthouse', 'bridge', 'planet', 'star', 'ocean', 'cathedral', 'tomb'],
+    words: ['mountain', 'river', 'rock', 'building', 'tree', 'diamond', 'gold', 'pyramid', 'statue', 'fortress', 'lighthouse', 'bridge', 'planet', 'star', 'sun', 'ocean', 'cathedral', 'tomb'],
   },
   {
     name: 'Pre-dates the USA (1776)',
