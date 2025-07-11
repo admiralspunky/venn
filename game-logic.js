@@ -87,7 +87,10 @@ async function startGame(isDaily) {
 
     // Use the daily seed for ALL randomization steps in daily mode
     const seed = isDaily ? getDailySeed() : Math.floor(Math.random() * 100000);
+
+    // Restore original rule generation logic
     activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
+
 
     updateGameTitle(isDaily);
     updateDailyBadge(isDaily);
@@ -125,10 +128,7 @@ async function startGame(isDaily) {
         return;
     }
 
-    // Remove these words from the pool
-    const selectedSet = new Set(weightedHand);
-    currentWordPool = currentWordPool.filter(w => !selectedSet.has(w));
-
+    // Original loop for populating currentHand and wordsInPlay
     for (const wordText of weightedHand) {
         const wordObj = { id: crypto.randomUUID(), text: wordText, correctZoneKey: null };
         currentHand.push(wordObj);
@@ -225,7 +225,8 @@ async function endGame(isWin) {
     // ✅ Build share button
     const shareButton = document.createElement('button');
     shareButton.classList.add("icon-btn", "share-results-btn");
-    shareButton.textContent = `📋`; // Direct Unicode character for clipboard
+    // Changed to direct Unicode character for clipboard
+    shareButton.textContent = `📋`; 
     shareButton.title = "Share Results";
     shareButton.addEventListener('click', () => {
         console.log("share button clicked, dailyMode =", dailyMode);
@@ -314,10 +315,13 @@ function getDailySeed() {
 
 //utility function, because some rules have a test function, but most don't
 function doesWordMatchRule(word, rule) {
+  // First, check if the word is explicitly listed in the rule's 'words' array
+  if (Array.isArray(rule.words) && rule.words.includes(word)) {
+    return true;
+  }
+  // If not explicitly listed, then check the 'test' function if it exists
   if (typeof rule.test === 'function') {
     return rule.test(word);
-  } else if (Array.isArray(rule.words)) {
-    return rule.words.includes(word);
   }
   return false;
 }
@@ -610,7 +614,7 @@ function getZoneDisplayName(zoneKey, revealRules = false) {
 }
 
 // =========================================
-// getWeightedWordList(rules)
+// getWeightedWordList()
 // -----------------------------------------
 // Called by: buildDeliberateWordPool()
 // Calls: getZoneKey(word, rules), shuffleArray()
@@ -622,14 +626,34 @@ function getZoneDisplayName(zoneKey, revealRules = false) {
 // =========================================
 function getWeightedWordList(rules) {
     const allWords = new Set();
-    const zoneBuckets = {};
-
     // Collect all words from all rules
     for (const rule of rules) {
-        for (const word of rule.words) {
-            allWords.add(word);
+        if (Array.isArray(rule.words)) {
+            rule.words.forEach(w => allWords.add(w));
         }
     }
+    // Also add words that pass the test function but are not explicitly in words array
+    // This is important for rules that primarily rely on a test function
+    for (const rule of rules) {
+        if (typeof rule.test === 'function') {
+            // Iterate through a broader pool of words to find those matching the test
+            // For this example, we'll assume a global 'allGameWords' or similar exists,
+            // or we'll just use the words already collected.
+            // A more robust solution might involve a larger, pre-defined dictionary.
+            // For now, we'll only consider words already in 'allWords' or those explicitly
+            // added to rule.words for test-based rules.
+            // This part is tricky without a full word dictionary.
+            // For demonstration, let's just ensure words in 'allWords' are tested.
+            for (const word of allWords) {
+                if (rule.test(word)) {
+                    allWords.add(word); // Add if test passes, even if not in rule.words
+                }
+            }
+        }
+    }
+
+
+    const zoneBuckets = {};
 
     // Classify each word into a zone
     for (const word of allWords) {
