@@ -13,7 +13,14 @@ const allPossibleRules = [
   {
     name: 'Can be found in a kitchen',
     categoryType: 'location',
-    words: ['fork', 'spoon', 'knife', 'plate', 'cup', 'bowl', 'pan', 'pot', 'oven', 'stove', 'refrigerator', 'microwave', 'sink', 'dish', 'mug', 'blender', 'toaster', 'kettle', 'cutting', 'spatula', 'colander', 'grater', 'peeler'],
+    words: [
+    'fork', 'spoon', 'knife', 'plate', 'cup', 'bowl', 'pan', 'pot', 'oven', 'stove',
+    'refrigerator', 'microwave', 'sink', 'dish', 'mug', 'blender', 'toaster', 'kettle',
+    'spatula', 'colander', 'grater', 'peeler', 'whisk', 'apron', 'ladle', 'tongs',
+    'strainer', 'can opener', 'cutting board', 'cookie sheet', 'corkscrew', 'mortar',
+    'pestle', 'grill', 'mixer', 'sieve', 'rolling pin', 'oven mitt', 'timer',
+    'measuring cup', 'scale', 'dish rack'
+],
   },
   {
     name: 'You would find it outside',
