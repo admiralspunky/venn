@@ -334,6 +334,25 @@
             color: var(--text-word-card-hand); 
         }
 
+	.word-card.placed-card {
+            color: inherit;
+        }
+		
+	/* bg colors for cards that were played from the hand */
+
+	/* For Light Mode */
+	.light .word-card.played-from-hand {
+		background-color: #AEC6CF; /* A light blue, or your preferred color */
+		color: #000000; /* Black text for contrast */
+		/* Add any other styling you want, e.g., border, box-shadow */
+	}
+
+	/* For Dark Mode (optional, if you want different styling in dark mode) */
+	.dark .word-card.played-from-hand {
+		background-color: #36454F; /* A darker shade for dark mode */
+		color: #FFFFFF; /* White text for contrast */
+	}
+
         .word-card.placed-card {
             color: inherit;
         }
