@@ -366,7 +366,11 @@ const allPossibleRules = [
 	{
 	  name: 'Contains exactly 3 vowels',
 	  categoryType: 'wordplay',
-	   words: ['word1', 'word2'],  // MUST be defined as an array
+	   words: [
+		    // These are words that should trigger the regex, but some of those vowels are 'y', so they wouldn't get picked up by the regex
+		    'bleary', 'cynical', 'dynamic', 'lyrical', 'mythical', 'mystery',
+		    'syllable', 'symphony', 'typical', 'tyranny', 'teary', 'weary'
+		],  // MUST be defined as an array
 	  test: (word) => {
 		const vowels = word.match(/[aeiou]/gi);
 
