@@ -225,7 +225,7 @@ async function endGame(isWin) {
     // ✅ Build share button
     const shareButton = document.createElement('button');
     shareButton.classList.add("icon-btn", "share-results-btn");
-    shareButton.textContent = `�`;
+    shareButton.textContent = `&#x21E7;`
     shareButton.title = "Share Results";
     shareButton.addEventListener('click', () => {
         console.log("share button clicked, dailyMode =", dailyMode);
