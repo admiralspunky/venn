@@ -225,7 +225,7 @@ async function endGame(isWin) {
     // ✅ Build share button
     const shareButton = document.createElement('button');
     shareButton.classList.add("icon-btn", "share-results-btn");
-    shareButton.textContent = `⇧`; // Direct Unicode character for upwards white arrow
+    shareButton.textContent = `📋`; // Direct Unicode character for clipboard
     shareButton.title = "Share Results";
     shareButton.addEventListener('click', () => {
         console.log("share button clicked, dailyMode =", dailyMode);
