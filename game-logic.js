@@ -1,24 +1,27 @@
 // game-logic.js
 
+//
 // Global Variables ('let' can be reassigned later; 'const' cannot)
-const CURRENT_VERSION = "1.02";
+//
+
+const CURRENT_VERSION = "1.03";
+// The address to the game, so we can post it in the Share dialog
+const URL = "https://admiralspunky.github.io/venn/"
+const genericLabels = ["Location", "Characteristic", "Wordplay"];
+
 let dailyMode = false;
 let wordsInPlay = [];
 let currentWordPool = [];
 let currentHand = [];
 let turns = 0;
 let selectedWordId = null;
-const genericLabels = ["Location", "Characteristic", "Wordplay"];
 let isDarkMode = localStorage.getItem('theme') === 'dark';
 let activeRules = [];
 // User's selected lives, retrieved from localStorage or defaulting to 3
 let userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
 // Current lives remaining in the game
 let livesRemaining = 0; 
-// The address to the game, so we can post it in the Share dialog
-const URL = "https://admiralspunky.github.io/venn/"
-
-// New: Daily streak variables
+// Daily streak variables
 let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || '0', 10);
 let lastDailyCompletionDate = localStorage.getItem('lastDailyCompletionDate') || '';
 
@@ -222,7 +225,7 @@ async function endGame(isWin) {
     // ✅ Build share button
     const shareButton = document.createElement('button');
     shareButton.classList.add("icon-btn", "share-results-btn");
-    shareButton.textContent = `📤`;
+    shareButton.textContent = `�`;
     shareButton.title = "Share Results";
     shareButton.addEventListener('click', () => {
         console.log("share button clicked, dailyMode =", dailyMode);
@@ -788,20 +791,32 @@ function renderHand() {
     });
 }
 
-function createWordCard(wordText, id, zoneKey) {
+/**
+ * Creates a word card DOM element.
+ * @param {string} wordText The text content of the word.
+ * @param {string} id The unique ID for the card element.
+ * @param {string} zoneKey The zone key to determine the card's text color.
+ * @param {boolean} isPlayedFromHand True if the card was played from the hand, false if initially seeded.
+ * @returns {HTMLElement} The created word card element.
+ */
+function createWordCard(wordText, id, zoneKey, isPlayedFromHand) {
     const card = document.createElement('div');
     card.classList.add('word-card', 'placed-card');
     card.id = `card-${id}`;
     card.innerHTML = `<span class="word-text">${wordText}</span>`;
 
-    const zoneConfig = zoneConfigs[zoneKey];
-    if (zoneConfig?.colorVar) {
-        card.style.backgroundColor = `var(${zoneConfig.colorVar})`;
+    if (isPlayedFromHand) {
+        card.classList.add('played-from-hand'); // Add this class for cards played from hand
+    } else {
+        // Only apply zone-specific background if NOT played from hand (i.e., initial seed)
+        const zoneConfig = zoneConfigs[zoneKey];
+        if (zoneConfig?.colorVar) {
+            card.style.backgroundColor = `var(${zoneConfig.colorVar})`;
+        }
     }
 
-    // Use matching text color for that zone
+    // Use matching text color for that zone (this applies to all cards)
     const zoneClassName = `--zone${String(zoneKey).replace(/-/g, '')}-text`;
-
     card.style.color = `var(${zoneClassName})`;
 
     return card;
@@ -824,7 +839,11 @@ function renderWordsInRegions() {
         const zoneKey = wordObj.correctZoneKey;
         const zoneElement = zoneElements[zoneKey];
         if (zoneElement && zoneElement.wordsDiv) {
-            const card = createWordCard(wordObj.text, wordObj.id, zoneKey);
+            // Determine if the card was played from hand or initially seeded
+            // If wordObj.isInitialSeed is true, then it was NOT played from hand.
+            // If wordObj.isInitialSeed is undefined/false, it was played from hand.
+            const isPlayedFromHand = !wordObj.isInitialSeed; 
+            const card = createWordCard(wordObj.text, wordObj.id, zoneKey, isPlayedFromHand);
             zoneElement.wordsDiv.appendChild(card);
         } else {
             console.warn(`❗ No valid zone element for key "${zoneKey}" when rendering word "${wordObj.text}".`);
@@ -935,7 +954,8 @@ function placeWordInRegion(targetZoneKeyString) {
     }
 	
 	//regardless of whether the attempted placement was correct, play the card anyway
-	const placedCard = createWordCard(selectedWordObj.text, selectedWordObj.id, true);
+    // Pass true for isPlayedFromHand here
+	const placedCard = createWordCard(selectedWordObj.text, selectedWordObj.id, selectedWordObj.correctZoneKey, true);
 	if (isCorrectPlacement == false) placedCard.classList.add("incorrect"); //if you screw up, make it pop visually
 	correctZoneElement.querySelector('.word-cards-container').appendChild(placedCard);
 
@@ -1080,14 +1100,15 @@ function seedInitialZones(pool) {
         const candidates = pool.filter(w => !wordsPlaced.has(w));
         const shuffled = shuffleArray([...candidates], 20 + i);
         let chosenWord = shuffled.find(word => matchesOnlyOneRule(word, targetRuleIndex))
-            || shuffled.find(word => activeRules[targetRuleIndex].test(word));
+            || shuffled.find(word => activeRules[targetRuleIndex].test(chosenWord));
 
         if (chosenWord) {
             wordsPlaced.add(chosenWord);
             wordsInPlay.push({
                 id: crypto.randomUUID(),
                 text: chosenWord,
-                correctZoneKey: targetZoneKey
+                correctZoneKey: targetZoneKey,
+                isInitialSeed: true // Mark as initially seeded for rendering logic
             });
         } else {
             console.warn(`[startGame] Could not find word for Rule ${targetZoneKey} (${activeRules[targetRuleIndex]?.name || 'N/A'})`);
