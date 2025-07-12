@@ -4,7 +4,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.03";
+const CURRENT_VERSION = "1.04";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/"
 const genericLabels = ["Location", "Characteristic", "Wordplay"];
@@ -942,56 +942,87 @@ function placeWordInRegion(targetZoneKeyString) {
 
     let isCorrectPlacement = false;
     let message = '';
+    let isErrorFeedback = false; // Control feedback color for both messageBox and bubble
+
+    // --- DEBUG LOGS START ---
+    console.log(`--- Placement Attempt ---`);
+    console.log(`Word: '${selectedWordObj.text}'`);
+    console.log(`Correct Zone Key: '${correctZoneKey}'`);
+    console.log(`Target Zone Key (placed in): '${targetZoneKeyString}'`);
+    // --- DEBUG LOGS END ---
 
     if (correctZoneKey === targetZoneKeyString) {
+        // Perfect match
         isCorrectPlacement = true;
         selectedWordObj.correctZoneKey = correctZoneKey;
         message = `Correct! '${selectedWordObj.text}' belongs in this category.`;
-
-        showZoneFeedback(`Correct! '${selectedWordObj.text}' fits here.`, targetZoneElement, false);
-	
+        isErrorFeedback = false;
+        console.log(`Outcome: Perfect Match`); // Debug log
     } else {
-        isCorrectPlacement = false;
-        selectedWordObj.correctZoneKey = correctZoneKey;
+        // Incorrect placement - now determine if it's a near miss or far miss
+        const targetIsSingleZone = ['1', '2', '3'].includes(targetZoneKeyString);
+        // Split the correctZoneKey into its individual components
+        const correctZoneParts = correctZoneKey.split('-');
+        // Check if the target single zone is one of the components of the correct overlap zone
+        const isTargetContainedInCorrectOverlap = correctZoneParts.includes(targetZoneKeyString);
 
-        console.log("Incorrect placement detected. Attempting to draw card...");
-        console.log("Current Word Pool BEFORE draw attempt:", currentWordPool);
-        console.log("Word being placed:", selectedWordObj.text);
-        console.log("Correct zone for word:", correctZoneKey);
-        console.log("Target zone where word was placed:", targetZoneKeyString);
-		
-        // Decrement lives if placement is incorrect
-        livesRemaining--; 
-        updateLivesDisplay(); // Update the display
-        
-		drawCard();
-		
-        const correctCategoryName = getZoneDisplayName(correctZoneKey, false);
-        message = `Oops! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
-        if (currentWordPool.length <= 3) {
-            message += `   Only ${currentWordPool.length} card${currentWordPool.length === 1 ? '' : 's'} left!`;
+        // --- DEBUG LOGS START ---
+        console.log(`Target Is Single Zone (placed in): ${targetIsSingleZone}`);
+        console.log(`Correct Zone Parts: [${correctZoneParts.join(', ')}]`);
+        console.log(`Is Target Contained In Correct Overlap: ${isTargetContainedInCorrectOverlap}`);
+        // --- DEBUG LOGS END ---
+
+        // A near miss occurs if:
+        // 1. The user placed the word in a single zone (e.g., '1').
+        // 2. The word's correct zone is an overlap zone (e.g., '1-2', '1-3', '1-2-3').
+        // 3. The single zone where the user placed it is *part of* the correct overlap zone.
+        if (targetIsSingleZone && correctZoneKey.includes('-') && isTargetContainedInCorrectOverlap) {
+            // Near miss: placed in a single zone, but it belongs in an overlapping zone that includes that single zone.
+            // Penalty: Draw a new card, but no life lost.
+            selectedWordObj.correctZoneKey = correctZoneKey; // Still mark with correct zone for visual placement
+            drawCard(); // Still draw a card
+
+            const correctCategoryName = getZoneDisplayName(correctZoneKey, false);
+            message = `Near Miss! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
+            isErrorFeedback = true; // Still show as a "mistake" visually
+            console.log(`Outcome: Near Miss`); // Debug log
+        } else {
+            // Far miss: completely wrong zone, or placed in an overlap when it belongs in a single zone, or placed in 'None' when it belongs elsewhere, etc.
+            // Penalty: Lose a life and draw a new card.
+            selectedWordObj.correctZoneKey = correctZoneKey; // Still mark with correct zone for visual placement
+            livesRemaining--; // Lose a life
+            updateLivesDisplay();
+            drawCard(); // Still draw a card
+
+            const correctCategoryName = getZoneDisplayName(correctZoneKey, false);
+            message = `Oops! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
+            if (currentWordPool.length <= 3) {
+                message += `   Only ${currentWordPool.length} card${currentWordPool.length === 1 ? '' : 's'} left!`;
+            }
+            message += ` Lives left: ${livesRemaining}.`;
+            isErrorFeedback = true; // Definitely an error
+            console.log(`Outcome: Far Miss`); // Debug log
         }
-        // Add lives remaining to the message
-        message += ` Lives left: ${livesRemaining}.`; 
-
-        showZoneFeedback(message, targetZoneElement, true);
     }
-	
-	//regardless of whether the attempted placement was correct, play the card anyway
-    // Pass true for isPlayedFromHand here
-	const placedCard = createWordCard(selectedWordObj.text, selectedWordObj.id, selectedWordObj.correctZoneKey, true);
-	if (isCorrectPlacement == false) placedCard.classList.add("incorrect"); //if you screw up, make it pop visually
-	correctZoneElement.querySelector('.word-cards-container').appendChild(placedCard);
 
-    showMessage(message, !isCorrectPlacement);
+    // Show feedback bubble
+    showZoneFeedback(message, targetZoneElement, isErrorFeedback);
+
+    // Regardless of correctness, place the card visually
+    const placedCard = createWordCard(selectedWordObj.text, selectedWordObj.id, selectedWordObj.correctZoneKey, true);
+    if (!isCorrectPlacement) { // If it was incorrect (either near or far miss)
+        placedCard.classList.add("incorrect");
+    }
+    correctZoneElement.querySelector('.word-cards-container').appendChild(placedCard);
+
+    // The main messageBox message should reflect the outcome
+    showMessage(message, isErrorFeedback); // Use isErrorFeedback for messageBox too
 
     selectedWordId = null;
     renderHand();
-    //renderWordsInRegions();
 
-    // Check for win or lose condition
-    checkGameEndCondition(); 
-}
+    checkGameEndCondition();
+}//function placeWordInRegion(targetZoneKeyString) {
 
 
 function drawCard() {
