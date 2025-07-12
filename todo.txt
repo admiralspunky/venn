@@ -1,10 +1,10 @@
-
--partial credit for near answers (maybe just lose 0.5 points?)
--add multiplayer functionality
--Setting to switch between Venn Diagram and Grid displays
--audio feedback
--drag-and-drop
--setting to change number of circles (2-4)
--setting to change categories on circles (let's do 3 Wordplay categories today, because why not)
--option to change the number of hand cards (but remember that Dailies should always use the same number)
--translate to other languages (wow, that's going to be an undertaking; not only does every single bit of on-screen text have to reference a separate file, but there will need to be an entire rules.js for every additional language)
+partial credit for near answers (maybe just lose 0.5 points?)
+add multiplayer functionality
+Setting to switch between Venn Diagram and Grid displays
+audio feedback
+drag-and-drop
+setting to change number of circles (2-4)
+setting to change categories on circles (let's do 3 Wordplay categories today, because why not)
+option to change the number of hand cards (but remember that Dailies should always use the same number)
+translate to other languages (wow, that's going to be an undertaking; not only does every single bit of on-screen text have to reference a separate file, but there will need to be an entire rules.js for every additional language)
+QR code
