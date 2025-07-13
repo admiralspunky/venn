@@ -134,6 +134,10 @@ async function startGame(isDaily) {
         return;
     }
 
+    // Remove words selected for the hand from the currentWordPool
+    // This is the line added/corrected to prevent duplicates in hand
+    currentWordPool = currentWordPool.filter(word => !weightedHand.includes(word));
+
     // Original loop for populating currentHand and wordsInPlay
     for (const wordText of weightedHand) {
         const wordObj = { id: crypto.randomUUID(), text: wordText, correctZoneKey: null };
