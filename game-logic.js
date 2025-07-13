@@ -331,7 +331,7 @@ function doesWordMatchRule(word, rule) {
 function getZoneKey(word, ruleResults) {
     let matchedZones = [];
 
-    rules.forEach((rule, index) => {
+    ruleResults.forEach((rule, index) => {
         if (doesWordMatchRule(word, rule)) {
             matchedZones.push(index + 1);
         }
