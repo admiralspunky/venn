@@ -525,7 +525,7 @@ const zoneElements = {
 const zoneConfigs = {
     '1': { id: 'zone-1', colorVar: '--zone1-bg', genericLabelIndex: 0, ruleIndices: [0], categoryTypes: ['location'] },
     '2': { id: 'zone-2', colorVar: '--zone2-bg', genericLabelIndex: 1, ruleIndices: [1], categoryTypes: ['characteristic'] },
-    '3': { id: 'zone-3', colorVar: '--zone3-bg', genericLabelIndex: 2, categoryTypes: ['wordplay'] },
+    '3': { id: 'zone-3', colorVar: '--zone3-bg', genericLabelIndex: 2, ruleIndices: [2], categoryTypes: ['wordplay'] }, // Added ruleIndices: [2]
     '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: 'Location & Characteristic', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
     '1-3': { id: 'red-yellow-overlap-container', colorVar: '--zone13-bg', customLabel: 'Location & Wordplay', ruleIndices: [0, 2], categoryTypes: ['location', 'wordplay'] },
     '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: 'Characteristic & Wordplay', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'wordplay'] },
