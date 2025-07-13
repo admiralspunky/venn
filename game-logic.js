@@ -4,7 +4,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.04";
+const CURRENT_VERSION = "1.05";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/"
 const genericLabels = ["Location", "Characteristic", "Wordplay"];
@@ -14,7 +14,7 @@ let wordsInPlay = [];
 let currentWordPool = [];
 let currentHand = [];
 let turns = 0;
-let selectedWordId = null;
+let selectedWordId = null; // Used for click-to-place, will also be used for drag-and-drop
 let isDarkMode = localStorage.getItem('theme') === 'dark';
 let activeRules = [];
 // User's selected lives, retrieved from localStorage or defaulting to 3
@@ -247,7 +247,7 @@ async function endGame(isWin) {
     // ✅ Build new game button
     const newGameButton = document.createElement('button');
     newGameButton.classList.add("btn");
-    newGameButton.textContent = `🔄`;
+    newGameButton.textContent = `�`;
     newGameButton.title = "Start New Game";
     newGameButton.addEventListener('click', () => {
         endButtonsContainer.classList.remove("visible"); // hide buttons
@@ -329,11 +329,15 @@ function doesWordMatchRule(word, rule) {
 
 // Utility to calculate a word's zone key based on which rules it matches
 function getZoneKey(word, ruleResults) {
-    const keys = [];
-    if (doesWordMatchRule(word, ruleResults[0])) keys.push("1");
-    if (doesWordMatchRule(word, ruleResults[1])) keys.push("2");
-    if (doesWordMatchRule(word, ruleResults[2])) keys.push("3");
-    return keys.length === 0 ? "0" : keys.join("-");
+    let matchedZones = [];
+
+    rules.forEach((rule, index) => {
+        if (doesWordMatchRule(word, rule)) {
+            matchedZones.push(index + 1);
+        }
+    });
+
+    return matchedZones.length ? matchedZones.join('-') : '0';
 }
 
 
@@ -515,7 +519,7 @@ const zoneElements = {
 const zoneConfigs = {
     '1': { id: 'zone-1', colorVar: '--zone1-bg', genericLabelIndex: 0, ruleIndices: [0], categoryTypes: ['location'] },
     '2': { id: 'zone-2', colorVar: '--zone2-bg', genericLabelIndex: 1, ruleIndices: [1], categoryTypes: ['characteristic'] },
-    '3': { id: 'zone-3', colorVar: '--zone3-bg', genericLabelIndex: 2, ruleIndices: [2], categoryTypes: ['wordplay'] },
+    '3': { id: 'zone-3', colorVar: '--zone3-bg', genericLabelIndex: 2, categoryTypes: ['wordplay'] },
     '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: 'Location & Characteristic', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
     '1-3': { id: 'red-yellow-overlap-container', colorVar: '--zone13-bg', customLabel: 'Location & Wordplay', ruleIndices: [0, 2], categoryTypes: ['location', 'wordplay'] },
     '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: 'Characteristic & Wordplay', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'wordplay'] },
@@ -810,6 +814,19 @@ function renderHand() {
         card.classList.add("word-card");
         card.id = `card-${wordObj.id}`;
         card.innerHTML = `<span class="word-text">${wordObj.text}</span>`;
+        
+        // Make cards draggable
+        card.setAttribute('draggable', 'true');
+        card.addEventListener('dragstart', (event) => {
+            event.dataTransfer.setData('text/plain', wordObj.id);
+            selectedWordId = wordObj.id; // Also set selectedWordId for consistency
+            card.classList.add('dragging'); // Add a class for styling feedback
+        });
+        card.addEventListener('dragend', (event) => {
+            card.classList.remove('dragging');
+        });
+
+        // Click-to-select functionality (still available)
         card.addEventListener('click', () => selectWord(wordObj.id));
         handWordsDiv.appendChild(card);
     });
@@ -1022,7 +1039,7 @@ function placeWordInRegion(targetZoneKeyString) {
     renderHand();
 
     checkGameEndCondition();
-}//function placeWordInRegion(targetZoneKeyString) {
+}
 
 
 function drawCard() {
@@ -1122,7 +1139,6 @@ function resetGameState() {
     messageBox.classList.remove("visible");
     messageBox.style.height = '';
     messageBox.style.minHeight = '';
-    messageBox.style.whiteSpace = '';
     messageBox.style.textAlign = '';
     hideModal();
     updateRuleBoxLabelsAndHints();
@@ -1362,9 +1378,34 @@ settingsModalOverlay.addEventListener('click', (event) => {
     }
 });
 
+// Add drag and drop event listeners to all zone containers (excluding hand)
 for (const key in zoneElements) {
     const element = zoneElements[key].container;
     if (element && key !== 'hand') {
-        element.addEventListener('click', () => placeWordInRegion(key));
+        element.addEventListener('click', () => placeWordInRegion(key)); // Keep click-to-place
+
+        // Drag and drop listeners
+        element.addEventListener('dragover', (event) => {
+            event.preventDefault(); // Allow drop
+            element.classList.add('drag-over'); // Visual feedback
+        });
+        element.addEventListener('dragenter', (event) => {
+            event.preventDefault(); // Allow drop
+            element.classList.add('drag-over'); // Visual feedback
+        });
+        element.addEventListener('dragleave', () => {
+            element.classList.remove('drag-over'); // Remove visual feedback
+        });
+        element.addEventListener('drop', (event) => {
+            event.preventDefault(); // Prevent default drop behavior
+            element.classList.remove('drag-over'); // Remove visual feedback
+
+            const draggedWordId = event.dataTransfer.getData('text/plain');
+            if (draggedWordId) {
+                selectedWordId = draggedWordId; // Set selectedWordId from drag data
+                placeWordInRegion(key);
+            }
+        });
     }
 }
+�
