@@ -25,6 +25,12 @@ let livesRemaining = 0;
 let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || '0', 10);
 let lastDailyCompletionDate = localStorage.getItem('lastDailyCompletionDate') || '';
 
+// Define fallback rules to prevent undefined errors if rule candidates are empty
+const fallbackLocationRule = { name: 'General Location', categoryType: 'location', words: [], test: () => false };
+const fallbackCharacteristicRule = { name: 'General Characteristic', categoryType: 'characteristic', words: [], test: () => false };
+const fallbackWordplayRule = { name: 'General Wordplay', categoryType: 'wordplay', words: [], test: () => false };
+
+
 document.title = GAME_TITLE;
 
 /**
@@ -247,7 +253,7 @@ async function endGame(isWin) {
     // ✅ Build new game button
     const newGameButton = document.createElement('button');
     newGameButton.classList.add("btn");
-    newGameButton.textContent = `�`;
+    newGameButton.textContent = `🔄`;
     newGameButton.title = "Start New Game";
     newGameButton.addEventListener('click', () => {
         endButtonsContainer.classList.remove("visible"); // hide buttons
@@ -331,7 +337,7 @@ function doesWordMatchRule(word, rule) {
 function getZoneKey(word, ruleResults) {
     let matchedZones = [];
 
-    ruleResults.forEach((rule, index) => {
+    rules.forEach((rule, index) => {
         if (doesWordMatchRule(word, rule)) {
             matchedZones.push(index + 1);
         }
@@ -1268,7 +1274,10 @@ function updateRuleBoxLabelsAndHints(isGameOver = false) {
             if (hintDiv) {
                 let hintText = '';
                 if (!isGameOver) {
-                    const numRulesMatched = zoneConfig.ruleIndices.length;
+                    // --- DEBUG LOG START ---
+                    console.log('Debug in updateRuleBoxLabelsAndHints: key=', key, 'zoneConfig=', zoneConfig, 'zoneConfig.ruleIndices=', zoneConfig.ruleIndices);
+                    // --- DEBUG LOG END ---
+                    const numRulesMatched = zoneConfig.ruleIndices.length; 
                     
                     if (numRulesMatched === 1) {
                         let relevantCategoryType = zoneConfig.categoryTypes[0];
