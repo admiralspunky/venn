@@ -231,12 +231,14 @@ const allPossibleRules = [
   {
     name: 'Pre-dates the USA (1776)',
     categoryType: 'characteristic',
-    words: ['pyramid', 'castle', 'sword', 'chariot', 'scroll', 'papyrus', 'rome', 'greece', 'egypt', 'bow', 'arrow', 'wheel', 'fire', 'cave', 'mammoth', 'dinosaur', 'moon', 'sun', 'star', 'tree', 'river', 'mountain'],
+    words: ['pyramid', 'castle', 'sword', 'chariot', 'scroll', 'papyrus', 'rome', 'greece', 'egypt', 'bow', 'arrow', 'wheel', 
+	    'fire', 'cave', 'mammoth', 'dinosaur', 'moon', 'sun', 'star', 'tree', 'river', 'mountain'],
   },
   {
     name: 'wilderness survival',
     categoryType: 'characteristic',
-    words: ["knife", "fire", "water", "shelter", "rope", "compass", "map", "signal", "stick", "berry", "plant", "trap", "axe", "flint", "tent", "path", "track", "gear", "food", "clothing", "blade", "bow", "arrow", "cave", "camp", "stone"]
+    words: ["knife", "fire", "water", "shelter", "rope", "compass", "map", "signal", "stick", "berry", "plant", "trap", "axe", "flint", "tent", "path", 
+	    "track", "gear", "food", "clothing", "blade", "bow", "arrow", "cave", "camp", "stone"]
 
   },
   {
@@ -256,9 +258,23 @@ const allPossibleRules = [
 	 {
 	  name: "Can be carried",
 	  categoryType: "characteristic",
-	  words: ["bag", "box", "radio", "baby", "knife", "bottle", "sword", "backpack", "helmet", "goggles", "mirror", "alarm", "pillow", "torch", "bucket", "hat", "broom", "plate", "mask", "towel", "rope", "bookbag", "phone", "key", "wallet", "pen", "tablet", "notebook", "flashlight", "camera", "thermos", "scarf", "snack", "dice", "lantern", "toy", "umbrella", "shovel", "candle", "calculator", "ball", "brick", "booklet", "cassette", "doll", "leash", "paintbrush"]
+	  words: ["bag", "box", "radio", "baby", "knife", "bottle", "sword", "backpack", "helmet", "goggles", "mirror", "alarm", "pillow", "torch", "bucket", "hat", 
+		  "broom", "plate", "mask", "towel", "rope", "bookbag", "phone", "key", "wallet", "pen", "tablet", "notebook", "flashlight", "camera", "thermos", "scarf", 
+		  "snack", "dice", "lantern", "toy", "umbrella", "shovel", "candle", "calculator", "ball", "brick", "booklet", "cassette", "doll", "leash", "paintbrush"]
 	},
 
+  {
+    name: 'Contains holes',
+    categoryType: 'characteristic',
+    words: [
+		'donut', 'swiss cheese', 'sieve', 'colander', 'net', 'strainer', 'button', 'belt',
+		'bagel', 'hoop', 'ring', 'pipe', 'straw', 'flute', 'whistle', 'mask', 'goggles', 
+		'door', 'grater', 'spiderweb', 'fence', 'lace', 'mesh', 'corkscrew', 'key', 'lock',
+		'fishing net', 'golf ball', 'vent', 'drain', 'sleeve', 'sock', 'glove', 'earring', 'chain',
+		'tire', 'wheel', 'speaker', 'grill', 'pulley', 'perforated paper', 'pegboard', 'waffle',
+		'honeycomb', 'chalice', 'colander', 'strainer'
+	],
+  },
   {
     name: 'Can be worn',
     categoryType: 'characteristic',
