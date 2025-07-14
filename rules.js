@@ -255,13 +255,14 @@ const allPossibleRules = [
 	  "heaven", "underworld", "hell", "afterlife", "fate", "destiny", "eternity", "rebirth"
 	],
   },
-	 {
-	  name: "Can be carried",
-	  categoryType: "characteristic",
-	  words: ["bag", "box", "radio", "baby", "knife", "bottle", "sword", "backpack", "helmet", "goggles", "mirror", "alarm", "pillow", "torch", "bucket", "hat", 
-		  "broom", "plate", "mask", "towel", "rope", "bookbag", "phone", "key", "wallet", "pen", "tablet", "notebook", "flashlight", "camera", "thermos", "scarf", 
-		  "snack", "dice", "lantern", "toy", "umbrella", "shovel", "candle", "calculator", "ball", "brick", "booklet", "cassette", "doll", "leash", "paintbrush"]
-	},
+ {
+  name: "Can be carried",
+  categoryType: "characteristic",
+  words: ["bag", "box", "radio", "baby", "knife", "bottle", "sword", "backpack", "helmet", "goggles", "mirror", "alarm", "pillow", "torch", "bucket", "hat", 
+	  "broom", "plate", "mask", "towel", "rope", "bookbag", "phone", "key", "wallet", "pen", "tablet", "notebook", "flashlight", "camera", "thermos", "scarf", 
+	  "snack", "dice", "lantern", "toy", "umbrella", "shovel", "candle", "calculator", "ball", "brick", "booklet", "cassette", "doll", "leash", "paintbrush",
+	 "comb","brush","staff"]
+},
 
   {
     name: 'Contains holes',
