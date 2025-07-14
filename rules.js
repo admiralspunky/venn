@@ -190,7 +190,7 @@ const allPossibleRules = [
     name: 'Shiny or reflective',
     categoryType: 'characteristic',
     words: ['mirror', 'diamond', 'gold', 'silver', 'glass', 'water', 'metal', 'chrome', 'lightbulb', 'jewelry', 'coin', 'window', 'lake', 'ice', 'snow', 'dew', 'raindrop', 
-	    'lamp', 'monitor', 'sink', 'sun', 'moon', 'star', 'river', 'pond', 'sky', 'scanner', 'faucet', 'television', 'light'],
+	    'lamp', 'monitor', 'sink', 'sun', 'moon', 'star', 'river', 'pond', 'television', 'light'],
   },
 
 	{
