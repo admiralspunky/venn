@@ -322,6 +322,12 @@ const allPossibleRules = [
     }
   },
   {
+    name: 'Has 4 letters',
+    categoryType: 'wordplay',
+    words: ['book', 'noon', 'kook', 'hall', 'pool', 'bike', 'lamp', 'jump', 'taxi'],
+    test: (word) => word.length === 4
+  },
+  {
     name: 'Has 5 letters',
     categoryType: 'wordplay',
     words: ['apple', 'table', 'chair', 'plane', 'grape', 'crane', 'stone', 'bread', 'flute', 'blink', 'knife'],
