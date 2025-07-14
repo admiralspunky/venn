@@ -271,8 +271,7 @@ const allPossibleRules = [
 		'bagel', 'hoop', 'ring', 'pipe', 'straw', 'flute', 'whistle', 'mask', 'goggles', 
 		'door', 'grater', 'spiderweb', 'fence', 'lace', 'mesh', 'corkscrew', 'key', 'lock',
 		'fishing net', 'golf ball', 'vent', 'drain', 'sleeve', 'sock', 'glove', 'earring', 'chain',
-		'tire', 'wheel', 'speaker', 'grill', 'pulley', 'perforated paper', 'pegboard', 'waffle',
-		'honeycomb', 'chalice', 'colander', 'strainer'
+		'tire', 'wheel', 'perforated paper', 'pegboard', 'honeycomb', 'colander', 'strainer'
 	],
   },
   {
