@@ -8,6 +8,10 @@ const CURRENT_VERSION = "1.05";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/"
 const genericLabels = ["Location", "Characteristic", "Wordplay"];
+const INITIAL_HAND_SIZE = 5;
+const MESSAGE_DISPLAY_TIME = 5000;
+const TOTAL_WORDS_IN_POOL = 200;
+const MIN_RULE_MATCHING_WORDS_PER_CATEGORY = 3;
 
 let dailyMode = false;
 let wordsInPlay = [];
@@ -429,13 +433,6 @@ function generateWordPoolWithProbabilities(ruleResults, wordPool, count, rng) {
 }
 
 console.log("Venn Diagram Game script loaded." + CURRENT_VERSION);
-document.getElementById('version-display').textContent = 'Version ' + CURRENT_VERSION;
-document.getElementById('game-title-text').textContent = GAME_TITLE;
-
-const INITIAL_HAND_SIZE = 5;
-const MESSAGE_DISPLAY_TIME = 5000;
-const TOTAL_WORDS_IN_POOL = 200;
-const MIN_RULE_MATCHING_WORDS_PER_CATEGORY = 3;
 
 document.addEventListener("DOMContentLoaded", () => {
     // Safe DOM setup
