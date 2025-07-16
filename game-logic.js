@@ -437,8 +437,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Safe DOM setup
     const versionEl = document.getElementById('version-display');
     const titleEl = document.getElementById('game-title-text');
-    if (versionEl) versionEl.textContent = 'Version ' + CURRENT_VERSION;
-    if (titleEl) titleEl.textContent = GAME_TITLE;
+	//I want to display the URL near the version number in the Settings menu, but I'm too lazy to make a whole new <div>
+    //if (versionEl) versionEl.textContent = 'Version ' + CURRENT_VERSION;
+    if (versionEl) versionEl.textContent = URL + ' v' + CURRENT_VERSION; 
+	
+	if (titleEl) titleEl.textContent = GAME_TITLE;
     
     // Safe theme setup, do we want to start in dark or light mode?
     applyTheme();
