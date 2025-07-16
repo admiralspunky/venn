@@ -440,7 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (versionEl) versionEl.textContent = 'Version ' + CURRENT_VERSION;
     if (titleEl) titleEl.textContent = GAME_TITLE;
     
-    // Safe theme setup
+    // Safe theme setup, do we want to start in dark or light mode?
     applyTheme();
 
     // Initialize difficulty slider and display
