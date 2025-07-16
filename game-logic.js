@@ -811,7 +811,7 @@ function showMessage(message, isError = false) {
 
 function renderHand() {
     const handWordsDiv = zoneElements['hand'].wordsDiv;
-    handWordsDiv.innerHTML = '';
+    handWordsDiv.textContent = '';
     
     zoneElements['hand'].container.classList.remove("game-over-summary");
     
@@ -1360,7 +1360,7 @@ function applyTheme() {
 
 // New function to update the moon/sun icon in the modal
 function applyThemeToggleIcon() {
-    if (darkModeToggleBtn) { // Check if the button exists before trying to update its innerHTML
+    if (darkModeToggleBtn) { // Check if the button exists before trying to update its textContent
         darkModeToggleBtn.textContent = isDarkMode ? '☀️' : '🌙'; // Sun for dark, Moon for light
     }
 }
