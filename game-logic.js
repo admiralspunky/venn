@@ -101,7 +101,6 @@ async function startGame(isDaily) {
     // Restore original rule generation logic
     activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
 
-
     updateGameTitle(isDaily);
     updateDailyBadge(isDaily);
     resetGameState();
@@ -269,7 +268,7 @@ async function endGame(isWin) {
     });
 
     // ✅ Insert buttons into #end-screen-buttons and show it
-    endButtonsContainer.innerHTML = '';
+    endButtonsContainer.textContent = '';
     endButtonsContainer.appendChild(newGameButton);
     endButtonsContainer.appendChild(shareButton);
     endButtonsContainer.classList.add("visible"); // ✅ Show buttons now
