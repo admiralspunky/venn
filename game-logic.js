@@ -4,7 +4,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.05";
+const CURRENT_VERSION = "1.06";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/"
 const genericLabels = ["Location", "Characteristic", "Wordplay"];
