@@ -1,29 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/x-icon" href="favicon.ico">
 
 <script>
 	const GAME_TITLE = "No Not There"
-    const TUTORIAL_TEXT = `There are three broad categories, Location, Characteristic, and Wordplay. In each game, each of those categories contains some hidden rule. You can mouseover each category to find example rules. 
-    Your mission is to figure out the rules for each category, and play cards from Your Hand where they're supposed to go. 
-    If you play a card in the wrong category, you have to draw a card to replace it, and you lose a life. 
-    If you play a card, and it's near the right category, you still have to draw a card to replace it, but you don't lose a life.
-    You're trying to empty your hand of cards before your lives run out.`;
+    const TUTORIAL_TEXT = `There are three broad categories, Location, Characteristic, and Wordplay. In each game, each of those categories contains some hidden rule. You can mouseover each category to find example rules. Your mission is to figure out the rules for each category, and play cards from Your Hand where they're supposed to go. If you play a card in the wrong category, you have to draw a card to replace it. You're trying to empty your hand of cards.`;
 	const ABOUT_TEXT = "I want to thank Ken Wickle, for bringing Things in Rings to our board game group, which led me to write this game."
 	const BYLINE = "© 2025 Justin Smith. All Rights Reserved admiralspunky@gmail.com"
 </script>
-	
-	<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VJJHBK294Z"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-VJJHBK294Z');
-</script>
-	
 <script src="game-logic.js" defer></script>
 <script src="rules.js"> </script>
 
@@ -31,9 +15,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Venn Diagram Game</title>
 
-    <!-- Removed external font link to avoid external dependencies -->
     <style>
-        /* Base colors (light mode) */
+        /* --- Base Colors (Light Mode) --- */
         :root {
             --bg-body: #f0f4f8;
             --bg-container: #ffffff;
@@ -68,7 +51,7 @@
             --zone0-placed-card-text: var(--zone0-text);
         }
 
-        /* Dark mode colors */
+        /* --- Dark Mode Colors --- */
         html.dark {
             --bg-body: #0F172A; /* Dark slate */
             --bg-container: #1E293B; /* Dark darker slate */
@@ -104,83 +87,86 @@
             --zone0-placed-card-text: var(--zone0-text);
         }
 
-		body {
+        /* --- Base Layout (Desktop First) --- */
+        body {
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            align-items: stretch;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            overflow-y: auto; 
-            font-family: sans-serif; /* Changed to generic sans-serif */
+            overflow-y: auto;
+            font-family: sans-serif;
             background-color: var(--bg-body);
             color: var(--text-secondary);
             transition: background-color 0.3s ease, color 0.3s ease;
-		}
+        }
 
         .game-container {
             background-color: var(--bg-container);
             border-radius: 1rem;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             display: flex;
-            flex-direction: column; 
+            flex-direction: column; /* Stacks top-bar and main-game-area */
             gap: 2rem;
             padding: 3rem;
-            width: 100%; 
-            height: 100vh; 
+            width: 100%;
             box-sizing: border-box;
             position: relative;
-            margin: 0 auto; 
+            margin: 0 auto;
             transition: background-color 0.3s ease;
-            align-items: center; 
+            align-items: center; /* Centers content horizontally within game-container */
+            flex-grow: 1; /* Allows game-container to take available space */
         }
-
 
         .main-game-area {
+            display: flex; /* This is now the flex container for message box and rules grid */
+            flex-direction: column; /* Stacks message box and rules grid vertically */
+            gap: 1.5rem; /* Space between message box and rules grid */
+            width: 100%;
             flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            width: 100%; 
-            /* align-items: center; Removed as title moved out */
+            /* Changed align-items to stretch to ensure rules-grid-container takes full width */
+            align-items: stretch; /* Ensure children stretch horizontally */
+            justify-content: flex-start; /* Align items to the top */
         }
 
-        /* .main-game-area h1 { Removed, as h1 moved out of main-game-area } */
+        /* Rules Grid Container (for the 8 zones + hand) */
+        #rules-grid-container {
+            display: grid; /* Default: Grid for desktop */
+            grid-template-columns: repeat(3, 1fr); /* 3 columns for desktop */
+            gap: 1rem;
+            flex-grow: 1; /* Allows the grid to take available space */
+            max-width: 100%; /* Ensure it doesn't overflow */
+        }
 
+        /* --- Top Bar and UI Elements --- */
         .top-left-ui, .top-right-ui {
             font-size: 1.1rem;
             font-weight: 600;
             color: var(--text-secondary);
             transition: color 0.3s ease;
+            display: flex;
+            flex-direction: column; /* Stack turns and lives */
+            gap: 0.25rem;
+            text-align: center;
         }
-		
-		.top-left-ui {
-			font-size: 1rem;
-			display: flex;
-			flex-direction: column;
-			gap: 0.25rem;            /* optional: vertical spacing between rows */
-			 text-align: center; /* Ensure text inside is centered */
-		}
 
-        .top-bar { 
+        .top-bar {
             display: flex;
             justify-content: space-between;
-            width: 100%; 
+            width: 100%;
             margin-bottom: 1rem;
-            align-items: center; /* Vertically align items in top-bar */
+            align-items: center;
         }
 
         .top-bar-title {
-            flex-grow: 1; /* Allow it to take up available space */
-            text-align: center; /* Ensure text inside is centered */
-            margin: 0 auto; /* Ensures it pushes itself to the center */
-            color: var(--text-primary); /* Inherit primary text color */
-            font-size: 2.25rem; /* Equivalent to text-3xl */
-            font-weight: 700; /* Equivalent to font-bold */
+            flex-grow: 1;
+            text-align: center;
+            margin: 0 auto;
+            color: var(--text-primary);
+            font-size: 2.25rem;
+            font-weight: 700;
             transition: color 0.3s ease;
-            line-height: 1; /* Adjust line height to prevent extra space */
+            line-height: 1;
         }
-
 
         .icon-btn {
             padding: 0.75rem 1rem;
@@ -192,20 +178,20 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            color: white; 
-            background-color: var(--text-secondary); 
+            color: white;
+            background-color: var(--text-secondary);
             transition: background-color 0.2s ease;
         }
 
         .icon-btn:hover {
-            background-color: var(--text-primary); 
+            background-color: var(--text-primary);
         }
 
         #settings-btn {
             padding: 0.875rem 1.125rem;
             font-size: 1.5rem;
         }
-        
+
         #new-game-modal-btn {
             padding: 0.75rem 1.5rem;
             font-size: 1.125rem;
@@ -224,8 +210,7 @@
             font-size: 0.95rem;
         }
 
-        /* #version-display { REMOVED from main screen, only shows up in Settings } */
-
+        /* --- Rule Box Styles --- */
         .rule-box {
             border: 2px solid var(--border-rule-box-default);
             border-radius: 0.75rem;
@@ -261,7 +246,12 @@
         #zone-2-3 { background-color: var(--zone23-bg); border-color: var(--zone23-border); color: var(--zone23-text); }
         #zone-1-2-3 { background-color: var(--zone123-bg); border-color: var(--zone123-border); color: var(--zone123-text); }
         #none-container { background-color: var(--zone0-bg); border-color: var(--zone0-border); color: var(--zone0-text); }
-        #hand-container { background-color: var(--zoneHand-bg); border-color: var(--zoneHand-border); color: var(--zoneHand-text); }
+        #hand-container {
+            background-color: var(--zoneHand-bg);
+            border-color: var(--zoneHand-border);
+            color: var(--zoneHand-text);
+            min-height: 100px; /* Ensure it's visible */
+        }
 
         .box-header {
             display: flex;
@@ -290,7 +280,7 @@
             width: 18px;
             height: 18px;
             vertical-align: middle;
-            fill: currentColor; 
+            fill: currentColor;
         }
 
         .word-cards-container {
@@ -303,7 +293,7 @@
             width: 100%;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: var(--border-rule-box-default) var(--bg-rule-box-default); 
+            scrollbar-color: var(--border-rule-box-default) var(--bg-rule-box-default);
         }
 
         /* Webkit scrollbar for Chrome/Safari */
@@ -334,31 +324,25 @@
             transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.2s ease, color 0.2s ease;
             outline: 2px solid transparent;
             outline-offset: 2px;
-            background-color: var(--bg-word-card-hand); 
-            color: var(--text-word-card-hand); 
+            background-color: var(--bg-word-card-hand);
+            color: var(--text-word-card-hand);
         }
-
-	.word-card.placed-card {
-            color: inherit;
-        }
-		
-	/* bg colors for cards that were played from the hand */
-
-	/* For Light Mode */
-	.light .word-card.played-from-hand {
-		background-color: #AEC6CF; /* A light blue, or your preferred color */
-		color: #000000; /* Black text for contrast */
-		/* Add any other styling you want, e.g., border, box-shadow */
-	}
-
-	/* For Dark Mode (optional, if you want different styling in dark mode) */
-	.dark .word-card.played-from-hand {
-		background-color: #36454F; /* A darker shade for dark mode */
-		color: #FFFFFF; /* White text for contrast */
-	}
 
         .word-card.placed-card {
             color: inherit;
+        }
+
+        /* bg colors for cards that were played from the hand */
+        /* For Light Mode */
+        .light .word-card.played-from-hand {
+            background-color: #AEC6CF; /* A light blue, or your preferred color */
+            color: #000000; /* Black text for contrast */
+        }
+
+        /* For Dark Mode (optional, if you want different styling in dark mode) */
+        .dark .word-card.played-from-hand {
+            background-color: #36454F; /* A darker shade for dark mode */
+            color: #FFFFFF; /* White text for contrast */
         }
 
         .word-card:hover {
@@ -431,7 +415,7 @@
             color: #991b1b;
         }
 
-        /* Modal Styles */
+        /* --- Modal Styles --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -479,213 +463,166 @@
             color: var(--text-secondary);
         }
 
-        /* Ensure the grid fills available width */
-        #rules-grid-container {
-            width: 100%;
+        /* --- End Game Buttons --- */
+        .end-buttons-row {
+            display: none;
         }
 
-        /* Responsive adjustments */
+        .end-buttons-row.visible {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        /* --- Settings Modal Specifics --- */
+        .settings-button-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-button-row button {
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+        #new-game-modal-btn {
+            background-color: #4f46e5;  /* Indigo */
+            color: white;
+            font-size: 1.75rem;         /* Bigger icon */
+            padding: 0.75rem;
+            width: 3.25rem;
+            height: 3.25rem;
+            border: none;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            transition: background-color 0.2s ease;
+            outline: none;
+        }
+
+        #new-game-modal-btn:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        #new-game-modal-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .word-card.incorrect {
+            border: 2px dashed red;
+            opacity: 0.7;
+        }
+
+        /* --- Feedback Bubble --- */
+        #zone-feedback-bubble {
+            position: fixed;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 1001;
+        }
+
+        #zone-feedback-bubble.success {
+            background-color: #16a34a; /* green-600 */
+        }
+
+        #zone-feedback-bubble.error {
+            background-color: #dc2626; /* red-600 */
+        }
+
+        /* --- Theme Overrides (Simplified) --- */
+        /* Light mode (default) */
+        html.light {
+            background-color: white;
+            color: black;
+        }
+
+        /* Dark mode override */
+        html.dark {
+            background-color: #111;
+            color: white;
+        }
+
+        /* --- Responsive Adjustments (Mobile First, then Desktop Overrides) --- */
         @media (max-width: 767px) {
-            body {
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: stretch;
-                height: 100vh;
-                margin: 0;
-                overflow-y: auto;
-                font-family: sans-serif; /* Changed to generic sans-serif */
-                background-color: var(--bg-body);
-                color: var(--text-secondary);
-                transition: background-color 0.3s ease, color 0.3s ease;
-            }
             .game-container {
-                flex-direction: column; 
-                height: auto;
-                width: 95%;
-                max-width: 500px;
+                flex-direction: column; /* Stacks top-bar, main-game-area vertically */
                 padding: 1.5rem;
                 gap: 1rem;
+                width: 95%;
+                max-width: 500px;
                 margin: 1rem auto;
             }
+
             .main-game-area {
+                flex-direction: column; /* Stacks message box and rules grid vertically */
                 width: 100%;
                 padding-top: 2rem;
                 gap: 1rem;
             }
-            .rules-layout-grid { /* This class is no longer explicitly used, but kept for reference */
-                grid-template-columns: 1fr;
-                grid-template-rows: auto;
-                max-width: 100%;
-                height: auto;
-                min-height: auto;
+
+            #rules-grid-container {
+                display: flex; /* Change to flex on mobile to allow 'order' to work for stacking */
+                flex-direction: column; /* Stack grid items vertically */
+                grid-template-columns: none; /* Override grid columns for 1D layout */
             }
-            .rules-layout-grid > div {
-                grid-column: auto;
-                grid-row: auto;
-            }
-            .hand-container {
-		order: -1; /* This moves the hand-container to the very beginning (top) of the flex column */
+
+            #hand-container {
+                order: -1; /* Move hand-container to the top within rules-grid-container */
                 max-height: 180px;
-            }
-            .top-left-ui, .top-right-ui {
-                position: static; 
-                width: auto; 
-                display: flex; 
-                justify-content: flex-start; 
-                align-items: center;
-                padding: 0; 
-                margin: 0; 
-            }
-            .top-bar { 
+                margin-bottom: 20px;
                 width: 100%;
-                padding: 0 0.75rem; /* Reduced horizontal padding for mobile */
-                margin-top: 0.5rem;
-                margin-bottom: 0.5rem;
-            }
-            .top-right-ui {
-                gap: 0.5rem;
-                justify-content: flex-end; 
-            }
-            .game-container {
-                padding-top: 1rem;
-            }
-            .icon-btn { 
-                padding: 0.6rem 0.9rem;
-                font-size: 1.2rem;
             }
 
             .rule-box {
                 min-height: 120px;
                 padding: 0.5rem;
             }
+
             .rule-box .box-header .box-label {
                 font-size: 0.9rem;
             }
+
             .word-card {
                 font-size: 0.7rem;
                 padding: 0.25rem 0.5rem;
             }
-            .top-bar-title {
-                font-size: 1.5rem; /* Smaller font size for mobile */
+
+            .top-bar {
+                padding: 0 0.75rem;
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
             }
+
+            .top-bar-title {
+                font-size: 1.5rem;
+            }
+
             #daily-badge {
-                display: none; /* Hide daily badge on mobile to save space */
+                display: none;
+            }
+
+            .icon-btn {
+                padding: 0.6rem 0.9rem;
+                font-size: 1.2rem;
             }
         }
-		
-		.end-buttons-row {
-			display: none;
-		}
 
-		.end-buttons-row.visible {
-			  display: flex;
-			  justify-content: center;
-			  gap: 1rem;
-			  margin-top: 1rem;
-		}
-		
-		/* prettifying the settings modal */
-		
-		.settings-button-row {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			gap: 1rem;
-			margin-bottom: 1.5rem;
-		}
-		
-		.settings-button-row button {
-			width: 48px;
-			height: 48px;
-			font-size: 1.5rem;
-			border-radius: 0.5rem;
-		}
-		
-		#new-game-modal-btn {
-			background-color: #4f46e5;  /* Indigo */
-			color: white;
-			font-size: 1.75rem;         /* Bigger icon */
-			padding: 0.75rem;
-			width: 3.25rem;
-			height: 3.25rem;
-			border: none;
-			border-radius: 0.75rem;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-			transition: background-color 0.2s ease;
-			outline: none;
-		}
-		
-		#new-game-modal-btn:focus {
-			outline: none;
-			box-shadow: none;
-		}
-
-		#new-game-modal-btn:hover {
-			background-color: #4338ca;
-		}
-		
-		.word-card.incorrect {
-			border: 2px dashed red;
-			opacity: 0.7;
-		}
-
-
-
-		
-		/* Replacing Tailwind */
-		
-		#zone-feedback-bubble {
-			position: fixed;
-			color: white;
-			padding: 6px 12px;
-			border-radius: 4px;
-			font-size: 0.875rem;
-			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-			opacity: 0;
-			transition: opacity 0.3s ease;
-			pointer-events: none;
-			z-index: 1001;
-		}
-
-		#zone-feedback-bubble.success {
-			background-color: #16a34a; /* green-600 */
-		}
-
-		#zone-feedback-bubble.error {
-			background-color: #dc2626; /* red-600 */
-		}
-		
-		/* Light mode (default) */
-		html.light {
-			background-color: white;
-			color: black;
-		}
-
-		/* Dark mode override */
-		html.dark {
-			background-color: #111;
-			color: white;
-		}
-
-		/* Desktop 3x3 grid, mobile fallback */
-		#rules-grid-container {
-			display: grid;
-			grid-template-columns: repeat(3, 1fr);
-			gap: 1rem;
-			width: 100%;
-		}
-
-		@media (max-width: 767px) {
-			#rules-grid-container {
-				grid-template-columns: 1fr;
-			}
-		}
-
-        /* NEW CSS FOR DIFFICULTY SLIDER */
+        /* --- NEW CSS FOR DIFFICULTY SLIDER --- */
         .modal-setting-item {
             display: flex;
             align-items: center;
@@ -766,18 +703,18 @@
             left: 0;
             width: 100%;
             padding: 0.5rem 1rem;
-            background-color: var(--bg-container); /* Match container background */
-            color: var(--text-secondary); /* Match secondary text color */
+            background-color: var(--bg-container);
+            color: var(--text-secondary);
             font-size: 0.75rem;
             text-align: center;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); /* Subtle shadow at the top */
-            z-index: 999; /* Ensure it's above most content but below modals */
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+            z-index: 999;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         @media (max-width: 767px) {
             #byline-display {
-                font-size: 0.65rem; /* Slightly smaller on mobile */
+                font-size: 0.65rem;
                 padding: 0.4rem 0.75rem;
             }
         }
@@ -873,18 +810,19 @@
                     <div class="word-cards-container"></div>
                     <div class="rule-hint"></div>
                 </div>
+                <!-- MOVED TO END: hand-container is now the last child for desktop 3x3 grid positioning -->
                 <div id="hand-container" class="rule-box">
                     <div class="box-header">
                         <span class="box-label">Your Hand:</span>
-                        </div>
+                    </div>
                     <div class="word-cards-container"></div>
-					<div id="end-screen-buttons" class="end-buttons-row hidden">
-						<!-- Buttons will be inserted here -->
-					</div>
-                    <div class="rule-hint"></div> </div>
+                    <div id="end-screen-buttons" class="end-buttons-row hidden">
+                        <!-- Buttons will be inserted here -->
+                    </div>
+                    <div class="rule-hint"></div>
+                </div>
             </div>
-        
-            </div>
+        </div>
     </div>
 
 <!-- SETTINGS -->
