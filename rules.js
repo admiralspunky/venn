@@ -25,8 +25,20 @@ const allPossibleRules = [
   {
     name: 'You would find it outside',
     categoryType: 'location',
-    words: ['tree', 'flower', 'cloud', 'mountain', 'river', 'rock', 'grass', 'sun', 'moon', 'star', 'bird', 'squirrel', 'bench', 'path', 'fence', 'gate', 'bush', 'pond', 'sky', 'dirt', 'squirrel', 'apple',
-      'snake', 'bee', 'tree', 'bird', 'rock'],
+    words: ['tree', 'flower', 'cloud', 'mountain', 'river', 'rock', 'grass', 'sun', 'moon', 'star', 'bird', 'squirrel', 'bench', 'path', 'fence', 'gate', 'bush', 'pond', 'sky', 'dirt', 'apple',
+   		   'snake', 'bee', 'tree', 'bird', 'rock', 'lion', 'tiger', 'bear', 'wolf', 'fox', 'bat', 'rat', 'cow',
+		  'pig', 'deer', 'horse', 'goat', 'sheep', 'zebra', 'giraffe', 'monkey', 'ape',
+		  'otter', 'whale', 'dolphin', 'shark', 'eel', 'octopus', 'crab', 'lobster', 'clam',
+		  'snail', 'slug', 'bee', 'ant', 'wasp', 'moth', 'fly', 'gnat', 'termite', 'beetle',
+		  'lizard', 'gecko', 'snake', 'python', 'cobra', 'frog', 'toad', 'newt', 'salamander',
+		  'chicken', 'duck', 'goose', 'swan', 'penguin', 'turkey', 'rooster', 'falcon',
+		  'hawk', 'eagle', 'owl', 'parrot', 'canary', 'finch', 'sparrow', 'pigeon',
+		  'fish', 'trout', 'bass', 'salmon', 'carp', 'anchovy', 'shad', 'guppy', 'minnow',
+		  'buffalo', 'bison', 'donkey', 'mule', 'camel', 'alpaca', 'llama', 'kangaroo',
+		  'koala', 'platypus', 'panther', 'leopard', 'jaguar', 'lynx', 'cheetah',
+		  'moose', 'elk', 'reindeer', 'ibex', 'yak', 'ox', 'weasel', 'ferret', 'skunk',
+		  'raccoon', 'badger', 'porcupine', 'hedgehog', 'armadillo', 'beaver', 'capybara',
+		  'walrus', 'seal', 'narwhal', 'flamingo', 'heron', 'crane', 'robin', 'peacock'],
   },
   {
     name: 'You expect to find it at a school',
@@ -110,10 +122,10 @@ const allPossibleRules = [
     name: 'Often makes a sound',
     categoryType: 'characteristic',
     words: [
-		'bell', 'whistle', 'drum', 'piano', 'clock', 'phone', 'car', 'dog', 'thunder',
+		'bell', 'whistle', 'drum', 'piano', 'clock', 'phone', 'car', 'cat', 'dog', 'thunder',
 		'siren', 'speaker', 'radio', 'alarm', 'cat', 'guitar', 'train', 'microphone',
 		'television', 'baby', 'wind', 'doorbell', 'engine', 'screaming',
-		'beep', 'buzz', 'clang', 'ding', 'buzzer', 'horn', 'chime'
+		'buzzer', 'horn', 'chime'
 ] },
   {
     name: 'Is a type of animal',
