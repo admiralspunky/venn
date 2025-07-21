@@ -449,7 +449,7 @@ const allPossibleRules = [
 		 categoryType: 'wordplay',
 		 words: ['fox', 'box', 'axe', 'taxi', 'extra', 'exit', 'fix', 'mix', 'flex', ' Xerox'],
 		 test: (word) => /x/i.test(word)
-	}
+	},
 
 	{
 		//defines a function named test that takes a word as input and returns true if the word contains the letter "z" (case-insensitive), and false otherwise.
