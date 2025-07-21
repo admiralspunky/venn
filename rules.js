@@ -407,15 +407,15 @@ const allPossibleRules = [
 	  categoryType: 'wordplay',
 	   words: ['apple', 'orange', 'igloo', 'umbrella', 'elephant', 'ostrich', 'island', 'apricot', 'ear', 'eye'],
 	  test: (word) => /^[aeiou]/i.test(word)
-	},
+},
   {
 	  name: 'Ends with a vowel',
 	  categoryType: 'wordplay',
 	   words: ['banana', 'potato', 'tomato', 'zebra', 'pizza', 'mango', 'avocado', 'kiwi', 'radio', 'auto','happy','mystery','tyranny','weary'],
 	  test: (word) => /[aeiou]$/i.test(word)
-	},
+},
 
-	{
+{
 	  name: 'Contains exactly 3 vowels',
 	  categoryType: 'wordplay',
 	   words: [
@@ -428,9 +428,9 @@ const allPossibleRules = [
 
 		return vowels && vowels.length === 3;
 	  }
-	},
+},
 
-	{
+{
 	  name: 'Contains no repeated letters',
 	  categoryType: 'wordplay',
 	   words: ['cat', 'dog', 'lamp', 'brick', 'house', 'plant', 'jump', 'quick', 'fox', 'zebra', 'light', 'grape'],
@@ -442,20 +442,20 @@ const allPossibleRules = [
 		}
 		return true;
 	  }
-	},
+},
 
-	{
-		 name: 'Contains the letter "x"',
-		 categoryType: 'wordplay',
-		 words: ['fox', 'box', 'axe', 'taxi', 'extra', 'exit', 'fix', 'mix', 'flex', ' Xerox'],
-		 test: (word) => /x/i.test(word)
-	},
+{
+	 name: 'Contains the letter "x"',
+	 categoryType: 'wordplay',
+	 words: ['fox', 'box', 'axe', 'taxi', 'extra', 'exit', 'fix', 'mix', 'flex', ' Xerox'],
+	 test: (word) => /x/i.test(word)
+},
 
-	{
-		//defines a function named test that takes a word as input and returns true if the word contains the letter "z" (case-insensitive), and false otherwise.
-		 name: 'Contains the letter "z"',
-		 categoryType: 'wordplay',
-		 words: ['zoo','pizza','zebra'],
-		 test: (word) => /z/i.test(word)
-	}
+{
+	//defines a function named test that takes a word as input and returns true if the word contains the letter "z" (case-insensitive), and false otherwise.
+	 name: 'Contains the letter "z"',
+	 categoryType: 'wordplay',
+	 words: ['zoo','pizza','zebra'],
+	 test: (word) => /z/i.test(word)
+}
 ];
