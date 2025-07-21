@@ -306,7 +306,7 @@ const allPossibleRules = [
 		  'shoe', 'cleat', 'goal', 'goalpost', 'court', 'field', 'track', 'bike', 'bike helmet',
 		  'trophy', 'referee', 'coach', 'stadium', 'bench', 'water bottle', 'sneaker', 'pad', 'guard',
 		  'mask', 'bike lock', 'timer', 'scoreboard', 'whistle', 'flag', 'gym', 'locker', 'goalie',
-		  'rope', 'jump rope', 'chalk', 'mat', 'belt', 'ring', 'rope', 'climb', 'coach whistle'
+		  'rope', 'jump rope', 'chalk', 'mat', 'belt', 'ring', 'rope', 'climb'
 		]
 
   },
