@@ -501,7 +501,7 @@ const handContainer = document.getElementById('hand-container');
 
 const settingsModalOverlay = document.getElementById('settings-modal-overlay');
 const modalCloseBtn = document.getElementById('modal-close-btn');
-const newGameModalBtn = document.getElementById('new-game-modal-btn');
+//const newGameModalBtn = document.getElementById('new-game-modal-btn');
 const darkModeToggleBtn = document.getElementById('dark-mode-toggle-btn'); // New dark mode toggle button
 const aboutBtn = document.getElementById('about-btn');
 
@@ -1376,9 +1376,8 @@ function toggleDarkMode() {
 // Event Listeners
 settingsBtn.addEventListener('click', showModal); // Gear icon now opens settings modal
 modalCloseBtn.addEventListener('click', hideModal);
-newGameModalBtn.addEventListener('click', () => {
-    startGame(false); //start a new game, but not in Daily mode
-});
+//newGameModalBtn.addEventListener('click', () => { startGame(false); }); //start a new game, but not in Daily mode
+
 // Event listener for the new dark mode toggle button inside the modal
 if (darkModeToggleBtn) {
     darkModeToggleBtn.addEventListener('click', toggleDarkMode);
