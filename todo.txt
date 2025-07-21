@@ -1,4 +1,4 @@
-the share button panel correctly hides when you press its own reset button, but not when you press the reset button in settings - and do we need that reset button anyway? You can just refresh the page
+rename Wordplay to Spelling
 let the user log in, to carry their streak across browsers and devices, and we'll need that anyway for mp
 Setting to switch between Venn Diagram and Grid displays
 audio feedback
