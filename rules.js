@@ -311,6 +311,7 @@ const allPossibleRules = [
 		]
 
   },
+{
     name: 'is an adjective',
     categoryType: 'characteristic',
       words: 
