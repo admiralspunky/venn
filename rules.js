@@ -394,7 +394,7 @@ const allPossibleRules = [
   {
 	  name: 'Ends with a vowel',
 	  categoryType: 'wordplay',
-	   words: ['banana', 'potato', 'tomato', 'zebra', 'pizza', 'mango', 'avocado', 'kiwi', 'radio', 'auto'],
+	   words: ['banana', 'potato', 'tomato', 'zebra', 'pizza', 'mango', 'avocado', 'kiwi', 'radio', 'auto','happy','mystery','tyranny','weary'],
 	  test: (word) => /[aeiou]$/i.test(word)
 	},
 
