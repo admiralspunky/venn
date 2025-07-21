@@ -143,8 +143,9 @@ const allPossibleRules = [
 		  'koala', 'platypus', 'panther', 'leopard', 'jaguar', 'lynx', 'cheetah',
 		  'moose', 'elk', 'reindeer', 'ibex', 'yak', 'ox', 'weasel', 'ferret', 'skunk',
 		  'raccoon', 'badger', 'porcupine', 'hedgehog', 'armadillo', 'beaver', 'capybara',
-		  'walrus', 'seal', 'narwhal', 'flamingo', 'heron', 'crane', 'robin', 'peacock'
-		]
+		  'walrus', 'seal', 'narwhal', 'flamingo', 'heron', 'crane', 'robin', 'peacock','zebra',
+	    	'chimpanzee'
+	]
   },
   {
     name: 'Is a type of fruit',
@@ -173,7 +174,7 @@ const allPossibleRules = [
 	'cashier', 'register', 'credit', 'label', 'barcode', 'shelf', 'basket', 'bag',
 	'container', 'helmet', 'net', 'glove', 'backpack', 'tray', 'remote', 'engine',
 	'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter',
-	'glue','highlighter','lightbulb','capsule','photo'
+	'glue','highlighter','lightbulb','capsule','photo','pizza'
 ] },
   {
     name: 'Dangerous',
@@ -310,7 +311,22 @@ const allPossibleRules = [
 		]
 
   },
-  // === Wordplay Rules ===
+    name: 'is an adjective',
+    categoryType: 'characteristic',
+      words: 
+	[
+		'lazy','crazy','hazy','dizzy','fuzzy','zany','zealous','bizarre','frozen','amazing',
+		'red','orange','yellow','green','indigo','violet','white','black','brown','gray',
+		'big','small','large','huge','tiny','many','few','much','little','most',
+		'happy','sad','angry','excited','calm','joyful','tired','brave','kind','friendly',
+		'sweet','sour','salty','bitter','spicy','zesty','fresh','stale','aromatic',
+		'funny','pretty','tall','wrong','honest','calm','dumb','tough','high','light','whole','entire',
+	]
+
+  },
+
+// === Wordplay Rules ===
+	
   {
     name: 'Has a consecutive double letter',
     categoryType: 'wordplay',
@@ -438,7 +454,7 @@ const allPossibleRules = [
 		//defines a function named test that takes a word as input and returns true if the word contains the letter "z" (case-insensitive), and false otherwise.
 		 name: 'Contains the letter "z"',
 		 categoryType: 'wordplay',
-		 words: ['zoo'],
+		 words: ['zoo','pizza','zebra'],
 		 test: (word) => /z/i.test(word)
 	}
 ];
