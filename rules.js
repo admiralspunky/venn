@@ -163,16 +163,17 @@ const allPossibleRules = [
     name: 'Mostly man-made',
     categoryType: 'characteristic',
     words: [
-  'car', 'building', 'phone', 'computer', 'chair', 'table', 'road', 'bridge',
-  'bottle', 'cup', 'book', 'watch', 'robot', 'tool', 'machine', 'brick', 'cement',
-  'microwave', 'remote', 'stapler', 'ladder', 'vacuum', 'rope', 'chainsaw',
-  'airplane', 'ticket', 'passport', 'terminal', 'runway', 'scanner', 'gate', 'alarm',
-  'announcement', 'security', 'luggage', 'boarding', 'receipt', 'screwdriver',
-  'clock', 'projector', 'keyboard', 'mouse', 'notebook', 'whiteboard', 'clipboard',
-  'calculator', 'envelope', 'printer', 'scanner', 'monitor', 'suitcase', 'badge',
-  'cashier', 'register', 'credit', 'label', 'barcode', 'shelf', 'basket', 'bag',
-  'container', 'helmet', 'net', 'glove', 'backpack', 'tray', 'remote', 'engine',
-  'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter'
+	'car', 'building', 'phone', 'computer', 'chair', 'table', 'road', 'bridge',
+	'bottle', 'cup', 'book', 'watch', 'robot', 'tool', 'machine', 'brick', 'cement',
+	'microwave', 'remote', 'stapler', 'ladder', 'vacuum', 'rope', 'chainsaw',
+	'airplane', 'ticket', 'passport', 'terminal', 'runway', 'scanner', 'gate', 'alarm',
+	'announcement', 'security', 'luggage', 'boarding', 'receipt', 'screwdriver',
+	'clock', 'projector', 'keyboard', 'mouse', 'notebook', 'whiteboard', 'clipboard',
+	'calculator', 'envelope', 'printer', 'scanner', 'monitor', 'suitcase', 'badge',
+	'cashier', 'register', 'credit', 'label', 'barcode', 'shelf', 'basket', 'bag',
+	'container', 'helmet', 'net', 'glove', 'backpack', 'tray', 'remote', 'engine',
+	'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter',
+	'glue','highlighter','lightbulb','capsule','photo'
 ] },
   {
     name: 'Dangerous',
@@ -244,7 +245,7 @@ const allPossibleRules = [
     name: 'Pre-dates the USA (1776)',
     categoryType: 'characteristic',
     words: ['pyramid', 'castle', 'sword', 'chariot', 'scroll', 'papyrus', 'rome', 'greece', 'egypt', 'bow', 'arrow', 'wheel', 
-	    'fire', 'cave', 'mammoth', 'dinosaur', 'moon', 'sun', 'star', 'tree', 'river', 'mountain'],
+	    'fire', 'cave', 'mammoth', 'dinosaur', 'moon', 'sun', 'star', 'tree', 'river', 'mountain','water','glass','apple'],
   },
   {
     name: 'wilderness survival',
