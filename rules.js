@@ -249,10 +249,10 @@ const allPossibleRules = [
 	    'fire', 'cave', 'mammoth', 'dinosaur', 'moon', 'sun', 'star', 'tree', 'river', 'mountain','water','glass','apple'],
   },
   {
-    name: 'wilderness survival',
+    name: 'would help you survive in the wilderness',
     categoryType: 'characteristic',
     words: ["knife", "fire", "water", "shelter", "rope", "compass", "map", "signal", "stick", "berry", "plant", "trap", "axe", "flint", "tent", "path", 
-	    "track", "gear", "food", "clothing", "blade", "bow", "arrow", "cave", "camp", "stone"]
+	    "track", "gear", "food", "clothing", "blade", "bow", "arrow", "cave", "camp", "stone",'belt']
 
   },
   {
@@ -323,11 +323,22 @@ const allPossibleRules = [
 		'sweet','sour','salty','bitter','spicy','zesty','fresh','stale','aromatic',
 		'funny','pretty','tall','wrong','honest','calm','dumb','tough','high','light','whole','entire',
 	]
-
   },
 
-// === Wordplay Rules ===
+  {
+    name: "Has one syllable",
+    categoryType: "wordplay",
+
+    words: [
+      'cat', 'dog', 'bird', 'fish', 'frog', 'rock', 'truck', 'grass', 'jump', 'cloud', 'desk', 'milk', 'glove', 'sink', 'knife', 'brick', 'chair', 'chalk',
+      'plant', 'brush', 'watch', 'skunk', 'peach', 'street', 'lamp', 'glass', 'crisp', 'blush', 'snack', 'flash', 'drill','book','hall','noon','stats',
+	'pup','tot','pop','peep','pip','gig'
 	
+    ]
+  },
+//
+// === Wordplay Rules ===
+//	
   {
     name: 'Has a consecutive double letter',
     categoryType: 'wordplay',
@@ -393,15 +404,7 @@ const allPossibleRules = [
       return false;
     }
   },
-  {
-    name: "Has one syllable",
-    categoryType: "wordplay",
 
-    words: [
-      'cat', 'dog', 'bird', 'fish', 'frog', 'rock', 'truck', 'grass', 'jump', 'cloud', 'desk', 'milk', 'glove', 'sink', 'knife', 'brick', 'chair', 'chalk',
-      'plant', 'brush', 'watch', 'skunk', 'peach', 'street', 'lamp', 'glass', 'crisp', 'blush', 'snack', 'flash', 'drill'
-    ]
-  },
   {
 	  name: 'Begins with a vowel',
 	  categoryType: 'wordplay',
