@@ -114,7 +114,7 @@ const allPossibleRules = [
       'car', 'jack', 'wrench', 'toolbox', 'bucket', 'tire', 'ladder', 'broom', 'rake',
       'bike', 'scooter', 'helmet', 'rope', 'hose', 'can', 'tool', 'drill', 'saw',
       'vacuum', 'box', 'bench', 'shelf', 'oil', 'rags', 'funnel', 'gloves', 'paint',
-      'chainsaw', 'hammer', 'pliers', 'screwdriver', 'garage', 'door', 'motor', 'engine',
+      'chainsaw', 'hammer', 'pliers', 'screwdriver','door', 'motor', 'engine',
       'belt', 'brake', 'gasoline', 'filter', 'battery', 'air compressor', 'grease',
       'wheel', 'lightbulb', 'radio', 'tape', 'measuring tape',
       'workbench', 'vise', 'spray paint', 'scraper', 'fan', 'light', 'canister', 'nails',
@@ -179,7 +179,7 @@ const allPossibleRules = [
       'cashier', 'register', 'credit', 'label', 'barcode', 'shelf', 'basket', 'bag',
       'container', 'helmet', 'net', 'glove', 'backpack', 'tray', 'remote', 'engine',
       'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter',
-      'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza'
+      'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh'
     ]
   },
   {
