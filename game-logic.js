@@ -6,7 +6,7 @@
 
 const CURRENT_VERSION = "1.06";
 // The address to the game, so we can post it in the Share dialog
-const URL = "https://admiralspunky.github.io/venn/"
+const URL = "https://admiralspunky.github.io/venn/";
 const genericLabels = ["Location", "Characteristic", "Spelling"]; //some zones get a customLabel instead
 const INITIAL_HAND_SIZE = 5;
 const MESSAGE_DISPLAY_TIME = 5000;
