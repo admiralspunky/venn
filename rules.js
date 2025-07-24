@@ -26,7 +26,7 @@ const allPossibleRules = [
     name: 'You would find it outside',
     categoryType: 'location',
     words: [
-      'tree', 'flower', 'cloud', 'mountain', 'river', 'rock', 'grass', 'sun', 'moon', 'star', 'bird', 'squirrel', 'bench', 'path', 'fence', 'gate', 'bush', 'pond', 'sky', 'dirt', 'apple',
+      'tree', 'flower', 'cloud', 'mountain', 'river', 'rock', 'grass', 'sun', 'moon', 'star', 'bird', 'squirrel', 'bench', 'path', 'fence', 'gate', 'bush', 'pond', 'sky', 'dirt', 
       'snake', 'bee', 'tree', 'bird', 'rock', 'lion', 'tiger', 'bear', 'wolf', 'fox', 'bat', 'rat', 'cow',
       'pig', 'deer', 'horse', 'goat', 'sheep', 'zebra', 'giraffe', 'monkey', 'ape',
       'otter', 'whale', 'dolphin', 'shark', 'eel', 'octopus', 'crab', 'lobster', 'clam',
@@ -39,7 +39,8 @@ const allPossibleRules = [
       'koala', 'platypus', 'panther', 'leopard', 'jaguar', 'lynx', 'cheetah',
       'moose', 'elk', 'reindeer', 'ibex', 'yak', 'ox', 'weasel', 'ferret', 'skunk',
       'raccoon', 'badger', 'porcupine', 'hedgehog', 'armadillo', 'beaver', 'capybara',
-      'walrus', 'seal', 'narwhal', 'flamingo', 'heron', 'crane', 'robin', 'peacock'
+      'walrus', 'seal', 'narwhal', 'flamingo', 'heron', 'crane', 'robin', 'peacock',
+	'tangerine','quince','apple'
     ],
   },
   {
