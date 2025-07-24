@@ -417,7 +417,7 @@ const allPossibleRules = [
   {
     name: 'Ends with a vowel',
     categoryType: 'wordplay',
-    words: ['banana', 'potato', 'tomato', 'zebra', 'pizza', 'mango', 'avocado', 'kiwi', 'radio', 'auto', 'happy', 'mystery', 'tyranny', 'weary'],
+    words: ['banana', 'potato', 'tomato', 'zebra', 'pizza', 'mango', 'avocado', 'kiwi', 'radio', 'auto', 'happy', 'mystery', 'tyranny', 'weary','blurry','teary','bleary','symphony'],
     test: (word) => /[aeiou]$/i.test(word)
   },
   {
@@ -447,9 +447,15 @@ const allPossibleRules = [
     }
   },
   {
+    name: 'Contains the letter "j"',
+    categoryType: 'wordplay',
+    words: ['jump','jaguar','projector','injection'],
+    test: (word) => /x/i.test(word)
+  },
+  {
     name: 'Contains the letter "x"',
     categoryType: 'wordplay',
-    words: ['fox', 'box', 'axe', 'taxi', 'extra', 'exit', 'fix', 'mix', 'flex', ' Xerox'],
+    words: ['fox', 'box', 'axe', 'taxi', 'extra', 'exit', 'fix', 'mix', 'flex'],
     test: (word) => /x/i.test(word)
   },
   {
