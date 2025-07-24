@@ -336,7 +336,7 @@ const allPossibleRules = [
   },
   {
     name: "Has one syllable",
-    categoryType: "wordplay",
+    categoryType: "characteristic",
     words: [
       'cat', 'dog', 'bird', 'fish', 'frog', 'rock', 'truck', 'grass', 'jump', 'cloud', 'desk', 'milk', 'glove', 'sink', 'knife', 'brick', 'chair', 'chalk',
       'plant', 'brush', 'watch', 'skunk', 'peach', 'street', 'lamp', 'glass', 'crisp', 'blush', 'snack', 'flash', 'drill', 'book', 'hall', 'noon', 'stats',
