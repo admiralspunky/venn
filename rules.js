@@ -179,7 +179,7 @@ const allPossibleRules = [
       'cashier', 'register', 'credit', 'label', 'barcode', 'shelf', 'basket', 'bag',
       'container', 'helmet', 'net', 'glove', 'backpack', 'tray', 'remote', 'engine',
       'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter',
-      'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh'
+      'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh','door','goalpost'
     ]
   },
   {
