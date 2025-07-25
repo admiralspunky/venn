@@ -1032,7 +1032,8 @@ function placeWordInRegion(targetZoneKeyString) {
     }
 
     // Show feedback bubble
-    showZoneFeedback(message, targetZoneElement, isErrorFeedback);
+	//I've made message-bubble fixed at the bottom of the screen, so we don't really need ZoneFeedback anymore, but I might need it later, so I'm just disabling it for now
+    // showZoneFeedback(message, targetZoneElement, isErrorFeedback);
 
     // Regardless of correctness, place the card visually
     const placedCard = createWordCard(selectedWordObj.text, selectedWordObj.id, selectedWordObj.correctZoneKey, true);
