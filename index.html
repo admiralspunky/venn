@@ -388,24 +388,42 @@
             visibility: visible;
         }
 
-        .message-box {
-            background-color: #d1fae5;
-            color: #065f46;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            margin-top: 1rem;
-            font-weight: 500;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            white-space: normal;
-            overflow: visible;
-            text-overflow: clip;
-            min-height: 2.5rem;
-            display: fixed;
-            align-items: center;
-            justify-content: center;
-        }
+.message-box {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    /* margin-top: 1rem; /* REMOVE THIS if you want fixed positioning based on viewport edges */
+    font-weight: 500;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    white-space: normal;
+    overflow: visible; /* You can keep these, but they might not be as relevant once fixed */
+    text-overflow: clip; /* You can keep these, but they might not be as relevant once fixed */
+    min-height: 2.5rem;
+
+    /* --- REQUIRED FOR FIXED POSITIONING --- */
+    position: fixed; 
+
+    /* --- POSITIONING (Choose where you want it) --- */
+    /* Example: Bottom-centered message box */
+    bottom: 20px; /* Distance from the bottom of the viewport */
+    left: 50%; /* Start from the middle horizontally */
+    transform: translateX(-50%); /* Pull it back by half its width to truly center */
+    width: 90%; /* Example: Take 90% of the screen width */
+    max-width: 400px; /* Example: Don't let it get too wide on large screens */
+
+    /* --- ENSURE VISIBILITY & LAYERING --- */
+    z-index: 1000; /* Make sure it appears on top of other content */
+
+    /* --- For centering content within the message box (if it becomes a flex container) --- */
+    /* If your message box content is just text, text-align: center; is enough. */
+    /* If you put other elements inside and want them centered with flexbox: */
+    display: flex; /* This makes it a flex container */
+    align-items: center; /* Vertically centers content if flex-direction is row */
+    justify-content: center; /* Horizontally centers content if flex-direction is row */
+}
 
         .message-box.visible {
             opacity: 1;
