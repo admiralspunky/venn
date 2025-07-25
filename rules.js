@@ -118,11 +118,42 @@ const allPossibleRules = [
       'chainsaw', 'hammer', 'pliers', 'screwdriver','door', 'motor', 'engine',
       'belt', 'brake', 'gasoline', 'filter', 'battery', 'air compressor', 'grease',
       'wheel', 'lightbulb', 'radio', 'tape', 'measuring tape',
-      'workbench', 'vise', 'spray paint', 'scraper', 'fan', 'light', 'canister', 'nails',
-      'bolts', 'nuts', 'sander', 'mask', 'goggles', 'earmuffs'
+      'workbench', 'vise', 'spray paint', 'scraper', 'fan', 'light', 'canister', 'nail',
+      'bolt', 'nut', 'sander', 'mask', 'goggles', 'earmuffs'
     ],
   },
-  // === Characteristic Rules ===
+{
+    name: 'You expect to find it in a library',
+    categoryType: 'location',
+    words: [
+        // Core items
+        'book', 'shelf', 'desk', 'chair', 'table', 'computer', 'printer', 'scanner',
+        'librarian', 'patron', 'card catalog', 'magazine', 'newspaper', 'DVD', 'CD',
+        'microfilm', 'map', 'atlas', 'dictionary', 'encyclopedia', 'thesaurus',
+
+        // Services & Areas
+        'reading room', 'study carrel', 'reference section', 'children\'s section',
+        'meeting room', 'restroom', 'water fountain', 'exit', 'entrance', 'information desk',
+        'checkout counter', 'return bin', 'sign', 'poster', 'display case', 'bulletin board',
+        'copy machine', 'shredder', 'wi-fi', 'power outlet', 'charging station',
+
+        // Tools & Supplies
+        'pen', 'pencil', 'paper', 'stapler', 'hole punch', 'clipboard', 'notepad',
+        'lamp', 'clock', 'calendar', 'whiteboard', 'projector', 'screen',
+        'cart', 'ladder', 'globe', 'magnifying glass', 'bookmark',
+
+        // Technology & Accessories (beyond basic computer)
+        'headphone', 'microphone', 'webcam', 'tablet', 'laptop', 'e-reader',
+
+        // Less common but still plausible
+        'art display', 'sculpture', 'plant', 'coffee machine' // (in some modern libraries)
+    ],
+},
+
+//
+// === Characteristic Rules ===
+//
+	
   {
     name: 'Often makes a sound',
     categoryType: 'characteristic',
