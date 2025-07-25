@@ -929,7 +929,7 @@ function showZoneFeedback(message, targetElement, isError = false) {
 
     setTimeout(() => {
         bubble.style.opacity = '0';
-    }, 1500);
+    }, 3000);
 }
 
 function placeWordInRegion(targetZoneKeyString) {
