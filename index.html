@@ -558,8 +558,10 @@
             color: white;
         }
 
+	
         /* --- Responsive Adjustments (Mobile First, then Desktop Overrides) --- */
-        @media (max-width: 767px) {
+        
+	@media (max-width: 767px) {
             .game-container {
                 flex-direction: column; /* Stacks top-bar, main-game-area vertically */
                 padding: 1.5rem;
@@ -584,7 +586,7 @@
 
             #hand-container {
                 order: -1; /* Move hand-container to the top within rules-grid-container */
-                max-height: 180px;
+                max-height: 200px;
                 margin-bottom: 20px;
                 width: 100%;
             }
@@ -595,11 +597,11 @@
             }
 
             .rule-box .box-header .box-label {
-                font-size: 0.9rem;
+                font-size: 1.0rem;
             }
 
             .word-card {
-                font-size: 0.9rem;
+                font-size: 1.0rem;
                 padding: 0.25rem 0.5rem;
             }
 
