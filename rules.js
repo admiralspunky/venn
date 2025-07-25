@@ -341,7 +341,7 @@ const allPossibleRules = [
     words: [
       'cat', 'dog', 'bird', 'fish', 'frog', 'rock', 'truck', 'grass', 'jump', 'cloud', 'desk', 'milk', 'glove', 'sink', 'knife', 'brick', 'chair', 'chalk',
       'plant', 'brush', 'watch', 'skunk', 'peach', 'street', 'lamp', 'glass', 'crisp', 'blush', 'snack', 'flash', 'drill', 'book', 'hall', 'noon', 'stats',
-      'pup', 'tot', 'pop', 'peep', 'pip', 'gig'
+      'pup', 'tot', 'pop', 'peep', 'pip', 'gig','break','red','tape','tool'
     ]
   },
   // === Wordplay Rules ===
