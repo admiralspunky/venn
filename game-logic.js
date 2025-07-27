@@ -149,6 +149,8 @@ async function startGame(isDaily) {
     }
 
     renderHand();
+
+	showMessage("Select a card in Your Hand, then play it in one of the other 8 zones.");
 }//async function startGame(isDaily)
 
 
