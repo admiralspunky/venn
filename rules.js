@@ -499,5 +499,17 @@ const allPossibleRules = [
     categoryType: 'wordplay',
     words: ['zoo', 'pizza', 'zebra'],
     test: (word) => /z/i.test(word)
-  }
-];
+  },
+	{
+	  name: 'Contains 4 or fewer unique letters',
+	  categoryType: 'wordplay',
+	  words: ['zoo', 'pizza','street','glass'],
+	  test: (word) => {
+	    const w = word.toLowerCase();
+	    const uniques = new Set(); // Use a Set to store unique characters
+	    for (const c of w) {
+	      uniques.add(c); // Sets automatically handle uniqueness
+	    }
+	    return uniques.size <= 4; // Check the size of the Set
+	  }	
+	}];	
