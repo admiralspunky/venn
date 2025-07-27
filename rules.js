@@ -215,7 +215,7 @@ const allPossibleRules = [
       'container', 'helmet', 'net', 'glove', 'backpack', 'tray', 'remote', 'engine',
       'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter',
       'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh','door','goalpost',
-	'ambulance','lens','mat','stethoscope','wheel','air compressor'
+	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan'
     ]
   },
   {
