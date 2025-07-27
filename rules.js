@@ -33,7 +33,7 @@ const allPossibleRules = [
       'snail', 'slug', 'bee', 'ant', 'wasp', 'moth', 'fly', 'gnat', 'termite', 'beetle',
       'lizard', 'gecko', 'snake', 'python', 'cobra', 'frog', 'toad', 'newt', 'salamander',
       'chicken', 'duck', 'goose', 'swan', 'penguin', 'turkey', 'rooster', 'falcon',
-      'hawk', 'eagle', 'owl', 'parrot', 'canary', 'finch', 'sparrow', 'pigeon','dog','cat'
+      'hawk', 'eagle', 'owl', 'parrot', 'canary', 'finch', 'sparrow', 'pigeon','dog','cat',
       'fish', 'trout', 'bass', 'salmon', 'carp', 'anchovy', 'shad', 'guppy', 'minnow',
       'buffalo', 'bison', 'donkey', 'mule', 'camel', 'alpaca', 'llama', 'kangaroo',
       'koala', 'platypus', 'panther', 'leopard', 'jaguar', 'lynx', 'cheetah','chimpanzee',
