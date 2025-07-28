@@ -1,4 +1,4 @@
-rename Wordplay to Spelling
+after a card is played to a zone, make that zone's cards less likely to be drawn again
 let the user log in, to carry their streak across browsers and devices, and we'll need that anyway for mp
 Setting to switch between Venn Diagram and Grid displays
 audio feedback
