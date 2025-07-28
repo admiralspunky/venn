@@ -122,7 +122,7 @@ const allPossibleRules = [
       'belt', 'brake', 'gasoline', 'filter', 'battery', 'air compressor', 'grease',
       'wheel', 'lightbulb', 'radio', 'tape', 'measuring tape',
       'workbench', 'vise', 'spray paint', 'scraper', 'fan', 'light', 'canister', 'nail',
-      'bolt', 'nut', 'sander', 'mask', 'goggles', 'earmuffs'
+      'bolt', 'nut', 'sander', 'mask', 'goggles', 'earmuffs',
     ],
   },
 {
@@ -138,7 +138,7 @@ const allPossibleRules = [
         'reading room', 'study carrel', 'reference section', 'children\'s section',
         'meeting room', 'restroom', 'water fountain', 'exit', 'entrance', 'information desk',
         'checkout counter', 'return bin', 'sign', 'poster', 'display case', 'bulletin board',
-        'copy machine', 'shredder', 'wi-fi', 'power outlet', 'charging station',
+        'copy machine', 'shredder', 'wi-fi', 'power outlet', 'charging station', 'door',
 
         // Tools & Supplies
         'pen', 'pencil', 'paper', 'stapler', 'hole punch', 'clipboard', 'notepad',
@@ -264,7 +264,8 @@ const allPossibleRules = [
   {
     name: 'Flammable',
     categoryType: 'characteristic',
-    words: ['paper', 'wood', 'gas', 'oil', 'candle', 'match', 'alcohol', 'fabric', 'cotton', 'plastic', 'coal', 'firewood', 'lighter', 'tinder', 'fuel', 'straw', 'leaves', 'grass', 'bush', 'gasoline', 'paint', 'flower', 'cardboard', 'kerosene', 'lighter fluid', 'aerosol', 'propane', 'solvent'],
+    words: ['paper', 'wood', 'gas', 'oil', 'candle', 'match', 'alcohol', 'fabric', 'cotton', 'plastic', 'coal', 'firewood', 'lighter', 'tinder', 'fuel', 'straw', 'leaves', 
+	    'grass', 'bush', 'gasoline', 'paint', 'flower', 'cardboard', 'kerosene', 'lighter fluid', 'aerosol', 'propane', 'solvent'],
   },
   {
     name: 'You can look through it',
