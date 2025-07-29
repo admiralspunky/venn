@@ -1,4 +1,5 @@
-after a card is played to a zone, make that zone's cards less likely to be drawn again
+after a card is played to a zone, make that zone's cards less likely to be drawn again (working on it)
+increase the number of example rules for each zone, but also remove the stipulation that the actual rule doesn't appear as an example
 setting for number of starting hint cards?
 let the user log in, to carry their streak across browsers and devices, and we'll need that anyway for mp
 Setting to switch between Venn Diagram and Grid displays
