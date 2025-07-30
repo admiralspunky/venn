@@ -6,7 +6,7 @@ const allPossibleRules = [
     words: [
       'computer', 'pen', 'paper', 'stapler', 'printer', 'desk', 'folder', 'calendar',
       'mouse', 'keyboard', 'chair', 'mug', 'lamp', 'phone', 'whiteboard', 'projector',
-      'clipboard', 'calculator', 'scanner', 'notebook', 'monitor', 'envelope', 'briefcase',
+      'clipboard', 'calculator', 'notebook', 'monitor', 'envelope', 'briefcase',
       'badge', 'highlighter', 'book', 'clock', 'ruler', 'glue', 'scissors'
     ],
   },
@@ -216,7 +216,7 @@ const allPossibleRules = [
       'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter',
       'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh','door','goalpost',
 	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan',
-	'diary','ceiling','pillow'
+	'diary','ceiling','pillow','pen','gloves'
     ]
   },
   {
