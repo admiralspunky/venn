@@ -96,7 +96,7 @@ const allPossibleRules = [
     categoryType: 'location',
     words: [
       "toilet", "sink", "shower", "bathtub", "mirror", "towel", "soap", "brush", "razor", "comb", "toothbrush", "toothpaste", "shampoo", "conditioner",
-      "faucet", "drain", "mat", "curtain", "lotion", "scale", "floss", "deodorant", "candle", "plunger"
+      "faucet", "drain", "mat", "curtain", "lotion", "scale", "floss", "deodorant", "candle", "plunger",'medicine'
     ]
   },
   {
@@ -108,7 +108,7 @@ const allPossibleRules = [
       "window", "curtain", "drawer", "bookshelf", "journal", "slippers", "headboard",
       "mattress", "duvet", "comforter", "poster", "photo", "frame", "television",
       "remote", "charger", "phone", "stuffed animal", "diary", "laundry", "hamper",
-      "clothes", "shoes", "desk", "chair", "fan", "ceiling"
+      "clothes", "shoes", "desk", "chair", "fan", 
     ]
   },
   {
@@ -138,7 +138,7 @@ const allPossibleRules = [
         'reading room', 'study carrel', 'reference section', 'children\'s section',
         'meeting room', 'restroom', 'water fountain', 'exit', 'entrance', 'information desk',
         'checkout counter', 'return bin', 'sign', 'poster', 'display case', 'bulletin board',
-        'copy machine', 'shredder', 'wi-fi', 'power outlet', 'charging station', 'door',
+        'copy machine', 'shredder', 'wi-fi', 'power outlet', 'charging station',
 
         // Tools & Supplies
         'pen', 'pencil', 'paper', 'stapler', 'hole punch', 'clipboard', 'notepad',
@@ -216,7 +216,7 @@ const allPossibleRules = [
       'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter',
       'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh','door','goalpost',
 	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan',
-	'diary','ceiling','pillow','pen','gloves'
+	'diary','ceiling','pillow','pen','gloves','toilet'
     ]
   },
   {
@@ -286,14 +286,15 @@ const allPossibleRules = [
   {
     name: 'Expected to last 100 years',
     categoryType: 'characteristic',
-    words: ['mountain', 'river', 'rock', 'building', 'tree', 'diamond', 'gold', 'pyramid', 'statue', 'fortress', 'lighthouse', 'bridge', 'planet', 'star', 'ocean', 'cathedral', 'tomb'],
+    words: ['mountain', 'river', 'rock', 'building', 'tree', 'diamond', 'gold', 'pyramid', 'statue', 'fortress', 'lighthouse', 'bridge', 'planet', 'star', 'ocean', 'cathedral', 'tomb','sun',
+	   'ocean','nation','castle','moon','water','afterlife','eternity','heaven','hell'],
   },
   {
     name: 'Pre-dates the USA (1776)',
     categoryType: 'characteristic',
     words: [
       'pyramid', 'castle', 'sword', 'chariot', 'scroll', 'papyrus', 'rome', 'greece', 'egypt', 'bow', 'arrow', 'wheel',
-      'fire', 'cave', 'mammoth', 'dinosaur', 'moon', 'sun', 'star', 'tree', 'river', 'mountain', 'water', 'glass', 'apple'
+      'fire', 'cave', 'mammoth', 'dinosaur', 'moon', 'sun', 'star', 'tree', 'river', 'mountain', 'water', 'glass', 'apple','ocean'
     ],
   },
   {
@@ -369,7 +370,7 @@ const allPossibleRules = [
       'big', 'small', 'large', 'huge', 'tiny', 'many', 'few', 'much', 'little', 'most',
       'happy', 'sad', 'angry', 'excited', 'calm', 'joyful', 'tired', 'brave', 'kind', 'friendly',
       'sweet', 'sour', 'salty', 'bitter', 'spicy', 'zesty', 'fresh', 'stale', 'aromatic',
-      'funny', 'pretty', 'tall', 'wrong', 'honest', 'calm', 'dumb', 'tough', 'high', 'light', 'whole', 'entire',
+      'funny', 'pretty', 'tall', 'right','wrong', 'honest', 'modest', 'calm', 'dumb', 'tough', 'high', 'light', 'whole', 'entire',
     ]
   },
   {
@@ -378,7 +379,7 @@ const allPossibleRules = [
     words: [
       'cat', 'dog', 'bird', 'fish', 'frog', 'rock', 'truck', 'grass', 'jump', 'cloud', 'desk', 'milk', 'glove', 'sink', 'knife', 'brick', 'chair', 'chalk',
       'plant', 'brush', 'watch', 'skunk', 'peach', 'street', 'lamp', 'glass', 'crisp', 'blush', 'snack', 'flash', 'drill', 'book', 'hall', 'noon', 'stats',
-      'pup', 'tot', 'pop', 'peep', 'pip', 'gig','break','red','tape','tool'
+      'pup', 'tot', 'pop', 'peep', 'pip', 'gig','break','red','tape','tool','right','wrong'
     ]
   },
   // === Wordplay Rules ===
