@@ -208,14 +208,15 @@ const allPossibleRules = [
       'bottle', 'cup', 'book', 'watch', 'robot', 'tool', 'machine', 'brick', 'cement',
       'microwave', 'remote', 'stapler', 'ladder', 'vacuum', 'rope', 'chainsaw',
       'airplane', 'ticket', 'passport', 'terminal', 'runway', 'scanner', 'gate', 'alarm',
-      'announcement','luggage', 'boarding', 'receipt', 'screwdriver',
+      'announcement','luggage', 'boarding', 'receipt', 'screwdriver','shoes',
       'clock', 'projector', 'keyboard', 'mouse', 'notebook', 'whiteboard', 'clipboard',
       'calculator', 'envelope', 'printer', 'scanner', 'monitor', 'suitcase', 'badge',
       'cashier', 'register', 'credit', 'label', 'barcode', 'shelf', 'basket', 'bag',
       'container', 'helmet', 'net', 'glove', 'backpack', 'tray', 'remote', 'engine',
       'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter',
       'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh','door','goalpost',
-	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan'
+	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan',
+	'diary','ceiling','pillow'
     ]
   },
   {
