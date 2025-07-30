@@ -1,4 +1,4 @@
-after a card is played to a zone, make that zone's cards less likely to be drawn again (working on it)
+after a card is played to a zone, make that zone's cards less likely to be drawn again (I'm working on it, but I need to make the zoneWeights apply to the INITIAL hand as well as the cards that get drawn during the game)
 increase the number of example rules for each zone, but also remove the stipulation that the actual rule doesn't appear as an example
 setting for number of starting hint cards?
 let the user log in, to carry their streak across browsers and devices, and we'll need that anyway for mp
