@@ -297,11 +297,11 @@ const allPossibleRules = [
     ],
   },
   {
-    name: 'would help you survive in the wilderness',
+    name: 'Would help you survive in the wild',
     categoryType: 'characteristic',
     words: [
       "knife", "fire", "water", "shelter", "rope", "compass", "map", "signal", "stick", "berry", "plant", "trap", "axe", "flint", "tent", "path",
-      "track", "gear", "food", "clothing", "blade", "bow", "arrow", "cave", "camp", "stone", 'belt'
+      "track", "gear", "food", "clothing", "blade", "bow", "arrow", "cave", "camp", "stone", 'belt','paper'
     ]
   },
   {
