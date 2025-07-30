@@ -4,7 +4,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.07";
+const CURRENT_VERSION = "1.08";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
 const genericLabels = ["Location", "Characteristic", "Spelling"]; //some zones get a customLabel instead
@@ -28,6 +28,8 @@ let livesRemaining = 0;
 // Daily streak variables
 let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || '0', 10);
 let lastDailyCompletionDate = localStorage.getItem('lastDailyCompletionDate') || '';
+//after a word is played into a zone, that zone's words are less likely to be drawn
+let zoneWeights = {};
 
 // Define fallback rules to prevent undefined errors if rule candidates are empty
 const fallbackLocationRule = { name: 'General Location', categoryType: 'location', words: [], test: () => false };
@@ -97,6 +99,20 @@ async function startGame(isDaily) {
 
     // Use the daily seed for ALL randomization steps in daily mode
     const seed = isDaily ? getDailySeed() : Math.floor(Math.random() * 100000);
+	
+	//These are the probabilities that, when a new card is drawn, it will belong to a certain zone, and I divide these weights every time a card is played in that zone 
+	//The initial three zones each start off with a card, so I'm reducing their weights before the start of the game, before the first hand is drawn
+	//TODO: except the initial cards do not get re-drawn if they're below the zoneWeight, and they should
+	zoneWeights = {
+        '0': 1.0, 
+        '1': 0.25,
+        '2': 0.25,
+        '3': 0.25,
+        '1-2': 1.0,
+        '1-3': 1.0,
+        '2-3': 1.0,
+        '1-2-3': 1.0
+    };
 
     // Restore original rule generation logic
     activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
@@ -372,12 +388,12 @@ function weightedRandomPick(weights, rng) {
 function generateWordPoolWithProbabilities(ruleResults, wordPool, count, rng) {
     const zoneProbabilities = {
         "1-2-3": 5,
-        "1-2": 10,
-        "1-3": 10,
-        "2-3": 10,
-        "1": 20,
-        "2": 20,
-        "3": 20,
+        "1-2": 15,
+        "1-3": 15,
+        "2-3": 15,
+        "1": 15,
+        "2": 15,
+        "3": 15,
         "0": 5
     };
     
@@ -582,10 +598,11 @@ function matchesOnlyOneRule(wordText, targetRuleIndex) {
     return matchedTargetRule && matchCount === 1;
 }
 
-//each rule displays the names of 3 other rules in that category
-function generateExampleHintsFor(rule, allRules, count = 3) {
-    const sameCategory = allRules.filter(r =>
-    r.categoryType === rule.categoryType && r.name !== rule.name
+//each rule displays the names of 5 other rules in that category
+function generateExampleHintsFor(rule, allRules ) {
+    const count = 5;
+	const sameCategory = allRules.filter(r =>
+    r.categoryType === rule.categoryType
     );
     
     const shuffled = [...sameCategory].sort(() => Math.random() - 0.5);
@@ -952,6 +969,11 @@ function placeWordInRegion(targetZoneKeyString) {
     const correctZoneKey = getCorrectZoneKeyForWord(selectedWordObj.text, activeRules);
     const correctZoneElement = zoneElements[correctZoneKey]?.container;
     const targetZoneElement = zoneElements[targetZoneKeyString]?.container;
+	
+	//regardless of correctness, the word was placed in the correctZoneKey, so make the correctZoneKey's cards less likely to be chosen again
+	zoneWeights[correctZoneKey] /= 4; 
+	console.log(` placement of ` + selectedWordObj.text + ' in zone ' + correctZoneKey + ', weight changed to ' + zoneWeights[correctZoneKey] );
+
 
     currentHand = currentHand.filter(w => w.id !== selectedWordId);
     const cardElement = document.getElementById(`card-${selectedWordId}`);
@@ -979,19 +1001,24 @@ function placeWordInRegion(targetZoneKeyString) {
     console.log(`Target Zone Key (placed in): '${targetZoneKeyString}'`);
     // --- DEBUG LOGS END ---
 
+    // This variable will hold the new card drawn from the pool
+    // Initialize to null, it will only be assigned if a new card is to be drawn (on a miss)
+    let newCardFromPool = null; 
+
     if (correctZoneKey === targetZoneKeyString) {
-        // Perfect match
+        // Perfect match: Hand size decreases, NO new card is drawn.
         isCorrectPlacement = true;
         selectedWordObj.correctZoneKey = correctZoneKey;
         message = `Correct! '${selectedWordObj.text}' belongs in this category.`;
         isErrorFeedback = false;
         console.log(`Outcome: Perfect Match`); // Debug log
+        
+        // Removed: newCardFromPool = drawCard();
+        // Hand size will now decrease by 1 for perfect matches.
     } else {
         // Incorrect placement - now determine if it's a near miss or far miss
         const targetIsSingleZone = ['1', '2', '3'].includes(targetZoneKeyString);
-        // Split the correctZoneKey into its individual components
         const correctZoneParts = correctZoneKey.split('-');
-        // Check if the target single zone is one of the components of the correct overlap zone
         const isTargetContainedInCorrectOverlap = correctZoneParts.includes(targetZoneKeyString);
 
         // --- DEBUG LOGS START ---
@@ -1000,27 +1027,20 @@ function placeWordInRegion(targetZoneKeyString) {
         console.log(`Is Target Contained In Correct Overlap: ${isTargetContainedInCorrectOverlap}`);
         // --- DEBUG LOGS END ---
 
-        // A near miss occurs if:
-        // 1. The user placed the word in a single zone (e.g., '1').
-        // 2. The word's correct zone is an overlap zone (e.g., '1-2', '1-3', '1-2-3').
-        // 3. The single zone where the user placed it is *part of* the correct overlap zone.
         if (targetIsSingleZone && correctZoneKey.includes('-') && isTargetContainedInCorrectOverlap) {
-            // Near miss: placed in a single zone, but it belongs in an overlapping zone that includes that single zone.
-            // Penalty: Draw a new card, but no life lost.
+            // Near miss: Draw a new card, but no life lost.
             selectedWordObj.correctZoneKey = correctZoneKey; // Still mark with correct zone for visual placement
-            drawCard(); // Still draw a card
-
+            newCardFromPool = drawCard(); // Draw a new card
             const correctCategoryName = getZoneDisplayName(correctZoneKey, false);
             message = `Near Miss! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
             isErrorFeedback = true; // Still show as a "mistake" visually
             console.log(`Outcome: Near Miss`); // Debug log
         } else {
-            // Far miss: completely wrong zone, or placed in an overlap when it belongs in a single zone, or placed in 'None' when it belongs elsewhere, etc.
-            // Penalty: Lose a life and draw a new card.
+            // Far miss: Lose a life and draw a new card.
             selectedWordObj.correctZoneKey = correctZoneKey; // Still mark with correct zone for visual placement
             livesRemaining--; // Lose a life
             updateLivesDisplay();
-            drawCard(); // Still draw a card
+            newCardFromPool = drawCard(); // Draw a new card
 
             const correctCategoryName = getZoneDisplayName(correctZoneKey, false);
             message = `Oops! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
@@ -1033,8 +1053,21 @@ function placeWordInRegion(targetZoneKeyString) {
         }
     }
 
-    // Show feedback bubble
-	//I've made message-bubble fixed at the bottom of the screen, so we don't really need ZoneFeedback anymore, but I might need it later, so I'm just disabling it for now
+    // This block now only executes if newCardFromPool was assigned (meaning a miss occurred)
+    if (newCardFromPool) {
+        // If drawCard() successfully returned a word (i.e., deck is not empty)
+        const newWordObj = { id: crypto.randomUUID(), text: newCardFromPool, correctZoneKey: null };
+        currentHand.push(newWordObj);
+        wordsInPlay.push(newWordObj); // Add to wordsInPlay so it can be tracked
+        console.log(`New card '${newWordObj.text}' added to hand.`);
+    } else if (!isCorrectPlacement) {
+        // This condition handles the case where it was a miss, but drawCard() returned null (deck empty)
+        console.log("No new card drawn for a miss because currentWordPool is empty.");
+        message += " (No more cards to draw!)"; // Inform the player
+    }
+
+
+    // Show feedback bubble (currently disabled by you)
     // showZoneFeedback(message, targetZoneElement, isErrorFeedback);
 
     // Regardless of correctness, place the card visually
@@ -1043,17 +1076,56 @@ function placeWordInRegion(targetZoneKeyString) {
         placedCard.classList.add("incorrect");
     }
     correctZoneElement.querySelector('.word-cards-container').appendChild(placedCard);
+	
 
     // The main messageBox message should reflect the outcome
     showMessage(message, isErrorFeedback); // Use isErrorFeedback for messageBox too
 
     selectedWordId = null;
-    renderHand();
+    renderHand(); // Re-render hand to show the updated hand (fewer cards on perfect, same on miss)
 
     checkGameEndCondition();
 }
 
+//I'm replacing the old drawCard function; this new function checks the zoneWeight before it actually draws the card
+function drawCard() {
+    // Loop until a card is successfully drawn or the deck is empty
+    while (currentWordPool.length > 0) {
+        let cardToConsider = currentWordPool[0]; // Get the top card
+        const cardZoneKey = getCorrectZoneKeyForWord(cardToConsider, activeRules);
 
+        // Get the weight for this card's zone
+        const zoneWeight = zoneWeights[cardZoneKey] !== undefined ? zoneWeights[cardZoneKey] : 1.0;
+
+        // Calculate the probability of *not* drawing this card (moving it to bottom)
+        const chanceToMoveToBottom = 1 - zoneWeight;
+
+        // Generate a random number between 0 and 1
+        const randomNumber = Math.random();
+
+        console.log(`Considering drawing '${cardToConsider}'. Zone: '${cardZoneKey}', Weight: ${zoneWeight.toFixed(2)}, Chance to move to bottom: ${chanceToMoveToBottom.toFixed(2)}, Random: ${randomNumber.toFixed(2)}`);
+
+        if (randomNumber < chanceToMoveToBottom) {
+            // If the random number suggests moving to bottom, do so
+            const movedCard = currentWordPool.shift(); // Remove from top
+            currentWordPool.push(movedCard);          // Add to bottom
+            console.log(`'${movedCard}' moved to bottom of deck due to zone weight.`);
+            // The loop will continue to the next iteration to consider the new top card
+        } else {
+            // If the random number suggests drawing, draw the card and exit the loop
+            const drawnCard = currentWordPool.shift(); // Remove from top and return
+            console.log(`'${drawnCard}' drawn.`);
+			
+            return drawnCard; // A card was drawn, exit the function
+        }
+    }
+
+    // If the loop finishes, it means currentWordPool.length was 0
+    console.log("Deck is empty. Cannot draw more cards.");
+    return null; // Or handle game end/shuffle
+}
+
+/*
 function drawCard() {
     if (currentWordPool.length > 0) {
 		//console.log("currentWordPool before pop:", [...currentWordPool]); // Log a copy before pop
@@ -1066,6 +1138,7 @@ function drawCard() {
         showMessage('No more cards to draw from the pool! Try to clear your hand.', true);
     }
 }
+*/
 
 function copyToClipboard(text) {
     const textarea = document.createElement('textarea');
@@ -1192,7 +1265,9 @@ function seedInitialZones(pool) {
                 text: chosenWord,
                 correctZoneKey: targetZoneKey,
                 isInitialSeed: true // Mark as initially seeded for rendering logic
-            });
+			});
+			zoneWeights[targetZoneKey] /= 4; // If a word gets placed in a zone, make it half as likely to be chosen again
+			console.log(`Initial placement of ` + chosenWord + ' in zone ' + targetZoneKey + ', weight changed to ' + zoneWeights[targetZoneKey] );
         } else {
             console.warn(`[startGame] Could not find word for Rule ${targetZoneKey} (${activeRules[targetRuleIndex]?.name || 'N/A'})`);
         }
@@ -1296,8 +1371,8 @@ function updateRuleBoxLabelsAndHints(isGameOver = false) {
                             }
                         });
                         
-                        const uniqueHints = Array.from(new Set(shuffleArray(candidateHints, Date.now() + key.length))).slice(0, 3);
-                        hintText = uniqueHints.length > 0 ? "Other rules of this type:\n" + uniqueHints.join('\n') : 'No other rules of this type available.';
+                        const uniqueHints = Array.from(new Set(shuffleArray(candidateHints, Date.now() + key.length))).slice(0, 5);
+                        hintText = uniqueHints.length > 0 ? "Some example rules of this type:\n\n" + uniqueHints.join('\n') : 'No other rules of this type available.';
                     } else if (numRulesMatched === 2) {
                         hintText = "Words in this category meet exactly 2 rules.";
                     } else if (numRulesMatched === 3) {
