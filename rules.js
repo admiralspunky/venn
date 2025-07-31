@@ -47,14 +47,14 @@ const allPossibleRules = [
     ],
   },
   {
-      name: 'You expect to find it inside a building',
+      name: 'expected inside a building',
       categoryType: 'location',
       words: [
         'table', 'chair', 'desk', 'lamp', 'rug', 'door', 'window', 'wall',
         'floor', 'ceiling', 'staircase', 'elevator', 'escalator', 'light switch',
         'power outlet', 'thermostat', 'smoke detector', 'fire extinguisher',
         'picture frame', 'bookshelf', 'television', 'computer', 'keyboard',
-	'bed',
+	'bed','microwave','sink','locker','monitor','toilet','shower','bathtub'
       ],
     },
   {
