@@ -163,6 +163,15 @@ const allPossibleRules = [
         'art display', 'sculpture', 'plant', 'coffee machine' // (in some modern libraries)
     ],
 },
+{
+      name: 'You expect to find it at a zoo',
+      categoryType: 'location',
+      words: [
+        'lion', 'tiger', 'bear', 'penguin', 'monkey', 'zebra', 'giraffe', 'hippo', 'elephant',
+        'enclosure', 'cage', 'fence', 'gate', 'ticket', 'map', 'path', 'bench',
+        'gift shop', 'snack bar', 'restroom', 'fountain', 'carousel', 'train', 'bus'
+      ]
+},
 
 //
 // === Characteristic Rules ===
