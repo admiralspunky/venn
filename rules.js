@@ -23,7 +23,7 @@ const allPossibleRules = [
     ],
   },
   {
-    name: 'You would find it outside',
+    name: 'You expect to find it outside',
     categoryType: 'location',
     words: [
       'tree', 'flower', 'cloud', 'mountain', 'river', 'rock', 'grass', 'sun', 'moon', 'star', 'bird', 'squirrel', 'bench', 'path', 'fence', 'gate', 'bush', 'pond', 'sky', 'dirt', 
@@ -46,6 +46,17 @@ const allPossibleRules = [
       
     ],
   },
+  {
+      name: 'You expect to find it inside a building',
+      categoryType: 'location',
+      words: [
+        'table', 'chair', 'desk', 'lamp', 'rug', 'door', 'window', 'wall',
+        'floor', 'ceiling', 'staircase', 'elevator', 'escalator', 'light switch',
+        'power outlet', 'thermostat', 'smoke detector', 'fire extinguisher',
+        'picture frame', 'bookshelf', 'television', 'computer', 'keyboard',
+	'bed',
+      ],
+    },
   {
     name: 'You expect to find it at a school',
     categoryType: 'location',
