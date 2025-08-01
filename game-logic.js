@@ -1296,9 +1296,9 @@ function generateActiveRules(gameSeed) {
 // Ensures sufficient pairwise and triple overlaps before accepting
 // =========================================
 function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 3, minTripleOverlap = 1, maxAttempts = 1000) {
-    const locationRules = allRules.filter(r => r.categoryType === 'location');
-    const characteristicRules = allRules.filter(r => r.categoryType === 'characteristic');
-    const wordplayRules = allRules.filter(r => r.categoryType === 'wordplay');
+    const locationRules = allRules.filter(r => r.categoryType === 'location' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
+    const characteristicRules = allRules.filter(r => r.categoryType === 'characteristic' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
+    const wordplayRules = allRules.filter(r => r.categoryType === 'wordplay' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         const loc = shuffleArray([...locationRules], seed + attempt * 3 + 1)[0];
