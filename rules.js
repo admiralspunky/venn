@@ -19,7 +19,7 @@ const allPossibleRules = [
       'spatula', 'colander', 'grater', 'peeler', 'whisk', 'apron', 'ladle', 'tongs',
       'strainer', 'can opener', 'cutting board', 'cookie sheet', 'corkscrew', 'mortar',
       'pestle', 'grill', 'mixer', 'sieve', 'rolling pin', 'oven mitt', 'timer',
-      'measuring cup', 'scale', 'dish rack'
+      'measuring cup', 'scale', 'dish rack','toaster'
     ],
   },
   {
@@ -54,7 +54,7 @@ const allPossibleRules = [
         'floor', 'ceiling', 'staircase', 'elevator', 'escalator', 'light switch',
         'power outlet', 'thermostat', 'smoke detector', 'fire extinguisher',
         'picture frame', 'bookshelf', 'television', 'computer', 'keyboard',
-	'bed','microwave','sink','locker','monitor','toilet','shower','bathtub'
+	'bed','microwave','sink','locker','monitor','toilet','shower','bathtub','toaster'
       ],
     },
   {
@@ -236,7 +236,7 @@ const allPossibleRules = [
       'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter',
       'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh','door','goalpost',
 	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan',
-	'diary','ceiling','pillow','pen','gloves','toilet','scalpel'
+	'diary','ceiling','pillow','pen','gloves','toilet','scalpel','toaster'
     ]
   },
   {
@@ -301,7 +301,8 @@ const allPossibleRules = [
   {
     name: 'Most people have touched it',
     categoryType: 'characteristic',
-    words: ['money', 'door', 'phone', 'keyboard', 'pen', 'paper', 'book', 'fabric', 'skin', 'water', 'food', 'glass', 'wood', 'metal', 'plastic', 'coin', 'window', 'shoes', 'handle', 'button', 'screen', 'table', 'chair'],
+    words: ['money', 'door', 'phone', 'keyboard', 'pen', 'paper', 'book', 'fabric', 'skin', 'water', 'food', 'glass', 'wood', 'metal', 'plastic', 'coin', 'window', 'shoes', 'handle', 'button', 'screen', 'table', 
+	    'chair','toaster'],
   },
   {
     name: 'Expected to last 100 years',
@@ -346,7 +347,7 @@ const allPossibleRules = [
       "bag", "box", "radio", "baby", "knife", "bottle", "sword", "backpack", "helmet", "goggles", "mirror", "alarm", "pillow", "torch", "bucket", "hat",
       "broom", "plate", "mask", "towel", "rope", "bookbag", "phone", "key", "wallet", "pen", "tablet", "notebook", "flashlight", "camera", "thermos", "scarf",
       "snack", "dice", "lantern", "toy", "umbrella", "shovel", "candle", "calculator", "ball", "brick", "booklet", "cassette", "doll", "leash", "paintbrush",
-      "comb", "brush", "staff", 'helmet','pencil','boots','ruler','mug','can opener','rolling pin'
+      "comb", "brush", "staff", 'helmet','pencil','boots','ruler','mug','can opener','rolling pin','toaster'
     ]
   },
   {
@@ -357,7 +358,7 @@ const allPossibleRules = [
       'bagel', 'hoop', 'ring', 'pipe', 'straw', 'flute', 'whistle', 'mask', 'goggles',
       'door', 'grater', 'spiderweb', 'fence', 'lace', 'mesh', 'corkscrew', 'key', 'lock',
       'fishing net', 'golf ball', 'vent', 'drain', 'sleeve', 'sock', 'glove', 'earring', 'chain',
-      'tire', 'wheel', 'perforated paper', 'pegboard', 'honeycomb', 'colander', 'strainer'
+      'tire', 'wheel', 'perforated paper', 'pegboard', 'honeycomb', 'colander', 'strainer','toaster'
     ],
   },
   {
