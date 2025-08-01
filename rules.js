@@ -236,7 +236,7 @@ const allPossibleRules = [
       'speaker', 'radio', 'lamp', 'trolley', 'x-ray', 'control', 'turnstile', 'scooter',
       'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh','door','goalpost',
 	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan',
-	'diary','ceiling','pillow','pen','gloves','toilet','scalpel','toaster','drain','sink','curtain','toothbrush','lotion','sweater','notepad','building'
+	'diary','ceiling','pillow','pen','gloves','toilet','scalpel','toaster','drain','sink','curtain','toothbrush','lotion','sweater','notepad','building',
     ]
   },
   {
@@ -509,7 +509,7 @@ const allPossibleRules = [
     name: 'Contains the letter "j"',
     categoryType: 'wordplay',
     words: ['jump','jaguar','projector','injection'],
-    test: (word) => /x/i.test(word)
+    test: (word) => /j/i.test(word)
   },
   {
     name: 'Contains the letter "x"',
