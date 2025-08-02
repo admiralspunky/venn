@@ -298,15 +298,19 @@ const allPossibleRules = [
     words: [
       "window", "glass", "telescope", "microscope", "binoculars", "periscope", "magnifying glass",
       "goggles", "lens", "eyeglasses", "sunglasses", "door", "peephole", "skylight",
-      "aquarium", "pinhole", "camera", "scope", "visor", "windshield", "screen",
-      "cellophane", "plastic", "ice", "jar", "beaker", "crystal", "bubble", "water"
+      "aquarium", "pinhole", "camera", "scope", "visor", "windshield", "screen",'flower',
+      "cellophane", "plastic", "ice", "jar", "beaker", "crystal", "bubble", "water",
+	'table', 'chair', 'desk', 'lamp', 'rug', 'door', 
     ]
   },
   {
     name: 'Most people have touched it',
     categoryType: 'characteristic',
-    words: ['money', 'door', 'phone', 'keyboard', 'pen', 'paper', 'book', 'fabric', 'skin', 'water', 'food', 'glass', 'wood', 'metal', 'plastic', 'coin', 'window', 'shoes', 'handle', 'button', 'screen', 'table', 
-	    'chair','toaster'],
+    words: ['money', 'door', 'phone', 'keyboard', 'pen', 'paper', 'book', 'fabric', 'skin', 'water', 'food', 
+	    'glass', 'wood', 'metal', 'plastic', 'coin', 'window', 'shoes', 'handle', 'button', 'screen', 'table', 
+	    'chair','toaster','clock','mattress','computer', 'bag',
+	    'fork', 'spoon', 'knife', 'plate', 'cup', 'bowl',
+	   ],
   },
   {
     name: 'Expected to last >100 years',
@@ -541,3 +545,4 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
