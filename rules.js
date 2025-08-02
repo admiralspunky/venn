@@ -43,6 +43,7 @@ const allPossibleRules = [
 	'tangerine','quince','apple',
       "phoenix", "centaur", "cyclops", "minotaur", "chimera", "hydra", "pegasus", "medusa", "griffin",
       "goblin", "troll", "fairy", "djinn", "mermaid", "nymph", "dryad", "yeti", "kraken","giant","sphinx",
+	'Jupiter'
       
     ],
   },
@@ -68,7 +69,8 @@ const allPossibleRules = [
       "exam", "test", "quiz", "schedule", "bus", "gym", "auditorium", "lab",
       "detention", "bell", "uniform", "grade", "report", "chalkboard", "highlighter",
       "paperclip", "stapler", "homework", "semester", "notepad", "lunchbox",
-      "classmate", "education", "study", "lecture", "syllabus", "library", "dictionary"
+      "classmate", "education", "study", "lecture", "syllabus", "library", "dictionary",
+	'projector'
     ]
   },
   {
@@ -99,7 +101,7 @@ const allPossibleRules = [
     categoryType: 'location',
     words: [
       'plane', 'airplane', 'luggage', 'ticket', 'passport', 'terminal', 'runway', 'gate', 'boarding', 'security', 'baggage', 'arrival', 'departure', 'flight', 'pilot', 'steward', 'customs',
-      'engine', 'alarm', 'announcement', 'siren', 'bell', 'beep', 'scanner', 'bag'
+      'engine', 'alarm', 'announcement', 'siren', 'bell', 'beep', 'scanner', 'bag','jet'
     ]
   },
   {
@@ -169,7 +171,7 @@ const allPossibleRules = [
       words: [
         'lion', 'tiger', 'bear', 'penguin', 'monkey', 'zebra', 'giraffe', 'hippo', 'elephant',
         'enclosure', 'cage', 'fence', 'gate', 'ticket', 'map', 'path', 'bench',
-        'gift shop', 'snack bar', 'restroom', 'fountain', 'carousel', 'train', 'bus'
+        'gift shop', 'snack bar', 'restroom', 'fountain', 'carousel', 'train', 'bus','jaguar'
       ]
 },
 
@@ -237,6 +239,7 @@ const allPossibleRules = [
       'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh','door','goalpost',
 	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan',
 	'diary','ceiling','pillow','pen','gloves','toilet','scalpel','toaster','drain','sink','curtain','toothbrush','lotion','sweater','notepad','building',
+	'jet','jewelry',
     ]
   },
   {
@@ -263,14 +266,15 @@ const allPossibleRules = [
   {
     name: 'Single-use',
     categoryType: 'characteristic',
-    words: ['napkin', 'tissue', 'disposable', 'cup', 'paper', 'plate', 'cotton', 'swab', 'match', 'firecracker', 'balloon', 'bandage', 'ticket', 'receipt', 'sticker', 'wrapper', 'straw', 'glove'],
+    words: ['napkin', 'tissue', 'disposable', 'cup', 'paper', 'plate', 'cotton', 'swab', 'match', 'firecracker', 'balloon', 'bandage', 'ticket', 'receipt', 'sticker', 'wrapper', 
+	    'straw', 'glove','bullet'],
   },
   {
     name: 'Shiny or reflective',
     categoryType: 'characteristic',
     words: [
       'mirror', 'diamond', 'gold', 'silver', 'glass', 'water', 'metal', 'chrome', 'lightbulb', 'jewelry', 'coin', 'window', 'lake', 'ice', 'snow', 'dew', 'raindrop',
-      'lamp', 'monitor', 'sink', 'sun', 'moon', 'star', 'river', 'pond', 'television', 'light'
+      'lamp', 'monitor', 'sink', 'sun', 'moon', 'star', 'river', 'pond', 'television', 'light','jet'
     ],
   },
   {
@@ -279,7 +283,7 @@ const allPossibleRules = [
     words: [
       'knife', 'needle', 'thorn', 'pin', 'pencil', 'nail', 'screw', 'star', 'mountain', 'tooth', 'horn', 'arrow', 'spear', 'branch', 'icicle', 'cactus', 'rose', 'shark',
       'fang', 'claw', 'sting', 'bee', 'scorpion', 'pinecone', 'leaf', 'spike', 'twig', 'sword', 'dagger', 'razor', 'scalpel', 'blade', 'dart', 'awl', 'pineapple',
-      'icepick', 'pickaxe', 'hook', 'peg', 'spur'
+      'icepick', 'pickaxe', 'hook', 'peg', 'spur','thorn'
     ],
   },
   {
@@ -305,17 +309,17 @@ const allPossibleRules = [
 	    'chair','toaster'],
   },
   {
-    name: 'Expected to last 100 years',
+    name: 'Expected to last >100 years',
     categoryType: 'characteristic',
     words: ['mountain', 'river', 'rock', 'building', 'tree', 'diamond', 'gold', 'pyramid', 'statue', 'fortress', 'lighthouse', 'bridge', 'planet', 'star', 'ocean', 'cathedral', 'tomb','sun',
-	   'ocean','nation','castle','moon','water','afterlife','eternity','heaven','hell'],
+	   'ocean','nation','castle','moon','water','afterlife','eternity','heaven','hell','Jupiter'],
   },
   {
     name: 'Pre-dates the USA (1776)',
     categoryType: 'characteristic',
     words: [
       'pyramid', 'castle', 'sword', 'chariot', 'scroll', 'papyrus', 'rome', 'greece', 'egypt', 'bow', 'arrow', 'wheel',
-      'fire', 'cave', 'mammoth', 'dinosaur', 'moon', 'sun', 'star', 'tree', 'river', 'mountain', 'water', 'glass', 'apple','ocean'
+      'fire', 'cave', 'mammoth', 'dinosaur', 'moon', 'sun', 'star', 'tree', 'river', 'mountain', 'water', 'glass', 'apple','ocean','Jupiter'
     ],
   },
   {
@@ -337,7 +341,7 @@ const allPossibleRules = [
       "thunderbolt", "lightning", "mirror", "cauldron", "sword", "dagger", "staff", "cloak",
       "dragon", "serpent", "wolf", "raven", "stag", "horse", "beast", "hero", "villain",
       "curse", "spell", "riddle", "fire", "ice", "shadow", "spirit", "ghost", "demon", "angel",
-      "heaven", "underworld", "hell", "afterlife", "fate", "destiny", "eternity", "rebirth"
+      "heaven", "underworld", "hell", "afterlife", "fate", "destiny", "eternity", "rebirth",'Jupiter'
     ],
   },
   {
@@ -347,7 +351,7 @@ const allPossibleRules = [
       "bag", "box", "radio", "baby", "knife", "bottle", "sword", "backpack", "helmet", "goggles", "mirror", "alarm", "pillow", "torch", "bucket", "hat",
       "broom", "plate", "mask", "towel", "rope", "bookbag", "phone", "key", "wallet", "pen", "tablet", "notebook", "flashlight", "camera", "thermos", "scarf",
       "snack", "dice", "lantern", "toy", "umbrella", "shovel", "candle", "calculator", "ball", "brick", "booklet", "cassette", "doll", "leash", "paintbrush",
-      "comb", "brush", "staff", 'helmet','pencil','boots','ruler','mug','can opener','rolling pin','toaster'
+      "comb", "brush", "staff", 'helmet','pencil','boots','ruler','mug','can opener','rolling pin','toaster','jewelry'
     ]
   },
   {
@@ -368,7 +372,7 @@ const allPossibleRules = [
       'hat', 'gloves', 'scarf', 'jacket', 'eyeglasses', 'sunglasses', 'watch', 'belt', 'shoes', 'socks', 'tie',
       'shirt', 'pants', 'dress', 'coat', 'boots', 'necklace', 'ring', 'earrings', 'bracelet', 'glasses',
       'cap', 'hoodie', 'shorts', 'sweater', 'vest', 'mittens', 'sandals', 'helmet', 'uniform', 'pajamas',
-      'cufflinks', 'crown', 'mask'
+      'cufflinks', 'crown', 'mask','jewelry'
     ],
   },
   {
@@ -391,7 +395,7 @@ const allPossibleRules = [
       'big', 'small', 'large', 'huge', 'tiny', 'many', 'few', 'much', 'little', 'most',
       'happy', 'sad', 'angry', 'excited', 'calm', 'joyful', 'tired', 'brave', 'kind', 'friendly',
       'sweet', 'sour', 'salty', 'bitter', 'spicy', 'zesty', 'fresh', 'stale', 'aromatic',
-      'funny', 'pretty', 'tall', 'right','wrong', 'honest', 'modest', 'calm', 'dumb', 'tough', 'high', 'light', 'whole', 'entire',
+      'funny', 'pretty', 'tall', 'right','wrong', 'honest', 'modest', 'calm', 'dumb', 'tough', 'high', 'light', 'whole', 'entire','jumpy'
     ]
   },
   {
@@ -400,7 +404,7 @@ const allPossibleRules = [
     words: [
       'cat', 'dog', 'bird', 'fish', 'frog', 'rock', 'truck', 'grass', 'jump', 'cloud', 'desk', 'milk', 'glove', 'sink', 'knife', 'brick', 'chair', 'chalk',
       'plant', 'brush', 'watch', 'skunk', 'peach', 'street', 'lamp', 'glass', 'crisp', 'blush', 'snack', 'flash', 'drill', 'book', 'hall', 'noon', 'stats',
-      'pup', 'tot', 'pop', 'peep', 'pip', 'gig','break','red','tape','tool','right','wrong'
+      'pup', 'tot', 'pop', 'peep', 'pip', 'gig','break','red','tape','tool','right','wrong','jet'
     ]
   },
   // === Wordplay Rules ===
