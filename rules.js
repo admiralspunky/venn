@@ -43,7 +43,7 @@ const allPossibleRules = [
 	'tangerine','quince','apple',
       "phoenix", "centaur", "cyclops", "minotaur", "chimera", "hydra", "pegasus", "medusa", "griffin",
       "goblin", "troll", "fairy", "djinn", "mermaid", "nymph", "dryad", "yeti", "kraken","giant","sphinx",
-	'Jupiter'
+	'Jupiter','zebra','blizzard'
       
     ],
   },
@@ -146,6 +146,7 @@ const allPossibleRules = [
         'book', 'shelf', 'desk', 'chair', 'table', 'computer', 'printer', 'scanner',
         'librarian', 'patron', 'card catalog', 'magazine', 'newspaper', 'DVD', 'CD',
         'microfilm', 'map', 'atlas', 'dictionary', 'encyclopedia', 'thesaurus',
+	'magazine',
 
         // Services & Areas
         'reading room', 'study carrel', 'reference section', 'children\'s section',
@@ -171,7 +172,8 @@ const allPossibleRules = [
       words: [
         'lion', 'tiger', 'bear', 'penguin', 'monkey', 'zebra', 'giraffe', 'hippo', 'elephant',
         'enclosure', 'cage', 'fence', 'gate', 'ticket', 'map', 'path', 'bench',
-        'gift shop', 'snack bar', 'restroom', 'fountain', 'carousel', 'train', 'bus','jaguar'
+        'gift shop', 'snack bar', 'restroom', 'fountain', 'carousel', 'train', 'bus','jaguar'.
+	'zebra','chimpanzee'
       ]
 },
 
@@ -254,7 +256,7 @@ const allPossibleRules = [
       'fall', 'electrocution', 'disease', 'infection', 'cancer', 'asbestos',
       'drowning', 'prison', 'war', 'battlefield', 'riot', 'murder', 'attack', 'ambush',
       'hostage', 'terror', 'sniper', 'heist', 'robbery', 'choke', 'strangle', 'stab',
-      'shoot', 'fight', 'punch', 'kick', 'bite'
+      'shoot', 'fight', 'punch', 'kick', 'bite',
     ]
   },
   {
@@ -376,7 +378,7 @@ const allPossibleRules = [
       'hat', 'gloves', 'scarf', 'jacket', 'eyeglasses', 'sunglasses', 'watch', 'belt', 'shoes', 'socks', 'tie',
       'shirt', 'pants', 'dress', 'coat', 'boots', 'necklace', 'ring', 'earrings', 'bracelet', 'glasses',
       'cap', 'hoodie', 'shorts', 'sweater', 'vest', 'mittens', 'sandals', 'helmet', 'uniform', 'pajamas',
-      'cufflinks', 'crown', 'mask','jewelry'
+      'cufflinks', 'crown', 'mask','jewelry','jersey'
     ],
   },
   {
@@ -409,7 +411,7 @@ const allPossibleRules = [
       'cat', 'dog', 'bird', 'fish', 'frog', 'rock', 'truck', 'grass', 'jump', 'cloud', 'desk', 'milk', 'glove', 'sink', 'knife', 'brick', 'chair', 'chalk',
       'plant', 'brush', 'watch', 'skunk', 'peach', 'street', 'lamp', 'glass', 'crisp', 'blush', 'snack', 'flash', 'drill', 'book', 'hall', 'noon', 'stats',
       'pup', 'tot', 'pop', 'peep', 'pip', 'gig','break','red','tape','tool','right','wrong','jet',
-	'floor','drill','snack','glass','moon','cup','judge','phone'
+	'floor','drill','snack','glass','moon','cup','judge','phone','zoo','zone'
     ]
   },
   // === Wordplay Rules ===
@@ -546,5 +548,6 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
