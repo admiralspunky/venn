@@ -487,7 +487,7 @@ const allPossibleRules = [
   {
     name: 'Ends with a vowel',
     categoryType: 'wordplay',
-    words: ['banana', 'potato', 'tomato', 'zebra', 'pizza', 'mango', 'avocado', 'kiwi', 'radio', 'auto', 'happy', 'mystery', 'tyranny', 'weary','blurry','teary','bleary','symphony'],
+    words: ['banana', 'potato', 'tomato', 'zebra', 'pizza', 'mango', 'avocado', 'kiwi', 'radio', 'auto', 'happy', 'mystery', 'tyranny', 'weary','blurry','teary','bleary','symphony','robbery'],
     test: (word) => /[aeiou]$/i.test(word)
   },
   {
@@ -560,6 +560,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
