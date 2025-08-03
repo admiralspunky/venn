@@ -172,7 +172,7 @@ const allPossibleRules = [
       words: [
         'lion', 'tiger', 'bear', 'penguin', 'monkey', 'zebra', 'giraffe', 'hippo', 'elephant',
         'enclosure', 'cage', 'fence', 'gate', 'ticket', 'map', 'path', 'bench',
-        'gift shop', 'snack bar', 'restroom', 'fountain', 'carousel', 'train', 'bus','jaguar'.
+        'gift shop', 'snack bar', 'restroom', 'fountain', 'carousel', 'train', 'bus','jaguar',
 	'zebra','chimpanzee'
       ]
 },
@@ -548,6 +548,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
