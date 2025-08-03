@@ -173,7 +173,7 @@ const allPossibleRules = [
         'lion', 'tiger', 'bear', 'penguin', 'monkey', 'zebra', 'giraffe', 'hippo', 'elephant',
         'enclosure', 'cage', 'fence', 'gate', 'ticket', 'map', 'path', 'bench',
         'gift shop', 'snack bar', 'restroom', 'fountain', 'carousel', 'train', 'bus','jaguar',
-	'zebra','chimpanzee'
+	'zebra','chimpanzee','toilet'
       ]
 },
 
@@ -491,6 +491,18 @@ const allPossibleRules = [
     test: (word) => /[aeiou]$/i.test(word)
   },
   {
+    name: 'Contains exactly 1 vowel',
+    categoryType: 'wordplay',
+    words: [
+      // These are words that should trigger the regex, but some of those vowels are 'y', so they wouldn't get picked up by the regex
+      'spry','why','try','wry'
+    ], // MUST be defined as an array
+    test: (word) => {
+      const vowels = word.match(/[aeiou]/gi);
+      return vowels && vowels.length === 1;
+    }
+  },
+  {
     name: 'Contains exactly 3 vowels',
     categoryType: 'wordplay',
     words: [
@@ -548,6 +560,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
