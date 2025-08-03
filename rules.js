@@ -408,7 +408,8 @@ const allPossibleRules = [
     words: [
       'cat', 'dog', 'bird', 'fish', 'frog', 'rock', 'truck', 'grass', 'jump', 'cloud', 'desk', 'milk', 'glove', 'sink', 'knife', 'brick', 'chair', 'chalk',
       'plant', 'brush', 'watch', 'skunk', 'peach', 'street', 'lamp', 'glass', 'crisp', 'blush', 'snack', 'flash', 'drill', 'book', 'hall', 'noon', 'stats',
-      'pup', 'tot', 'pop', 'peep', 'pip', 'gig','break','red','tape','tool','right','wrong','jet'
+      'pup', 'tot', 'pop', 'peep', 'pip', 'gig','break','red','tape','tool','right','wrong','jet',
+	'floor','drill','snack','glass','moon','cup','judge','phone'
     ]
   },
   // === Wordplay Rules ===
@@ -545,4 +546,5 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
