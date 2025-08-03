@@ -43,7 +43,7 @@ const allPossibleRules = [
 	'tangerine','quince','apple',
       "phoenix", "centaur", "cyclops", "minotaur", "chimera", "hydra", "pegasus", "medusa", "griffin",
       "goblin", "troll", "fairy", "djinn", "mermaid", "nymph", "dryad", "yeti", "kraken","giant","sphinx",
-	'Jupiter','zebra','blizzard'
+	'Jupiter','Venus','zebra','blizzard'
       
     ],
   },
@@ -101,7 +101,7 @@ const allPossibleRules = [
     categoryType: 'location',
     words: [
       'plane', 'airplane', 'luggage', 'ticket', 'passport', 'terminal', 'runway', 'gate', 'boarding', 'security', 'baggage', 'arrival', 'departure', 'flight', 'pilot', 'steward', 'customs',
-      'engine', 'alarm', 'announcement', 'siren', 'bell', 'beep', 'scanner', 'bag','jet'
+      'engine', 'alarm', 'announcement', 'siren', 'bell', 'beep', 'scanner', 'bag','jet','Virgin'
     ]
   },
   {
@@ -318,14 +318,14 @@ const allPossibleRules = [
     name: 'Expected to last >100 years',
     categoryType: 'characteristic',
     words: ['mountain', 'river', 'rock', 'building', 'tree', 'diamond', 'gold', 'pyramid', 'statue', 'fortress', 'lighthouse', 'bridge', 'planet', 'star', 'ocean', 'cathedral', 'tomb','sun',
-	   'ocean','nation','castle','moon','water','afterlife','eternity','heaven','hell','Jupiter'],
+	   'ocean','nation','castle','moon','water','afterlife','eternity','heaven','hell','Jupiter','Venus',],
   },
   {
     name: 'Pre-dates the USA (1776)',
     categoryType: 'characteristic',
     words: [
       'pyramid', 'castle', 'sword', 'chariot', 'scroll', 'papyrus', 'rome', 'greece', 'egypt', 'bow', 'arrow', 'wheel',
-      'fire', 'cave', 'mammoth', 'dinosaur', 'moon', 'sun', 'star', 'tree', 'river', 'mountain', 'water', 'glass', 'apple','ocean','Jupiter'
+      'fire', 'cave', 'mammoth', 'dinosaur', 'moon', 'sun', 'star', 'tree', 'river', 'mountain', 'water', 'glass', 'apple','ocean','Jupiter','Venus',
     ],
   },
   {
@@ -347,7 +347,7 @@ const allPossibleRules = [
       "thunderbolt", "lightning", "mirror", "cauldron", "sword", "dagger", "staff", "cloak",
       "dragon", "serpent", "wolf", "raven", "stag", "horse", "beast", "hero", "villain",
       "curse", "spell", "riddle", "fire", "ice", "shadow", "spirit", "ghost", "demon", "angel",
-      "heaven", "underworld", "hell", "afterlife", "fate", "destiny", "eternity", "rebirth",'Jupiter'
+      "heaven", "underworld", "hell", "afterlife", "fate", "destiny", "eternity", "rebirth",'Jupiter','Venus',
     ],
   },
   {
@@ -378,7 +378,7 @@ const allPossibleRules = [
       'hat', 'gloves', 'scarf', 'jacket', 'eyeglasses', 'sunglasses', 'watch', 'belt', 'shoes', 'socks', 'tie',
       'shirt', 'pants', 'dress', 'coat', 'boots', 'necklace', 'ring', 'earrings', 'bracelet', 'glasses',
       'cap', 'hoodie', 'shorts', 'sweater', 'vest', 'mittens', 'sandals', 'helmet', 'uniform', 'pajamas',
-      'cufflinks', 'crown', 'mask','jewelry','jersey'
+      'cufflinks', 'crown', 'mask','jewelry','jersey','vest'
     ],
   },
   {
@@ -401,7 +401,8 @@ const allPossibleRules = [
       'big', 'small', 'large', 'huge', 'tiny', 'many', 'few', 'much', 'little', 'most',
       'happy', 'sad', 'angry', 'excited', 'calm', 'joyful', 'tired', 'brave', 'kind', 'friendly',
       'sweet', 'sour', 'salty', 'bitter', 'spicy', 'zesty', 'fresh', 'stale', 'aromatic',
-      'funny', 'pretty', 'tall', 'right','wrong', 'honest', 'modest', 'calm', 'dumb', 'tough', 'high', 'light', 'whole', 'entire','jumpy'
+      'funny', 'pretty', 'tall', 'right','wrong', 'honest', 'modest', 'calm', 'dumb', 'tough', 'high', 'light', 'whole', 'entire','jumpy',
+	'vicious','vengeful'
     ]
   },
   {
@@ -411,7 +412,7 @@ const allPossibleRules = [
       'cat', 'dog', 'bird', 'fish', 'frog', 'rock', 'truck', 'grass', 'jump', 'cloud', 'desk', 'milk', 'glove', 'sink', 'knife', 'brick', 'chair', 'chalk',
       'plant', 'brush', 'watch', 'skunk', 'peach', 'street', 'lamp', 'glass', 'crisp', 'blush', 'snack', 'flash', 'drill', 'book', 'hall', 'noon', 'stats',
       'pup', 'tot', 'pop', 'peep', 'pip', 'gig','break','red','tape','tool','right','wrong','jet',
-	'floor','drill','snack','glass','moon','cup','judge','phone','zoo','zone'
+	'floor','drill','snack','glass','moon','cup','judge','phone','zoo','zone','vend'
     ]
   },
   // === Wordplay Rules ===
@@ -560,6 +561,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
