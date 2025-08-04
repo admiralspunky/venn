@@ -357,7 +357,7 @@ const allPossibleRules = [
       "bag", "box", "radio", "baby", "knife", "bottle", "sword", "backpack", "helmet", "goggles", "mirror", "alarm", "pillow", "torch", "bucket", "hat",
       "broom", "plate", "mask", "towel", "rope", "bookbag", "phone", "key", "wallet", "pen", "tablet", "notebook", "flashlight", "camera", "thermos", "scarf",
       "snack", "dice", "lantern", "toy", "umbrella", "shovel", "candle", "calculator", "ball", "brick", "booklet", "cassette", "doll", "leash", "paintbrush",
-      "comb", "brush", "staff", 'helmet','pencil','boots','ruler','mug','can opener','rolling pin','toaster','jewelry'
+      "comb", "brush", "staff", 'helmet','pencil','boots','ruler','mug','can opener','rolling pin','toaster','jewelry','magnifying glass','map','lamp'
     ]
   },
   {
@@ -561,6 +561,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
