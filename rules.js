@@ -109,7 +109,7 @@ const allPossibleRules = [
     categoryType: 'location',
     words: [
       "toilet", "sink", "shower", "bathtub", "mirror", "towel", "soap", "brush", "razor", "comb", "toothbrush", "toothpaste", "shampoo", "conditioner",
-      "faucet", "drain", "mat", "curtain", "lotion", "scale", "floss", "deodorant", "candle", "plunger",'medicine'
+      "faucet", "drain", "mat", "curtain", "lotion", "scale", "floss", "deodorant", "candle", "plunger",'medicine',
     ]
   },
   {
@@ -208,7 +208,7 @@ const allPossibleRules = [
       'moose', 'elk', 'reindeer', 'ibex', 'yak', 'ox', 'weasel', 'ferret', 'skunk',
       'raccoon', 'badger', 'porcupine', 'hedgehog', 'armadillo', 'beaver', 'capybara',
       'walrus', 'seal', 'narwhal', 'flamingo', 'heron', 'crane', 'robin', 'peacock', 'zebra',
-      'chimpanzee'
+      'chimpanzee','axototl'
     ]
   },
   {
@@ -232,7 +232,7 @@ const allPossibleRules = [
       'bottle', 'cup', 'book', 'watch', 'robot', 'tool', 'machine', 'brick', 'cement',
       'microwave', 'remote', 'stapler', 'ladder', 'vacuum', 'rope', 'chainsaw',
       'airplane', 'ticket', 'passport', 'terminal', 'runway', 'scanner', 'gate', 'alarm',
-      'announcement','luggage', 'boarding', 'receipt', 'screwdriver','shoes',
+      'announcement','luggage', 'receipt', 'screwdriver','shoes',
       'clock', 'projector', 'keyboard', 'mouse', 'notebook', 'whiteboard', 'clipboard',
       'calculator', 'envelope', 'printer', 'scanner', 'monitor', 'suitcase', 'badge',
       'cashier', 'register', 'credit', 'label', 'barcode', 'shelf', 'basket', 'bag',
@@ -241,7 +241,7 @@ const allPossibleRules = [
       'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh','door','goalpost',
 	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan',
 	'diary','ceiling','pillow','pen','gloves','toilet','scalpel','toaster','drain','sink','curtain','toothbrush','lotion','sweater','notepad','building',
-	'jet','jewelry',
+	'jet','jewelry','plunger','candle','smoke detector','cassette','casserole'
     ]
   },
   {
@@ -561,6 +561,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
