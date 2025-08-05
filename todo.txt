@@ -1,4 +1,5 @@
 screen to show ALL the names of the rules, but dynamically, all of the rules that are currently in the file
+apply for copyright
 setting for number of starting hint cards?
 let the user log in, to carry their streak across browsers and devices, and we'll need that anyway for mp
 Setting to switch between Venn Diagram and Grid displays
@@ -11,4 +12,5 @@ QR code
 even with the icons, I sometimes have trouble telling which tier 2 Zone is the overlap between two specific tier 1 Zones. Maybe, while you mouseover a tier 2 Zone, the relevant tier 1 Zones can change visually somehow? Maybe just make the titles bold, but only while the overlap Zone is being moused over.
 add multiplayer functionality
 words like 'beauty' would incorrectly trigger the 'contains exactly 3 vowels' rule because of the 'y'; perhaps we need an Exclusion list, but for now, just avoid using words like 'beauty' in any other rule
+
 
