@@ -43,7 +43,7 @@ const allPossibleRules = [
 	'tangerine','quince','apple',
       "phoenix", "centaur", "cyclops", "minotaur", "chimera", "hydra", "pegasus", "medusa", "griffin",
       "goblin", "troll", "fairy", "djinn", "mermaid", "nymph", "dryad", "yeti", "kraken","giant","sphinx",
-	'Jupiter','Venus','zebra','blizzard'
+	'Jupiter','Venus','zebra','blizzard','mosquito','axotlotl'
       
     ],
   },
@@ -241,7 +241,7 @@ const allPossibleRules = [
       'glue', 'highlighter', 'lightbulb', 'capsule', 'photo', 'pizza','mesh','door','goalpost',
 	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan',
 	'diary','ceiling','pillow','pen','gloves','toilet','scalpel','toaster','drain','sink','curtain','toothbrush','lotion','sweater','notepad','building',
-	'jet','jewelry','plunger','candle','smoke detector','cassette','casserole'
+	'jet','jewelry','plunger','candle','smoke detector','cassette','casserole','water bottle','mortar'
     ]
   },
   {
@@ -562,6 +562,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
