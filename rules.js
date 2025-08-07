@@ -70,7 +70,7 @@ const allPossibleRules = [
       "detention", "bell", "uniform", "grade", "report", "chalkboard", "highlighter",
       "paperclip", "stapler", "homework", "semester", "notepad", "lunchbox",
       "classmate", "education", "study", "lecture", "syllabus", "library", "dictionary",
-	'projector'
+	'projector','phone'
     ]
   },
   {
@@ -359,7 +359,7 @@ const allPossibleRules = [
       "broom", "plate", "mask", "towel", "rope", "bookbag", "phone", "key", "wallet", "pen", "tablet", "notebook", "flashlight", "camera", "thermos", "scarf",
       "snack", "dice", "lantern", "toy", "umbrella", "shovel", "candle", "calculator", "ball", "brick", "booklet", "cassette", "doll", "leash", "paintbrush",
       "comb", "brush", "staff", 'helmet','pencil','boots','ruler','mug','can opener','rolling pin','toaster','jewelry','magnifying glass','map','lamp',
-	'toothpaste','floss'
+	'toothpaste','floss','chalk'
     ]
   },
   {
@@ -563,6 +563,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
