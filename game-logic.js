@@ -231,7 +231,7 @@ async function endGame(isWin) {
             dailyStreak = 0;
             localStorage.setItem('dailyStreak', dailyStreak);
             localStorage.setItem('lastDailyCompletionDate', ''); // Clear last completion date
-            console.log("Daily puzzle failed. Streak reset to 0.");
+            console.log("Daily puzzle failed. Streak reset to 0. Try the difficulty sliders in the Settings menu.");
         }
     }
 
@@ -239,7 +239,7 @@ async function endGame(isWin) {
     // ✅ Show message box
     const messageText = isWin
         ? `🎉 You Win! Game Over in ${turns} turns!`
-        : `💀 Game Over! You ran out of guesses. Total turns: ${turns}`;
+        : `💀 Game Over! You ran out of guesses. Try the difficulty sliders in the Settings menu. Total turns: ${turns}`;
     messageBox.textContent = messageText;
     messageBox.classList.add("visible");
 
