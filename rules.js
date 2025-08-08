@@ -498,7 +498,7 @@ const allPossibleRules = [
     categoryType: 'wordplay',
     words: [
       // These are words that should trigger the regex, but they include both a consonant 'y' and a single vowel, so they wouldn't get picked up by the regex
-      'yak'
+      'yak','yes','yet','yin','yon',
     ], // MUST be defined as an array
 	  // words like 'study' should NOT trigger this rule, but I don't want to code an exclusion list, so I'm always counting 'y' as a vowel for this rule
     test: (word) => {
@@ -564,6 +564,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
