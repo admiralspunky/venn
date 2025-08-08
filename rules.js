@@ -19,7 +19,7 @@ const allPossibleRules = [
       'spatula', 'colander', 'grater', 'peeler', 'whisk', 'apron', 'ladle', 'tongs',
       'strainer', 'can opener', 'cutting board', 'cookie sheet', 'corkscrew', 'mortar',
       'pestle', 'grill', 'mixer', 'sieve', 'rolling pin', 'oven mitt', 'timer',
-      'measuring cup', 'scale', 'dish rack','toaster'
+      'measuring cup', 'scale', 'dish rack','toaster','chicken'
     ],
   },
   {
@@ -564,6 +564,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
