@@ -497,10 +497,10 @@ const allPossibleRules = [
     name: 'Contains exactly 1 vowel',
     categoryType: 'wordplay',
     words: [
-      // These are words that should trigger the regex, but some of those vowels are 'y', so they wouldn't get picked up by the regex
-      'spry','why','try','wry'
+      // These are words that should trigger the regex, but they include both a consonant 'y' and a single vowel, so they wouldn't get picked up by the regex
+      'yak'
     ], // MUST be defined as an array
-	  // words like 'study' should NOT trigger this rule, but I don't want to code an exclusion list, so I'm always counting 'y' as a vowel for now
+	  // words like 'study' should NOT trigger this rule, but I don't want to code an exclusion list, so I'm always counting 'y' as a vowel for this rule
     test: (word) => {
       const vowels = word.match(/[aeiouy]/gi);
       return vowels && vowels.length === 1;
@@ -564,6 +564,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
