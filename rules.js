@@ -38,7 +38,7 @@ const allPossibleRules = [
       'buffalo', 'bison', 'donkey', 'mule', 'camel', 'alpaca', 'llama', 'kangaroo',
       'koala', 'platypus', 'panther', 'leopard', 'jaguar', 'lynx', 'cheetah','chimpanzee',
       'moose', 'elk', 'reindeer', 'ibex', 'yak', 'ox', 'weasel', 'ferret', 'skunk',
-      'raccoon', 'badger', 'porcupine', 'hedgehog', 'armadillo', 'beaver', 'capybara',
+      'raccoon', 'badger', 'porcupine', 'hedgehog', 'armadillo', 'beaver',
       'walrus', 'seal', 'narwhal', 'flamingo', 'heron', 'crane', 'robin', 'peacock',
 	'tangerine','quince','apple',
       "phoenix", "centaur", "cyclops", "minotaur", "chimera", "hydra", "pegasus", "medusa", "griffin",
@@ -206,7 +206,7 @@ const allPossibleRules = [
       'buffalo', 'bison', 'donkey', 'mule', 'camel', 'alpaca', 'llama', 'kangaroo',
       'koala', 'platypus', 'panther', 'leopard', 'jaguar', 'lynx', 'cheetah',
       'moose', 'elk', 'reindeer', 'ibex', 'yak', 'ox', 'weasel', 'ferret', 'skunk',
-      'raccoon', 'badger', 'porcupine', 'hedgehog', 'armadillo', 'beaver', 'capybara',
+      'raccoon', 'badger', 'porcupine', 'hedgehog', 'armadillo', 'beaver', 
       'walrus', 'seal', 'narwhal', 'flamingo', 'heron', 'crane', 'robin', 'peacock', 'zebra',
       'chimpanzee','axototl'
     ]
@@ -242,7 +242,7 @@ const allPossibleRules = [
 	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan',
 	'diary','ceiling','pillow','pen','gloves','toilet','scalpel','toaster','drain','sink','curtain','toothbrush','lotion','sweater','notepad','building',
 	'jet','jewelry','plunger','candle','smoke detector','cassette','casserole','water bottle','mortar',
-		'shampoo','faucet'
+		'shampoo','faucet','comb','conditioner','razor','screen',
     ]
   },
   {
@@ -277,7 +277,7 @@ const allPossibleRules = [
     categoryType: 'characteristic',
     words: [
       'mirror', 'diamond', 'gold', 'silver', 'glass', 'water', 'metal', 'chrome', 'lightbulb', 'jewelry', 'coin', 'window', 'lake', 'ice', 'snow', 'dew', 'raindrop',
-      'lamp', 'monitor', 'sink', 'sun', 'moon', 'star', 'river', 'pond', 'television', 'light','jet'
+      'lamp', 'monitor', 'sink', 'sun', 'moon', 'star', 'river', 'pond', 'television', 'light','jet','screen'
     ],
   },
   {
@@ -564,6 +564,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
