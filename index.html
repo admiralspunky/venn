@@ -13,13 +13,13 @@
 </script>		
 	
 <script>
-	const GAME_TITLE = "No Not There"
     const TUTORIAL_TEXT = `There are three broad categories, Location, Characteristic, and Spelling. In each game, each of those categories contains some hidden rule. You can mouseover each category to find example rules. Your mission is to figure out the rules for each category, and play cards from Your Hand where they're supposed to go. If you play a card in the wrong zone, you have to draw a card to replace it. You're trying to empty your hand of cards.`;
 	const ABOUT_TEXT = "I want to thank Ken Wickle, for bringing Things in Rings to our board game group, which led me to write this game."
 	const BYLINE = "© 2025 Justin Smith. All Rights Reserved admiralspunky@gmail.com"
 </script>
-<script src="game-logic.js" defer></script>
 <script src="rules.js"> </script>
+<script src="game-logic.js" defer></script>
+
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -653,7 +653,7 @@
             }
         }
 
-        /* --- NEW CSS FOR DIFFICULTY SLIDER --- */
+        /* --- DIFFICULTY SLIDER --- */
         .modal-setting-item {
             display: flex;
             align-items: center;
@@ -725,7 +725,6 @@
             min-width: 20px;
             text-align: center;
         }
-        /* END NEW CSS */
 
         /* BYLINE STYLES */
         #byline-display {
@@ -750,6 +749,38 @@
             }
         }
         /* END BYLINE STYLES */
+		
+		/* rules popup - the button in Settings that shows a list of all the rules in the game */
+		
+		#rules-list-container {
+			max-height: 70vh; /* Adjust this value as needed */
+			overflow-y: auto; 
+		}
+		
+		.rules-popup-content {
+			background: var(--bg-container);
+			color: var(--text-primary);
+			padding: 2rem;
+			border-radius: 0.5rem;
+			max-width: 90%;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			position: relative;
+			display: flex;
+			flex-direction: column;
+		}
+		
+		/* Create three equal columns that floats next to each other */
+		.column {
+		  float: left;
+		  padding: 10px;
+		}
+		
+		/* Clear floats after the columns */
+		.row:after {
+		  content: "";
+		  display: table;
+		  clear: both;
+		}
 
     </style>
 
@@ -842,7 +873,7 @@
                     <div class="word-cards-container"></div>
                     <div class="rule-hint"></div>
                 </div>
-                <!-- MOVED TO END: hand-container is now the last child for desktop 3x3 grid positioning -->
+                <!-- hand-container is now the last child for desktop 3x3 grid positioning -->
                 <div id="hand-container" class="rule-box">
                     <div class="box-header">
                         <span class="box-label">Your Hand:</span>
@@ -867,6 +898,8 @@
 				<button id="dark-mode-toggle-btn" class="icon-btn" title="Toggle Dark Mode">&#9728;</button>
 				<!--<button id="new-game-modal-btn" title="Start New Game">&#x21BB;</button> -->
 				<!--<button id="about-btn" title="About and Acknowledgements">&#x21BB;</button> -->
+				<button id="showAllRulesBtn" class="icon-btn" title="Show All Rules" >✅</button>
+
 			</div>
 
             <!-- Difficulty Slider -->
@@ -901,6 +934,15 @@
         
             </div>
     </div>
+</div>
+
+
+
+<div id="rules-popup-overlay" class="modal-overlay">
+  <h3>All Possible Rules</h3>
+  <div id="rules-popup-content" class="modal-content">
+	<!-- I'll add this list in the script -->
+  </div>
 </div>
 
 <div id="zone-feedback-bubble" class="fixed text-white px-3 py-2 rounded shadow-lg text-sm z-[1001] transition-opacity duration-300 hidden pointer-events-none"></div>
