@@ -4,7 +4,8 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.08";
+const CURRENT_VERSION = "1.09";
+const GAME_TITLE = "No Not There";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
 const genericLabels = ["Location", "Characteristic", "Spelling"]; //some zones get a customLabel instead
@@ -35,6 +36,20 @@ let zoneWeights = {};
 const fallbackLocationRule = { name: 'General Location', categoryType: 'location', words: [], test: () => false };
 const fallbackCharacteristicRule = { name: 'General Characteristic', categoryType: 'characteristic', words: [], test: () => false };
 const fallbackWordplayRule = { name: 'General Wordplay', categoryType: 'wordplay', words: [], test: () => false };
+
+const settingsModalOverlay = document.getElementById('settings-modal-overlay');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+//const newGameModalBtn = document.getElementById('new-game-modal-btn');
+const darkModeToggleBtn = document.getElementById('dark-mode-toggle-btn');
+const showAllRulesBtn = document.getElementById('showAllRulesBtn');
+const rulesPopupOverlay = document.getElementById('rules-popup-overlay');
+const rulesPopupContent = document.getElementById('rules-popup-content');
+
+const aboutBtn = document.getElementById('about-btn');
+
+// Get the difficulty slider and display elements inside the modal
+const difficultySlider = document.getElementById('difficulty-slider');
+const livesDisplayModal = document.getElementById('lives-display-modal');
 
 
 document.title = GAME_TITLE;
@@ -167,6 +182,11 @@ async function startGame(isDaily) {
     renderHand();
 
 	showMessage("Select a card in Your Hand, then play it in one of the other 8 zones.");
+	
+	const rulesListContainer = document.getElementById('rules-list-container');
+	if (rulesListContainer) {
+		rulesListContainer.innerHTML = buildRulesHTML();
+	}
 }//async function startGame(isDaily)
 
 
@@ -516,16 +536,6 @@ const livesDisplay = document.getElementById('lives-display');
 const settingsBtn = document.getElementById('settings-btn'); // This is now just the settings opener
 const messageBox = document.getElementById('message-box');
 const handContainer = document.getElementById('hand-container');
-
-const settingsModalOverlay = document.getElementById('settings-modal-overlay');
-const modalCloseBtn = document.getElementById('modal-close-btn');
-//const newGameModalBtn = document.getElementById('new-game-modal-btn');
-const darkModeToggleBtn = document.getElementById('dark-mode-toggle-btn'); // New dark mode toggle button
-const aboutBtn = document.getElementById('about-btn');
-
-// NEW: Get the difficulty slider and display elements inside the modal
-const difficultySlider = document.getElementById('difficulty-slider');
-const livesDisplayModal = document.getElementById('lives-display-modal');
 
 
 const zoneElements = {
@@ -1279,7 +1289,7 @@ function seedInitialZones(pool) {
 function generateActiveRules(gameSeed) {
     const locationCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'location')], gameSeed + 1);
     const characteristicCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'characteristic')], gameSeed + 2);
-    const wordplayCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'wordplay')], gameSeed + 3);
+    const wordplayCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'spelling')], gameSeed + 3);
     
 	return [
 	  locationCandidates.length > 0 ? locationCandidates[0] : fallbackLocationRule,
@@ -1292,18 +1302,18 @@ function generateActiveRules(gameSeed) {
 // generateActiveRulesWithOverlap()
 // -----------------------------------------
 // Called by: startGame()
-// Returns: an array of 3 rules [location, characteristic, wordplay]
+// Returns: an array of 3 rules [location, characteristic, spelling]
 // Ensures sufficient pairwise and triple overlaps before accepting
 // =========================================
 function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 3, minTripleOverlap = 1, maxAttempts = 1000) {
     const locationRules = allRules.filter(r => r.categoryType === 'location' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
     const characteristicRules = allRules.filter(r => r.categoryType === 'characteristic' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
-    const wordplayRules = allRules.filter(r => r.categoryType === 'wordplay' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
+    const spellingRules = allRules.filter(r => r.categoryType === 'spelling' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         const loc = shuffleArray([...locationRules], seed + attempt * 3 + 1)[0];
         const chr = shuffleArray([...characteristicRules], seed + attempt * 3 + 2)[0];
-        const wrd = shuffleArray([...wordplayRules], seed + attempt * 3 + 3)[0];
+        const wrd = shuffleArray([...spellingRules], seed + attempt * 3 + 3)[0];
 
         const candidateSet = [loc, chr, wrd];
         const zoneBuckets = getWeightedWordList(candidateSet);
@@ -1422,6 +1432,43 @@ function hideModal() {
     }, 300);
 }
 
+// NEW: Functions to show/hide the separate rules pop-up
+function showRulesPopup() {
+    if (rulesPopupOverlay) {
+        rulesPopupOverlay.classList.add('visible');
+        console.log('Rules popup shown.');
+    }
+}
+
+function hideRulesPopup() {
+    if (rulesPopupOverlay) {
+        rulesPopupOverlay.classList.remove('visible');
+        console.log('Rules popup hidden.');
+    }
+}
+
+//this function prints the names of all the rules that are currently in the game
+//I initially tried to output this list in an HTML div, but that was exceedingly difficult for some reason, so instead I'm just copying the list to the clipboard
+
+function buildRulesHTML() {
+    let rulesHTML = 'All Rules by Category\n'; // Moved initial string into the variable
+    const rulesByCategory = allPossibleRules.reduce((acc, rule) => {
+        const category = rule.categoryType;
+        if (!acc[category]) acc[category] = [];
+        acc[category].push(rule.name);
+        return acc;
+    }, {});
+    for (const category in rulesByCategory) {
+        rulesHTML += `\n${category.charAt(0).toUpperCase() + category.slice(1)}:\n`; // Added a colon and newline
+        
+        // This is the corrected part
+        rulesHTML += rulesByCategory[category].map(name => `- ${name}`).join('\n');
+
+        rulesHTML += '\n'; // Add a blank line between categories
+    }
+    return rulesHTML.trim(); // Trim any trailing whitespace
+}
+
 function applyTheme() {
     const htmlElement = document.documentElement;
 
@@ -1439,7 +1486,7 @@ function applyTheme() {
 }
 
 
-// New function to update the moon/sun icon in the modal
+// function to update the moon/sun icon in the modal
 function applyThemeToggleIcon() {
     if (darkModeToggleBtn) { // Check if the button exists before trying to update its textContent
         darkModeToggleBtn.textContent = isDarkMode ? '☀️' : '🌙'; // Sun for dark, Moon for light
@@ -1456,13 +1503,38 @@ settingsBtn.addEventListener('click', showModal); // Gear icon now opens setting
 modalCloseBtn.addEventListener('click', hideModal);
 //newGameModalBtn.addEventListener('click', () => { startGame(false); }); //start a new game, but not in Daily mode
 
-// Event listener for the new dark mode toggle button inside the modal
+// Event listener for the dark mode toggle button inside the modal
 if (darkModeToggleBtn) {
     darkModeToggleBtn.addEventListener('click', toggleDarkMode);
 }
 
+if (showAllRulesBtn) {
+    showAllRulesBtn.addEventListener('click', (event) => {
+
+        console.log('Rules button clicked from settings modal.');
+		copyToClipboard(buildRulesHTML());
+        //hideModal(); // Close the settings modal
+        //showRulesPopup(); // Open the new rules popup
+		
+		/*
+		// Listener for clicking outside the rules popup content
+		if (rulesPopupOverlay) {
+			rulesPopupOverlay.addEventListener('click', (event) => {
+				
+				// If the click target is the overlay itself, hide the popup
+				if (event.target != rulesPopupOverlay) {
+					console.log('event.target === rulesPopupOverlay');
+					hideRulesPopup();
+				}
+			});
+		}
+		*/
+    });
+}
+
 settingsModalOverlay.addEventListener('click', (event) => {
     if (event.target === settingsModalOverlay) {
+		console.log('event.target === settingsModalOverlay');
         hideModal();
     }
 });
