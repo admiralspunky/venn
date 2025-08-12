@@ -1365,9 +1365,8 @@ function updateRuleBoxLabelsAndHints(isGameOver = false) {
             if (hintDiv) {
                 let hintText = '';
                 if (!isGameOver) {
-                    // --- DEBUG LOG START ---
                     console.log('Debug in updateRuleBoxLabelsAndHints: key=', key, 'zoneConfig=', zoneConfig, 'zoneConfig.ruleIndices=', zoneConfig.ruleIndices);
-                    // --- DEBUG LOG END ---
+                    
                     const numRulesMatched = zoneConfig.ruleIndices.length; 
                     
                     if (numRulesMatched === 1) {
