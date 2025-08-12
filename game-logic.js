@@ -35,7 +35,7 @@ let zoneWeights = {};
 // Define fallback rules to prevent undefined errors if rule candidates are empty
 const fallbackLocationRule = { name: 'General Location', categoryType: 'location', words: [], test: () => false };
 const fallbackCharacteristicRule = { name: 'General Characteristic', categoryType: 'characteristic', words: [], test: () => false };
-const fallbackWordplayRule = { name: 'General Wordplay', categoryType: 'wordplay', words: [], test: () => false };
+const fallbackSpellingRule = { name: 'General Spelling', categoryType: 'spelling', words: [], test: () => false };
 
 const settingsModalOverlay = document.getElementById('settings-modal-overlay');
 const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -527,7 +527,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const iconSVGs = {
     'location': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
     'characteristic': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L23.725 9.17l-6.104 5.952 1.442 8.45L12 18.295l-7.063 3.794 1.442-8.45L.275 9.17l8.057-1.015L12 .587z"/></svg>`,
-    'wordplay': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7h5.5L13 3.5V9z"/></svg>`
+    'spelling': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7h5.5L13 3.5V9z"/></svg>`
 };
 
 const turnsDisplay = document.getElementById('turns-display');
@@ -556,11 +556,11 @@ const zoneElements = {
 const zoneConfigs = {
     '1': { id: 'zone-1', colorVar: '--zone1-bg', genericLabelIndex: 0, ruleIndices: [0], categoryTypes: ['location'] },
     '2': { id: 'zone-2', colorVar: '--zone2-bg', genericLabelIndex: 1, ruleIndices: [1], categoryTypes: ['characteristic'] },
-    '3': { id: 'zone-3', colorVar: '--zone3-bg', genericLabelIndex: 2, ruleIndices: [2], categoryTypes: ['wordplay'] }, // Added ruleIndices: [2]
+    '3': { id: 'zone-3', colorVar: '--zone3-bg', genericLabelIndex: 2, ruleIndices: [2], categoryTypes: ['spelling'] }, // Added ruleIndices: [2]
     '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: 'Location & Characteristic', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
-    '1-3': { id: 'red-yellow-overlap-container', colorVar: '--zone13-bg', customLabel: 'Location & Spelling', ruleIndices: [0, 2], categoryTypes: ['location', 'wordplay'] },
-    '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: 'Characteristic & Spelling', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'wordplay'] },
-    '1-2-3': { id: 'zone-1-2-3', colorVar: '--zone123-bg', customLabel: 'All Three', ruleIndices: [0, 1, 2], categoryTypes: ['location', 'characteristic', 'wordplay'] },
+    '1-3': { id: 'red-yellow-overlap-container', colorVar: '--zone13-bg', customLabel: 'Location & Spelling', ruleIndices: [0, 2], categoryTypes: ['location', 'spelling'] },
+    '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: 'Characteristic & Spelling', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'spelling'] },
+    '1-2-3': { id: 'zone-1-2-3', colorVar: '--zone123-bg', customLabel: 'All Three', ruleIndices: [0, 1, 2], categoryTypes: ['location', 'characteristic', 'spelling'] },
     '0': { id: 'none-container', colorVar: '--zone0-bg', customLabel: 'None of the above', ruleIndices: [], categoryTypes: [] }
 };
 
@@ -1289,12 +1289,12 @@ function seedInitialZones(pool) {
 function generateActiveRules(gameSeed) {
     const locationCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'location')], gameSeed + 1);
     const characteristicCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'characteristic')], gameSeed + 2);
-    const wordplayCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'spelling')], gameSeed + 3);
+    const spellingCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'spelling')], gameSeed + 3);
     
 	return [
 	  locationCandidates.length > 0 ? locationCandidates[0] : fallbackLocationRule,
 	  characteristicCandidates.length > 0 ? characteristicCandidates[0] : fallbackCharacteristicRule,
-	  wordplayCandidates.length > 0 ? wordplayCandidates[0] : fallbackWordplayRule
+	  spellingCandidates.length > 0 ? spellingCandidates[0] : fallbackspellingRule
 	];
 }
 
