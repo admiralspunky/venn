@@ -1253,7 +1253,7 @@ function updateLivesSetting(value) {
 
 
 function seedInitialZones(pool) {
-    const initialZoneKeys = ['1', '2', '3', '1-2-3'];
+    const initialZoneKeys = ['1', '2', '3', ];
     const wordsPlaced = new Set();
     
     for (let i = 0; i < initialZoneKeys.length; i++) {
