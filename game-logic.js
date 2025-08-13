@@ -1258,30 +1258,49 @@ function updateLivesSetting(value) {
 
 
 function seedInitialZones(pool) {
-	console.log("activeRules contents:", activeRules);
-	
+    // Note: It's better to declare the initialZoneKeys in a way that doesn't
+    // require hardcoding the number of rules. This example assumes 3 rules.
     const initialZoneKeys = ['1', '2', '3', '1-2-3'];
     const wordsPlaced = new Set();
+    
     for (let i = 0; i < initialZoneKeys.length; i++) {
         const targetZoneKey = initialZoneKeys[i];
-        let chosenWord = null;
-
         const candidates = pool.filter(w => !wordsPlaced.has(w));
         const shuffled = shuffleArray([...candidates], 20 + i);
+        let chosenWord = null;
 
-        // --- New Logic for 1-2-3 Zone ---
-        if (targetZoneKey === '1-2-3') {
+        // Special case for multi-rule zones like '1-2-3'
+        if (targetZoneKey.includes('-')) {
+            const ruleIndices = targetZoneKey.split('-').map(str => parseInt(str) - 1);
+            
             chosenWord = shuffled.find(word => {
-                // Check if the word matches ALL three rules
-                return activeRules[0].test(word) && activeRules[1].test(word) && activeRules[2].test(word);
+                // This checks if the word matches ALL of the rules in the combination
+                return ruleIndices.every(ruleIndex => {
+                    const rule = activeRules[ruleIndex];
+                    // Gracefully handle rules that don't have a .test function
+                    // We assume that if there's no test, the rule doesn't apply to the word
+                    return rule && typeof rule.test === 'function' ? rule.test(word) : false;
+                });
             });
+
         } else {
-            // --- Original Logic for Single-Rule Zones ---
+            // Original logic for single-rule zones
             const targetRuleIndex = parseInt(targetZoneKey) - 1;
-            chosenWord = shuffled.find(word => matchesOnlyOneRule(word, targetRuleIndex))
-                || shuffled.find(word => activeRules[targetRuleIndex].test(word));
+            const rule = activeRules[targetRuleIndex];
+            
+            // Check if the rule object exists and has a test method before using it
+            if (rule && typeof rule.test === 'function') {
+                chosenWord = shuffled.find(word => matchesOnlyOneRule(word, targetRuleIndex))
+                    || shuffled.find(word => rule.test(word));
+            } else {
+                // Log a warning or handle this case as appropriate
+                console.warn(`Rule ${targetZoneKey} does not have a test function.`);
+                // You might choose to find a word based on some other property here,
+                // or simply continue to the next loop iteration.
+            }
         }
 
+        // Rest of the function remains the same
         if (chosenWord) {
             wordsPlaced.add(chosenWord);
             wordsInPlay.push({
@@ -1290,18 +1309,19 @@ function seedInitialZones(pool) {
                 correctZoneKey: targetZoneKey,
                 isInitialSeed: true
             });
+            // Your logic for zone weights and logging here
             zoneWeights[targetZoneKey] /= 4;
-            console.log(`Initial placement of ` + chosenWord + ' in zone ' + targetZoneKey + ', weight changed to ' + zoneWeights[targetZoneKey]);
+            console.log(`Initial placement of ${chosenWord} in zone ${targetZoneKey}, weight changed to ${zoneWeights[targetZoneKey]}`);
         } else {
             console.warn(`[startGame] Could not find word for Rule ${targetZoneKey}`);
         }
         
-        // This part needs adjustment if you want to log the rules for 1-2-3
-        if (targetZoneKey === '1-2-3') {
-            console.log(`rule for 1-2-3: ${activeRules[0]?.name}, ${activeRules[1]?.name}, ${activeRules[2]?.name}`);
+        // Logging rules
+        if (targetZoneKey.includes('-')) {
+            const ruleNames = targetZoneKey.split('-').map(str => activeRules[parseInt(str) - 1]?.name).join(', ');
+            console.log(`Rules for ${targetZoneKey}: ${ruleNames}`);
         } else {
-            const targetRuleIndex = parseInt(targetZoneKey) - 1;
-            console.log(`rule ${i + 1}: ${activeRules[targetRuleIndex]?.name}`);
+            console.log(`Rule ${i + 1}: ${activeRules[parseInt(targetZoneKey) - 1]?.name}`);
         }
     }
 }
