@@ -594,13 +594,13 @@ function getBoxIconsSVG(categoryTypes) {
 function matchesOnlyOneRule(word, targetRuleIndex) {
     let matchCount = 0;
     for (let i = 0; i < activeRules.length; i++) {
-        const rule = activeRules[i];
-        // Ensure the rule has a .test method before calling it
-        if (rule && typeof rule.test === 'function' && rule.test(word)) {
+        // Use optional chaining here as well
+        if (activeRules[i]?.test?.(word)) {
             matchCount++;
         }
     }
-    return matchCount === 1 && (activeRules[targetRuleIndex] && typeof activeRules[targetRuleIndex].test === 'function' && activeRules[targetRuleIndex].test(word));
+    // Final check for the target rule using optional chaining
+    return matchCount === 1 && (activeRules[targetRuleIndex]?.test?.(word));
 }
 
 //each rule displays the names of 5 other rules in that category
