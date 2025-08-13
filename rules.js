@@ -92,7 +92,7 @@ const allPossibleRules = [
     categoryType: 'location',
     words: [
       "shelf", "cart", "bag", "receipt", "aisle", "counter", "barcode", "pricetag", "cashier", "sign", "display", "product", "clothing", "food", "grocery", "produce", "box", "basket", "scale",
-      "coupon", "sale", "door", "window", "advertisement", "customer", "employee", "manager", "cleaner", "floor", "ceiling", "lighting", "cash", "scanner", "stockroom", "inventory", "locker",
+      "coupon", "sale", "door", "window", "advertisement", "customer", "employee", "manager", "cleaner", "floor", "ceiling", "lighting", "cash", "scanner", "stockroom", "locker",
       "stall", "trolley", "lanes"
     ]
   },
@@ -242,7 +242,7 @@ const allPossibleRules = [
 	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan',
 	'diary','ceiling','pillow','pen','gloves','toilet','scalpel','toaster','drain','sink','curtain','toothbrush','lotion','sweater','notepad','building',
 	'jet','jewelry','plunger','candle','smoke detector','cassette','casserole','water bottle','mortar',
-		'shampoo','faucet','comb','conditioner','razor','screen',
+		'shampoo','faucet','comb','conditioner','razor','screen','medicine','soap','eraser','chariot','golf ball','jar'
     ]
   },
   {
@@ -564,3 +564,4 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
