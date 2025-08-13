@@ -591,21 +591,16 @@ function getBoxIconsSVG(categoryTypes) {
     return iconsHtml;
 }
 
-function matchesOnlyOneRule(wordText, targetRuleIndex) {
+function matchesOnlyOneRule(word, targetRuleIndex) {
     let matchCount = 0;
-    let matchedTargetRule = false;
-    
     for (let i = 0; i < activeRules.length; i++) {
         const rule = activeRules[i];
-        if (doesWordMatchRule(wordText, rule)) {
+        // Ensure the rule has a .test method before calling it
+        if (rule && typeof rule.test === 'function' && rule.test(word)) {
             matchCount++;
-            if (i === targetRuleIndex) {
-                matchedTargetRule = true;
-            }
         }
     }
-    
-    return matchedTargetRule && matchCount === 1;
+    return matchCount === 1 && (activeRules[targetRuleIndex] && typeof activeRules[targetRuleIndex].test === 'function' && activeRules[targetRuleIndex].test(word));
 }
 
 //each rule displays the names of 5 other rules in that category
