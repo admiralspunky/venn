@@ -1258,15 +1258,27 @@ function updateLivesSetting(value) {
 
 
 function seedInitialZones(pool) {
-    const initialZoneKeys = ['1', '2', '3','1-2-3'];
+    const initialZoneKeys = ['1', '2', '3', '1-2-3'];
     const wordsPlaced = new Set();
     for (let i = 0; i < initialZoneKeys.length; i++) {
         const targetZoneKey = initialZoneKeys[i];
-        const targetRuleIndex = parseInt(targetZoneKey) - 1;
+        let chosenWord = null;
+
         const candidates = pool.filter(w => !wordsPlaced.has(w));
         const shuffled = shuffleArray([...candidates], 20 + i);
-        let chosenWord = shuffled.find(word => matchesOnlyOneRule(word, targetRuleIndex))
-            || shuffled.find(word => activeRules[targetRuleIndex].test(chosenWord));
+
+        // --- New Logic for 1-2-3 Zone ---
+        if (targetZoneKey === '1-2-3') {
+            chosenWord = shuffled.find(word => {
+                // Check if the word matches ALL three rules
+                return activeRules[0].test(word) && activeRules[1].test(word) && activeRules[2].test(word);
+            });
+        } else {
+            // --- Original Logic for Single-Rule Zones ---
+            const targetRuleIndex = parseInt(targetZoneKey) - 1;
+            chosenWord = shuffled.find(word => matchesOnlyOneRule(word, targetRuleIndex))
+                || shuffled.find(word => activeRules[targetRuleIndex].test(word));
+        }
 
         if (chosenWord) {
             wordsPlaced.add(chosenWord);
@@ -1274,14 +1286,21 @@ function seedInitialZones(pool) {
                 id: crypto.randomUUID(),
                 text: chosenWord,
                 correctZoneKey: targetZoneKey,
-                isInitialSeed: true // Mark as initially seeded for rendering logic
-			});
-			zoneWeights[targetZoneKey] /= 4; // If a word gets placed in a zone, make it half as likely to be chosen again
-			console.log(`Initial placement of ` + chosenWord + ' in zone ' + targetZoneKey + ', weight changed to ' + zoneWeights[targetZoneKey] );
+                isInitialSeed: true
+            });
+            zoneWeights[targetZoneKey] /= 4;
+            console.log(`Initial placement of ` + chosenWord + ' in zone ' + targetZoneKey + ', weight changed to ' + zoneWeights[targetZoneKey]);
         } else {
-            console.warn(`[startGame] Could not find word for Rule ${targetZoneKey} (${activeRules[targetRuleIndex]?.name || 'N/A'})`);
+            console.warn(`[startGame] Could not find word for Rule ${targetZoneKey}`);
         }
-        console.log(`rule ${i + 1} : ${activeRules[i]?.name}`);
+        
+        // This part needs adjustment if you want to log the rules for 1-2-3
+        if (targetZoneKey === '1-2-3') {
+            console.log(`rule for 1-2-3: ${activeRules[0]?.name}, ${activeRules[1]?.name}, ${activeRules[2]?.name}`);
+        } else {
+            const targetRuleIndex = parseInt(targetZoneKey) - 1;
+            console.log(`rule ${i + 1}: ${activeRules[targetRuleIndex]?.name}`);
+        }
     }
 }
 
