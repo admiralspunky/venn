@@ -242,7 +242,8 @@ const allPossibleRules = [
 	'ambulance','lens','mat','stethoscope','wheel','air compressor','slippers','nightstand','laundry','fan',
 	'diary','ceiling','pillow','pen','gloves','toilet','scalpel','toaster','drain','sink','curtain','toothbrush','lotion','sweater','notepad','building',
 	'jet','jewelry','plunger','candle','smoke detector','cassette','casserole','water bottle','mortar',
-		'shampoo','faucet','comb','conditioner','razor','screen','medicine','soap','eraser','chariot','golf ball','jar'
+		'shampoo','faucet','comb','conditioner','razor','screen','medicine','soap','eraser','chariot','golf ball','jar',
+		'earmuffs','workbench'
     ]
   },
   {
@@ -564,6 +565,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
