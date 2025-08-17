@@ -52,6 +52,43 @@ const aboutBtn = document.getElementById('about-btn');
 const difficultySlider = document.getElementById('difficulty-slider');
 const livesDisplayModal = document.getElementById('lives-display-modal');
 
+const iconSVGs = {
+    'location': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
+    'characteristic': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L23.725 9.17l-6.104 5.952 1.442 8.45L12 18.295l-7.063 3.794 1.442-8.45L.275 9.17l8.057-1.015L12 .587z"/></svg>`,
+    'spelling': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7h5.5L13 3.5V9z"/></svg>`
+};
+
+const turnsDisplay = document.getElementById('turns-display');
+// Get the lives display element on the main game screen
+const livesDisplay = document.getElementById('lives-display'); 
+const settingsBtn = document.getElementById('settings-btn'); // This is now just the settings opener
+const messageBox = document.getElementById('message-box');
+const handContainer = document.getElementById('hand-container');
+
+
+const zoneElements = {
+    '1': { container: document.getElementById('zone-1'), wordsDiv: document.getElementById('zone-1').querySelector('.word-cards-container') },
+    '2': { container: document.getElementById('zone-2'), wordsDiv: document.getElementById('zone-2').querySelector('.word-cards-container') },
+    '3': { container: document.getElementById('zone-3'), wordsDiv: document.getElementById('zone-3').querySelector('.word-cards-container') },
+    '1-2': { container: document.getElementById('zone-1-2'), wordsDiv: document.getElementById('zone-1-2').querySelector('.word-cards-container') },
+    '1-3': { container: document.getElementById('zone-1-3'), wordsDiv: document.getElementById('zone-1-3').querySelector('.word-cards-container') },
+    '2-3': { container: document.getElementById('zone-2-3'), wordsDiv: document.getElementById('zone-2-3').querySelector('.word-cards-container') },
+    '1-2-3': { container: document.getElementById('zone-1-2-3'), wordsDiv: document.getElementById('zone-1-2-3').querySelector('.word-cards-container') },
+    '0': { container: document.getElementById('none-container'), wordsDiv: document.getElementById('none-container').querySelector('.word-cards-container') },
+    'hand': { container: document.getElementById('hand-container'), wordsDiv: document.getElementById('hand-container').querySelector('.word-cards-container') }
+};
+
+const zoneConfigs = {
+    '1': { id: 'zone-1', colorVar: '--zone1-bg', genericLabelIndex: 0, ruleIndices: [0], categoryTypes: ['location'] },
+    '2': { id: 'zone-2', colorVar: '--zone2-bg', genericLabelIndex: 1, ruleIndices: [1], categoryTypes: ['characteristic'] },
+    '3': { id: 'zone-3', colorVar: '--zone3-bg', genericLabelIndex: 2, ruleIndices: [2], categoryTypes: ['spelling'] }, // Added ruleIndices: [2]
+    '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: 'Location & Characteristic', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
+    '1-3': { id: 'zone-1-3', colorVar: '--zone13-bg', customLabel: 'Location & Spelling', ruleIndices: [0, 2], categoryTypes: ['location', 'spelling'] },
+    '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: 'Characteristic & Spelling', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'spelling'] },
+    '1-2-3': { id: 'zone-1-2-3', colorVar: '--zone123-bg', customLabel: 'All Three', ruleIndices: [0, 1, 2], categoryTypes: ['location', 'characteristic', 'spelling'] },
+    '0': { id: 'none-container', colorVar: '--zone0-bg', customLabel: 'None of the above', ruleIndices: [], categoryTypes: [] }
+};
+
 
 document.title = GAME_TITLE;
 
@@ -733,43 +770,6 @@ function generateWordPoolWithProbabilities(ruleResults, wordPool, count, rng) {
     return selected;
 }
 
-
-const iconSVGs = {
-    'location': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
-    'characteristic': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L23.725 9.17l-6.104 5.952 1.442 8.45L12 18.295l-7.063 3.794 1.442-8.45L.275 9.17l8.057-1.015L12 .587z"/></svg>`,
-    'spelling': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7h5.5L13 3.5V9z"/></svg>`
-};
-
-const turnsDisplay = document.getElementById('turns-display');
-// Get the lives display element on the main game screen
-const livesDisplay = document.getElementById('lives-display'); 
-const settingsBtn = document.getElementById('settings-btn'); // This is now just the settings opener
-const messageBox = document.getElementById('message-box');
-const handContainer = document.getElementById('hand-container');
-
-
-const zoneElements = {
-    '1': { container: document.getElementById('zone-1'), wordsDiv: document.getElementById('zone-1').querySelector('.word-cards-container') },
-    '2': { container: document.getElementById('zone-2'), wordsDiv: document.getElementById('zone-2').querySelector('.word-cards-container') },
-    '3': { container: document.getElementById('zone-3'), wordsDiv: document.getElementById('zone-3').querySelector('.word-cards-container') },
-    '1-2': { container: document.getElementById('zone-1-2'), wordsDiv: document.getElementById('zone-1-2').querySelector('.word-cards-container') },
-    '1-3': { container: document.getElementById('zone-1-3'), wordsDiv: document.getElementById('zone-1-3').querySelector('.word-cards-container') },
-    '2-3': { container: document.getElementById('zone-2-3'), wordsDiv: document.getElementById('zone-2-3').querySelector('.word-cards-container') },
-    '1-2-3': { container: document.getElementById('zone-1-2-3'), wordsDiv: document.getElementById('zone-1-2-3').querySelector('.word-cards-container') },
-    '0': { container: document.getElementById('none-container'), wordsDiv: document.getElementById('none-container').querySelector('.word-cards-container') },
-    'hand': { container: document.getElementById('hand-container'), wordsDiv: document.getElementById('hand-container').querySelector('.word-cards-container') }
-};
-
-const zoneConfigs = {
-    '1': { id: 'zone-1', colorVar: '--zone1-bg', genericLabelIndex: 0, ruleIndices: [0], categoryTypes: ['location'] },
-    '2': { id: 'zone-2', colorVar: '--zone2-bg', genericLabelIndex: 1, ruleIndices: [1], categoryTypes: ['characteristic'] },
-    '3': { id: 'zone-3', colorVar: '--zone3-bg', genericLabelIndex: 2, ruleIndices: [2], categoryTypes: ['spelling'] }, // Added ruleIndices: [2]
-    '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: 'Location & Characteristic', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
-    '1-3': { id: 'zone-1-3', colorVar: '--zone13-bg', customLabel: 'Location & Spelling', ruleIndices: [0, 2], categoryTypes: ['location', 'spelling'] },
-    '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: 'Characteristic & Spelling', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'spelling'] },
-    '1-2-3': { id: 'zone-1-2-3', colorVar: '--zone123-bg', customLabel: 'All Three', ruleIndices: [0, 1, 2], categoryTypes: ['location', 'characteristic', 'spelling'] },
-    '0': { id: 'none-container', colorVar: '--zone0-bg', customLabel: 'None of the above', ruleIndices: [], categoryTypes: [] }
-};
 
 function createSeededRandom(seed) {
     let s = seed % 2147483647;
