@@ -4,7 +4,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.09";
+const CURRENT_VERSION = "1.10";
 const GAME_TITLE = "No Not There";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -29,6 +29,7 @@ let livesRemaining = 0;
 // Daily streak variables
 let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || '0', 10);
 let lastDailyCompletionDate = localStorage.getItem('lastDailyCompletionDate') || '';
+
 //after a word is played into a zone, that zone's words are less likely to be drawn
 let zoneWeights = {};
 
@@ -98,7 +99,7 @@ document.title = GAME_TITLE;
  * - `updateGameTitle()`: To update the display based on game mode.
  * - `updateDailyBadge()`: To show/hide the daily badge.
  * - `resetGameState()`: To clear previous game data.
- * - `generateCurrentWordPool()`: To create the initial set of available words.
+ * - `buildDeliberateWordPool()`: To create the initial set of available words.
  * - `seedInitialZones()`: To place words on the board at the start.
  * - `renderWordsInRegions()`: To display the pre-seeded words.
  * - `shuffleArray()`: To deterministically shuffle the word pool.
@@ -108,6 +109,61 @@ document.title = GAME_TITLE;
  * - `crypto.randomUUID()`: To generate unique IDs for words.
  * - `renderHand()`: To display the player's initial hand.
  */
+ 
+console.log("Venn Diagram Game script loaded." + CURRENT_VERSION);
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Safe DOM setup
+    const versionEl = document.getElementById('version-display');
+    const titleEl = document.getElementById('game-title-text');
+	//I want to display the URL near the version number in the Settings menu, but I'm too lazy to make a whole new <div>
+    //if (versionEl) versionEl.textContent = 'Version ' + CURRENT_VERSION;
+    if (versionEl) versionEl.textContent = URL + ' v' + CURRENT_VERSION; 
+	
+	if (titleEl) titleEl.textContent = GAME_TITLE;
+    
+    // Safe theme setup, do we want to start in dark or light mode?
+    applyTheme();
+
+    // Initialize difficulty slider and display
+    if (difficultySlider && livesDisplayModal) {
+        userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
+        difficultySlider.value = userSetLives;
+        livesDisplayModal.textContent = userSetLives;
+
+        difficultySlider.addEventListener('input', (event) => {
+            updateLivesSetting(parseInt(event.target.value, 10));
+        });
+    }
+
+    // Existing DOMContentLoaded logic for starting game
+    const today = getTodayDateString();
+    const lastPlayed = localStorage.getItem("lastDailyDate");
+
+    // Check for missed daily puzzle and reset streak if necessary
+    if (lastPlayed && lastPlayed !== today) {
+        const lastDate = new Date(lastPlayed);
+        const currentDate = new Date(today);
+        const diffTime = Math.abs(currentDate - lastDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 1) { // If more than one day has passed since last play
+            dailyStreak = 0;
+            localStorage.setItem('dailyStreak', dailyStreak);
+            console.log("Missed a day. Daily streak reset to 0.");
+        }
+    }
+
+    if (lastPlayed !== today) {
+        localStorage.setItem("lastDailyDate", today);
+        console.log("Starting Daily Game for", today);
+        startGame(true);
+    } else {
+        console.log("Starting regular game");
+        startGame(false);
+    }
+}); 
+ 
 async function startGame(isDaily) {
     console.log("startGame(isDaily)", isDaily);
     dailyMode = isDaily;
@@ -117,7 +173,7 @@ async function startGame(isDaily) {
 	
 	//These are the probabilities that, when a new card is drawn, it will belong to a certain zone, and I divide these weights every time a card is played in that zone 
 	//The initial three zones each start off with a card, so I'm reducing their weights before the start of the game, before the first hand is drawn
-	//TODO: except the initial cards do not get re-drawn if they're below the zoneWeight, and they should
+	//TODO: except the initial cards do not get re-drawn if they're below the zoneWeight, and maybe they should
 	zoneWeights = {
         '0': 1.0, 
         '1': 0.25,
@@ -129,20 +185,20 @@ async function startGame(isDaily) {
         '1-2-3': 1.0
     };
 
-    // Restore original rule generation logic
+    // Let's generate some rules, ok?
     activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
+	console.log("rules:" + activeRules);
 
     updateGameTitle(isDaily);
     updateDailyBadge(isDaily);
     resetGameState();
 
     // Use deterministic seed for the full word pool
-    const initialFullWordPool = generateCurrentWordPool(seed + 1);
-    console.log("Initial Full Word Pool:", initialFullWordPool);
+	const initialFullWordPool = buildDeliberateWordPool(activeRules, seed + 1);
 
-    // Use deterministic seed for initial zone seeding
+    // a few words get played as hints at the start of the game
     seedInitialZones(initialFullWordPool);
-    renderWordsInRegions();
+	renderWordsInRegions(); // we have to actually draw those words
 
     // Remove seeded (already placed) words from pool, deterministic shuffle for remaining pool
     currentWordPool = initialFullWordPool.filter(w => !wordsInPlay.some(obj => obj.text === w));
@@ -172,21 +228,33 @@ async function startGame(isDaily) {
     // This is the line added/corrected to prevent duplicates in hand
     currentWordPool = currentWordPool.filter(word => !weightedHand.includes(word));
 
-    // Original loop for populating currentHand and wordsInPlay
-    for (const wordText of weightedHand) {
-        const wordObj = { id: crypto.randomUUID(), text: wordText, correctZoneKey: null };
-        currentHand.push(wordObj);
-        wordsInPlay.push(wordObj);
-    }
-
+	// Corrected loop for populating currentHand and wordsInPlay
+	for (const wordObjFromWeightedHand of weightedHand) {
+		const wordObj = { 
+			id: crypto.randomUUID(), 
+			text: wordObjFromWeightedHand.text, 
+			correctZoneKey: wordObjFromWeightedHand.correctZoneKey 
+		};
+		currentHand.push(wordObj);
+		wordsInPlay.push(wordObj);
+	}
+	console.log("Weighted Hand before renderHand:", weightedHand);
     renderHand();
 
 	showMessage("Select a card in Your Hand, then play it in one of the other 8 zones.");
 	
+	//the rules list popup in the settings menu
 	const rulesListContainer = document.getElementById('rules-list-container');
 	if (rulesListContainer) {
 		rulesListContainer.innerHTML = buildRulesHTML();
 	}
+	
+	//This will assign .exampleHints to all rules
+	for (const rule of allPossibleRules) {
+    if (!rule.exampleHints || !Array.isArray(rule.exampleHints)) {
+        rule.exampleHints = generateExampleHintsFor(rule, allPossibleRules);
+    }
+}
 }//async function startGame(isDaily)
 
 
@@ -347,12 +415,217 @@ async function endGame(isWin) {
 }//async function endGame(isWin)
 
 
-//This will assign .exampleHints to all rules
-for (const rule of allPossibleRules) {
-    if (!rule.exampleHints || !Array.isArray(rule.exampleHints)) {
-        rule.exampleHints = generateExampleHintsFor(rule, allPossibleRules);
+// =========================================
+// generateActiveRulesWithOverlap()
+// -----------------------------------------
+// Called by: startGame()
+// Returns: an array of 3 rules [location, characteristic, spelling]
+// Ensures sufficient pairwise and triple overlaps before accepting
+// =========================================
+function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 3, minTripleOverlap = 1, maxAttempts = 1000) {
+    const locationRules = allRules.filter(r => r.categoryType === 'location' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
+    const characteristicRules = allRules.filter(r => r.categoryType === 'characteristic' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
+    const spellingRules = allRules.filter(r => r.categoryType === 'spelling' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const loc = shuffleArray([...locationRules], seed + attempt * 3 + 1)[0];
+        const chr = shuffleArray([...characteristicRules], seed + attempt * 3 + 2)[0];
+        const wrd = shuffleArray([...spellingRules], seed + attempt * 3 + 3)[0];
+
+        const candidateSet = [loc, chr, wrd];
+        const zoneBuckets = getWeightedWordList(candidateSet);
+
+        const sharedZones = ['1-2', '1-3', '2-3', '1-2-3'];
+        const totalSharedCount = sharedZones.reduce((sum, zone) => sum + (zoneBuckets[zone]?.length || 0), 0);
+        const tripleOverlapCount = zoneBuckets['1-2-3']?.length || 0;
+
+        if (tripleOverlapCount >= minTripleOverlap && totalSharedCount >= minSharedWords) {
+            console.log(`✅ Found overlapping rules on attempt ${attempt + 1}`);
+
+            // Debug: print zone distribution
+            const zoneKeys = ["0", "1", "2", "3", "1-2", "1-3", "2-3", "1-2-3"];
+            console.log("🔎 Potential word distribution for selected rules (pre-weighted):");
+            for (const key of zoneKeys) {
+                const count = zoneBuckets[key]?.length || 0;
+                console.log(`  Zone ${key}: ${count} word(s)`);
+            }
+
+            return candidateSet;
+        }
+    }
+
+    console.warn("⚠️ No sufficiently overlapping rule trio found after max attempts. Falling back.");
+    return generateActiveRules(seed); // fallback to simpler selection
+}
+
+function generateActiveRules(gameSeed) {
+    const locationCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'location')], gameSeed + 1);
+    const characteristicCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'characteristic')], gameSeed + 2);
+    const spellingCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'spelling')], gameSeed + 3);
+    
+	return [
+	  locationCandidates.length > 0 ? locationCandidates[0] : fallbackLocationRule,
+	  characteristicCandidates.length > 0 ? characteristicCandidates[0] : fallbackCharacteristicRule,
+	  spellingCandidates.length > 0 ? spellingCandidates[0] : fallbackspellingRule
+	];
+}
+
+// =========================================
+// buildDeliberateWordPool()
+// -----------------------------------------
+// Called by: startgame()
+// Returns: an array of words with guaranteed zone coverage - and attaches a correctZoneKey property to each word
+// Ensures at least 1 Zone 0 word, even if all 3 rules are broad
+// =========================================
+
+function buildDeliberateWordPool(rules, seed) {
+    const rng = mulberry32(seed || Date.now());
+    
+    const desiredCounts = {
+        '1': 3,
+        '2': 3,
+        '3': 3,
+        '1-2': 3,
+        '1-3': 3,
+        '2-3': 3,
+        '1-2-3': 3,
+        '0': 3,
+    };
+
+    // Get all words used by the current active rules
+    const usedRuleWords = new Set();
+    for (const rule of rules) {
+        if (Array.isArray(rule.words)) {
+            rule.words.forEach(w => usedRuleWords.add(w));
+        }
+    }
+
+    // Get all words across all rules
+    const allRuleWords = new Set();
+    for (const rule of allPossibleRules) {
+        if (Array.isArray(rule.words)) {
+            rule.words.forEach(w => allRuleWords.add(w));
+        }
+    }
+
+    const neutralWords = [...allRuleWords].filter(w => !usedRuleWords.has(w));
+    const allWords = [...usedRuleWords, ...neutralWords];
+
+    const shuffledWords = allWords
+        .map(word => ({ word, sortKey: rng() }))
+        .sort((a, b) => a.sortKey - b.sortKey)
+        .map(obj => obj.word);
+
+    const zoneBuckets = {};
+    const selected = [];
+
+    for (const word of shuffledWords) {
+        const zoneKey = getCorrectZoneKeyForWord(word, rules);
+
+        if (!(zoneKey in desiredCounts)) continue;
+
+        if (!zoneBuckets[zoneKey]) {
+            zoneBuckets[zoneKey] = [];
+        }
+
+        if (zoneBuckets[zoneKey].length < desiredCounts[zoneKey]) {
+            // Here's the key change: push an object with both the word and its zone key.
+            const wordObject = {
+                text: word,
+                correctZoneKey: zoneKey
+            };
+            zoneBuckets[zoneKey].push(wordObject);
+            selected.push(wordObject);
+        }
+
+        const allZonesFilled = Object.entries(desiredCounts).every(([zone, count]) =>
+            (zoneBuckets[zone] || []).length >= count
+        );
+        if (allZonesFilled) break;
+    }
+    
+    console.log("✅ buildDeliberateWordPool complete. Zone distribution:");
+    for (const [zone, target] of Object.entries(desiredCounts)) {
+        const actual = (zoneBuckets[zone] || []).length;
+        console.log(`  Zone ${zone}: ${actual} / ${target}`);
+    }
+
+    return selected;
+}
+
+// This function needs to be called after the word objects in the pool have their `correctZoneKey` property set.
+function seedInitialZones(pool) {
+	console.log("Initial Full Word Pool:", pool);
+	
+    const initialZoneKeys = ['1', '2', '3', '1-2-3'];
+    const wordsPlaced = new Set();
+    
+    for (const targetZoneKey of initialZoneKeys) {
+        //the two lines work together to create a randomized list of words that have not yet been used
+		const candidates = pool.filter(w => !wordsPlaced.has(w.text)); // Filter by word.text
+        const shuffled = shuffleArray([...candidates]);
+		
+        let chosenWord = null;
+
+        if (targetZoneKey === '1-2-3') {
+            // Find a word that has been pre-calculated to be in the '1-2-3' zone
+            chosenWord = shuffled.find(word => word.correctZoneKey === '1-2-3');
+			console.log(`For targetZoneKey === '1-2-3', chosenWord = ${chosenWord}`);
+        } else {
+            // Find a word that has been pre-calculated to be in one of the single zones
+            chosenWord = shuffled.find(word => word.correctZoneKey === targetZoneKey);
+        }
+
+        if (chosenWord) {
+            wordsPlaced.add(chosenWord.text); // Add the word's text to the set
+            wordsInPlay.push({
+                id: crypto.randomUUID(),
+                text: chosenWord.text,
+                correctZoneKey: chosenWord.correctZoneKey,
+                isInitialSeed: true
+            });
+			
+			//remove the word from the pool, so it doesn't get drawn again
+			const indexToRemove = pool.findIndex(w => w.text === chosenWord.text);
+			if (indexToRemove !== -1) {	pool.splice(indexToRemove, 1); }
+			
+            zoneWeights[targetZoneKey] /= 4; // If a word gets placed in a zone, make that zone likely to be chosen again, when we're drawing cards for the hand
+            console.log(`Initial placement of ${chosenWord.text} in zone ${targetZoneKey}, weight changed to ${zoneWeights[targetZoneKey]}`);
+        } else {
+            console.warn(`[startGame] Could not find word for zone ${targetZoneKey}`);
+        }
     }
 }
+
+/*
+function seedInitialZones(pool) {
+    const initialZoneKeys = ['1', '2', '3','1-2-3'];
+    const wordsPlaced = new Set();
+    for (let i = 0; i < initialZoneKeys.length; i++) {
+        const targetCorrectZoneKeyForWord = initialZoneKeys[i];
+        const targetRuleIndex = parseInt(targetCorrectZoneKeyForWord) - 1;
+        const candidates = pool.filter(w => !wordsPlaced.has(w));
+        const shuffled = shuffleArray([...candidates], 20 + i);
+        let chosenWord = shuffled.find(word => matchesOnlyOneRule(word, targetRuleIndex))
+            || shuffled.find(word => activeRules[targetRuleIndex].test(chosenWord));
+
+        if (chosenWord) {
+            wordsPlaced.add(chosenWord);
+            wordsInPlay.push({
+                id: crypto.randomUUID(),
+                text: chosenWord,
+                correctZoneKey: targetCorrectZoneKeyForWord,
+                isInitialSeed: true // Mark as initially seeded for rendering logic
+			});
+			zoneWeights[targetCorrectZoneKeyForWord] /= 4; // If a word gets placed in a zone, make it half as likely to be chosen again
+			console.log(`Initial placement of ` + chosenWord + ' in zone ' + targetCorrectZoneKeyForWord + ', weight changed to ' + zoneWeights[targetCorrectZoneKeyForWord] );
+        } else {
+            console.warn(`[startGame] Could not find word for Rule ${targetCorrectZoneKeyForWord} (${activeRules[targetRuleIndex]?.name || 'N/A'})`);
+        }
+        console.log(`rule ${i + 1} : ${activeRules[i]?.name}`);
+    }
+}
+*/
 
 function getTodayDateString() {
     const today = new Date();
@@ -364,31 +637,20 @@ function getDailySeed() {
     return parseInt(today, 10);
 }
 
-//utility function, because some rules have a test function, but most don't
-function doesWordMatchRule(word, rule) {
-  // First, check if the word is explicitly listed in the rule's 'words' array
-  if (Array.isArray(rule.words) && rule.words.includes(word)) {
-    return true;
-  }
-  // If not explicitly listed, then check the 'test' function if it exists
-  if (typeof rule.test === 'function') {
-    return rule.test(word);
-  }
-  return false;
-}
+// Updated utility function to handle both strings and objects
+function doesWordMatchRule(wordOrObject, rule) {
+    // Get the word text, whether it's a string or an object
+    const word = typeof wordOrObject === 'string' ? wordOrObject : wordOrObject.text;
 
-
-// Utility to calculate a word's zone key based on which rules it matches
-function getZoneKey(word, ruleResults) {
-    let matchedZones = [];
-
-    ruleResults.forEach((rule, index) => {
-        if (doesWordMatchRule(word, rule)) {
-            matchedZones.push(index + 1);
-        }
-    });
-
-    return matchedZones.length ? matchedZones.join('-') : '0';
+    // First, check if the word is explicitly listed in the rule's 'words' array
+    if (Array.isArray(rule.words) && rule.words.includes(word)) {
+        return true;
+    }
+    // If not explicitly listed, then check the 'test' function if it exists
+    if (typeof rule.test === 'function') {
+        return rule.test(word);
+    }
+    return false;
 }
 
 
@@ -417,11 +679,12 @@ function generateWordPoolWithProbabilities(ruleResults, wordPool, count, rng) {
         "0": 5
     };
     
+  
     const zoneBuckets = {};
     
-    // Group words by their zone key
+    // Now, use the wordPool to group words by their new zone key property.
     for (const word of wordPool) {
-        const zoneKey = getZoneKey(word, ruleResults);
+        const zoneKey = word.correctZoneKey; 
         if (!zoneBuckets[zoneKey]) zoneBuckets[zoneKey] = [];
         zoneBuckets[zoneKey].push(word);
     }
@@ -436,7 +699,7 @@ function generateWordPoolWithProbabilities(ruleResults, wordPool, count, rng) {
     
     // Flatten all zone keys in weighted order
     const weightedZoneKeys = Object.keys(zoneProbabilities).sort(
-    (a, b) => zoneProbabilities[b] - zoneProbabilities[a]
+        (a, b) => zoneProbabilities[b] - zoneProbabilities[a]
     );
     
     // Main loop
@@ -445,83 +708,30 @@ function generateWordPoolWithProbabilities(ruleResults, wordPool, count, rng) {
         const bucket = zoneBuckets[zoneKey] || [];
         
         // Find first unused word from the bucket
-        const candidate = bucket.find(word => !used.has(word));
+        const candidate = bucket.find(word => !used.has(word.text));
         
         if (candidate) {
             selected.push(candidate);
-            used.add(candidate);
+            used.add(candidate.text);
         } else {
             // Fallback: check all buckets for unused words
             const fallback = Object.values(zoneBuckets)
             .flat()
-            .find(word => !used.has(word));
+            .find(word => !used.has(word.text));
             
             if (!fallback) break; // No words left at all
             selected.push(fallback);
-            used.add(fallback);
+            used.add(fallback.text);
         }
     }
-    // 🔍 Add this debug block here
+    
+    // In this logging loop, use the pre-calculated key.
     for (const word of selected) {
-        console.log('generateWordPoolWithProbabilities ', word, '→', getZoneKey(word, ruleResults));
+        console.log('generateWordPoolWithProbabilities ', word.text, '→', word.correctZoneKey);
     }
     
     return selected;
 }
-
-console.log("Venn Diagram Game script loaded." + CURRENT_VERSION);
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Safe DOM setup
-    const versionEl = document.getElementById('version-display');
-    const titleEl = document.getElementById('game-title-text');
-	//I want to display the URL near the version number in the Settings menu, but I'm too lazy to make a whole new <div>
-    //if (versionEl) versionEl.textContent = 'Version ' + CURRENT_VERSION;
-    if (versionEl) versionEl.textContent = URL + ' v' + CURRENT_VERSION; 
-	
-	if (titleEl) titleEl.textContent = GAME_TITLE;
-    
-    // Safe theme setup, do we want to start in dark or light mode?
-    applyTheme();
-
-    // Initialize difficulty slider and display
-    if (difficultySlider && livesDisplayModal) {
-        userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
-        difficultySlider.value = userSetLives;
-        livesDisplayModal.textContent = userSetLives;
-
-        difficultySlider.addEventListener('input', (event) => {
-            updateLivesSetting(parseInt(event.target.value, 10));
-        });
-    }
-
-    // Existing DOMContentLoaded logic for starting game
-    const today = getTodayDateString();
-    const lastPlayed = localStorage.getItem("lastDailyDate");
-
-    // Check for missed daily puzzle and reset streak if necessary
-    if (lastPlayed && lastPlayed !== today) {
-        const lastDate = new Date(lastPlayed);
-        const currentDate = new Date(today);
-        const diffTime = Math.abs(currentDate - lastDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays > 1) { // If more than one day has passed since last play
-            dailyStreak = 0;
-            localStorage.setItem('dailyStreak', dailyStreak);
-            console.log("Missed a day. Daily streak reset to 0.");
-        }
-    }
-
-    if (lastPlayed !== today) {
-        localStorage.setItem("lastDailyDate", today);
-        console.log("Starting Daily Game for", today);
-        startGame(true);
-    } else {
-        console.log("Starting regular game");
-        startGame(false);
-    }
-});
 
 
 const iconSVGs = {
@@ -543,22 +753,19 @@ const zoneElements = {
     '2': { container: document.getElementById('zone-2'), wordsDiv: document.getElementById('zone-2').querySelector('.word-cards-container') },
     '3': { container: document.getElementById('zone-3'), wordsDiv: document.getElementById('zone-3').querySelector('.word-cards-container') },
     '1-2': { container: document.getElementById('zone-1-2'), wordsDiv: document.getElementById('zone-1-2').querySelector('.word-cards-container') },
-    '1-3': { container: document.getElementById('red-yellow-overlap-container'), wordsDiv: document.getElementById('red-yellow-overlap-container').querySelector('.word-cards-container') },
+    '1-3': { container: document.getElementById('zone-1-3'), wordsDiv: document.getElementById('zone-1-3').querySelector('.word-cards-container') },
     '2-3': { container: document.getElementById('zone-2-3'), wordsDiv: document.getElementById('zone-2-3').querySelector('.word-cards-container') },
     '1-2-3': { container: document.getElementById('zone-1-2-3'), wordsDiv: document.getElementById('zone-1-2-3').querySelector('.word-cards-container') },
     '0': { container: document.getElementById('none-container'), wordsDiv: document.getElementById('none-container').querySelector('.word-cards-container') },
     'hand': { container: document.getElementById('hand-container'), wordsDiv: document.getElementById('hand-container').querySelector('.word-cards-container') }
 };
 
-
-
-
 const zoneConfigs = {
     '1': { id: 'zone-1', colorVar: '--zone1-bg', genericLabelIndex: 0, ruleIndices: [0], categoryTypes: ['location'] },
     '2': { id: 'zone-2', colorVar: '--zone2-bg', genericLabelIndex: 1, ruleIndices: [1], categoryTypes: ['characteristic'] },
     '3': { id: 'zone-3', colorVar: '--zone3-bg', genericLabelIndex: 2, ruleIndices: [2], categoryTypes: ['spelling'] }, // Added ruleIndices: [2]
     '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: 'Location & Characteristic', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
-    '1-3': { id: 'red-yellow-overlap-container', colorVar: '--zone13-bg', customLabel: 'Location & Spelling', ruleIndices: [0, 2], categoryTypes: ['location', 'spelling'] },
+    '1-3': { id: 'zone-1-3', colorVar: '--zone13-bg', customLabel: 'Location & Spelling', ruleIndices: [0, 2], categoryTypes: ['location', 'spelling'] },
     '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: 'Characteristic & Spelling', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'spelling'] },
     '1-2-3': { id: 'zone-1-2-3', colorVar: '--zone123-bg', customLabel: 'All Three', ruleIndices: [0, 1, 2], categoryTypes: ['location', 'characteristic', 'spelling'] },
     '0': { id: 'none-container', colorVar: '--zone0-bg', customLabel: 'None of the above', ruleIndices: [], categoryTypes: [] }
@@ -619,7 +826,11 @@ function generateExampleHintsFor(rule, allRules ) {
     return shuffled.slice(0, count).map(r => r.name);
 }
 
-function getCorrectZoneKeyForWord(word, rules) {
+// Updated function to handle both strings and objects
+function getCorrectZoneKeyForWord(wordOrObject, rules) {
+    // Get the word text, whether it's a string or an object
+    const word = typeof wordOrObject === 'string' ? wordOrObject : wordOrObject.text;
+
     let matchedZones = [];
 
     rules.forEach((rule, index) => {
@@ -659,7 +870,7 @@ function getZoneDisplayName(zoneKey, revealRules = false) {
 // getWeightedWordList()
 // -----------------------------------------
 // Called by: buildDeliberateWordPool()
-// Calls: getZoneKey(word, rules), shuffleArray()
+// Calls: getCorrectZoneKeyForWord(word, rules), shuffleArray()
 // 
 // Purpose:
 // Groups all words from the current active rules into buckets
@@ -699,7 +910,7 @@ function getWeightedWordList(rules) {
 
     // Classify each word into a zone
     for (const word of allWords) {
-        const zoneKey = getZoneKey(word, rules);
+        const zoneKey = getCorrectZoneKeyForWord(word, rules);
         if (!zoneBuckets[zoneKey]) zoneBuckets[zoneKey] = [];
         zoneBuckets[zoneKey].push(word);
 
@@ -708,12 +919,13 @@ function getWeightedWordList(rules) {
         }
     }
 
+/*
     // Log full zone distribution
     console.log("🔎 zoneBuckets (raw counts):");
     Object.entries(zoneBuckets).forEach(([key, val]) => {
         console.log(`  Zone ${key}: ${val.length} word(s)`);
     });
-
+*/
     return zoneBuckets;
 }
 
@@ -725,106 +937,6 @@ function mulberry32(seed) {
         t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
-}
-
-// =========================================
-// buildDeliberateWordPool()
-// -----------------------------------------
-// Called by: generateCurrentWordPool()
-// Returns: an array of words with guaranteed zone coverage
-// Ensures at least 1 Zone 0 word, even if all 3 rules are broad
-// =========================================
-
-function buildDeliberateWordPool(rules, seed) {
-    const rng = mulberry32(seed || Date.now());
-
-    const desiredCounts = {
-        '1': 3,
-        '2': 3,
-        '3': 3,
-        '1-2': 3,
-        '1-3': 3,
-        '2-3': 3,
-        '1-2-3': 3,
-        '0': 3,
-    };
-
-    // Get all words used by the current active rules
-    const usedRuleWords = new Set();
-    for (const rule of rules) {
-        if (Array.isArray(rule.words)) {
-            rule.words.forEach(w => usedRuleWords.add(w));
-        }
-    }
-
-    // Get all words across all rules
-    const allRuleWords = new Set();
-    for (const rule of allPossibleRules) {
-        if (Array.isArray(rule.words)) {
-            rule.words.forEach(w => allRuleWords.add(w));
-        }
-    }
-
-    // Words not used in current rules
-    const neutralWords = [...allRuleWords].filter(w => !usedRuleWords.has(w));
-    const allWords = [...usedRuleWords, ...neutralWords];
-
-    const shuffledWords = allWords
-        .map(word => ({ word, sortKey: rng() }))
-        .sort((a, b) => a.sortKey - b.sortKey)
-        .map(obj => obj.word);
-
-    const zoneBuckets = {};
-    const selected = [];
-
-    for (const word of shuffledWords) {
-        const zoneKey = getCorrectZoneKeyForWord(word, rules);
-
-        if (!(zoneKey in desiredCounts)) continue;
-
-        if (!zoneBuckets[zoneKey]) {
-            zoneBuckets[zoneKey] = [];
-        }
-
-        if (zoneBuckets[zoneKey].length < desiredCounts[zoneKey]) {
-            zoneBuckets[zoneKey].push(word);
-            selected.push(word);
-        }
-
-        const allZonesFilled = Object.entries(desiredCounts).every(([zone, count]) =>
-            (zoneBuckets[zone] || []).length >= count
-        );
-        if (allZonesFilled) break;
-    }
-
-    console.log("✅ buildDeliberateWordPool complete. Zone distribution:");
-    for (const [zone, target] of Object.entries(desiredCounts)) {
-        const actual = (zoneBuckets[zone] || []).length;
-        console.log(`  Zone ${zone}: ${actual} / ${target}`);
-    }
-
-    return selected;
-}
-
-
-// =========================================
-// generateCurrentWordPool()
-// -----------------------------------------
-// This is the top-level function that assembles the game's word pool.
-// It delegates selection to buildDeliberateWordPool(), then tracks
-// and logs the zone distribution for the selected words.
-// =========================================
-function generateCurrentWordPool(seed) {
-    const pool = buildDeliberateWordPool(activeRules, seed);
-    
-    const zoneCount = {};
-    pool.forEach(word => {
-        const z = getZoneKey(word, activeRules);
-        zoneCount[z] = (zoneCount[z] || 0) + 1;
-    });
-    console.log("✅ Final WordPool distribution:", zoneCount);
-    
-    return pool;
 }
 
 function showMessage(message, isError = false) {
@@ -868,6 +980,17 @@ function renderHand() {
         card.addEventListener('click', () => selectWord(wordObj.id));
         handWordsDiv.appendChild(card);
     });
+}
+
+//this helper function is only ever called by renderHand
+function selectWord(id) {
+    if (selectedWordId) {
+        document.getElementById(`card-${selectedWordId}`)?.classList.remove("selected");
+    }
+    
+    selectedWordId = id;
+    document.getElementById(`card-${selectedWordId}`).classList.add("selected");
+    showMessage(`Selected: ${wordsInPlay.find(w => w.id === id).text}. Now click a box to place it.`);
 }
 
 /**
@@ -931,16 +1054,6 @@ function renderWordsInRegions() {
 }
 
 
-function selectWord(id) {
-    if (selectedWordId) {
-        document.getElementById(`card-${selectedWordId}`)?.classList.remove("selected");
-    }
-    
-    selectedWordId = id;
-    document.getElementById(`card-${selectedWordId}`).classList.add("selected");
-    showMessage(`Selected: ${wordsInPlay.find(w => w.id === id).text}. Now click a box to place it.`);
-}
-
 // Show a feedback bubble near a zone or element
 function showZoneFeedback(message, targetElement, isError = false) {
     const bubble = document.getElementById('zone-feedback-bubble');
@@ -961,13 +1074,13 @@ function showZoneFeedback(message, targetElement, isError = false) {
     }, 3000);
 }
 
-function placeWordInRegion(targetZoneKeyString) {
+function placeWordInRegion(targetCorrectZoneKeyForWordString) {
     if (!selectedWordId) {
         showMessage('Please select a word first!', true);
         return;
     }
 
-    if (targetZoneKeyString === 'hand') {
+    if (targetCorrectZoneKeyForWordString === 'hand') {
         showMessage('You cannot place words into your hand. Select a rule box or "None"!', true);
         return;
     }
@@ -978,7 +1091,7 @@ function placeWordInRegion(targetZoneKeyString) {
     const selectedWordObj = wordsInPlay.find(w => w.id === selectedWordId);
     const correctZoneKey = getCorrectZoneKeyForWord(selectedWordObj.text, activeRules);
     const correctZoneElement = zoneElements[correctZoneKey]?.container;
-    const targetZoneElement = zoneElements[targetZoneKeyString]?.container;
+    const targetZoneElement = zoneElements[targetCorrectZoneKeyForWordString]?.container;
 	
 	//regardless of correctness, the word was placed in the correctZoneKey, so make the correctZoneKey's cards less likely to be chosen again
 	zoneWeights[correctZoneKey] /= 4; 
@@ -1008,14 +1121,14 @@ function placeWordInRegion(targetZoneKeyString) {
     console.log(`--- Placement Attempt ---`);
     console.log(`Word: '${selectedWordObj.text}'`);
     console.log(`Correct Zone Key: '${correctZoneKey}'`);
-    console.log(`Target Zone Key (placed in): '${targetZoneKeyString}'`);
+    console.log(`Target Zone Key (placed in): '${targetCorrectZoneKeyForWordString}'`);
     // --- DEBUG LOGS END ---
 
     // This variable will hold the new card drawn from the pool
     // Initialize to null, it will only be assigned if a new card is to be drawn (on a miss)
     let newCardFromPool = null; 
 
-    if (correctZoneKey === targetZoneKeyString) {
+    if (correctZoneKey === targetCorrectZoneKeyForWordString) {
         // Perfect match: Hand size decreases, NO new card is drawn.
         isCorrectPlacement = true;
         selectedWordObj.correctZoneKey = correctZoneKey;
@@ -1027,9 +1140,9 @@ function placeWordInRegion(targetZoneKeyString) {
         // Hand size will now decrease by 1 for perfect matches.
     } else {
         // Incorrect placement - now determine if it's a near miss or far miss
-        const targetIsSingleZone = ['1', '2', '3'].includes(targetZoneKeyString);
+        const targetIsSingleZone = ['1', '2', '3'].includes(targetCorrectZoneKeyForWordString);
         const correctZoneParts = correctZoneKey.split('-');
-        const isTargetContainedInCorrectOverlap = correctZoneParts.includes(targetZoneKeyString);
+        const isTargetContainedInCorrectOverlap = correctZoneParts.includes(targetCorrectZoneKeyForWordString);
 
         // --- DEBUG LOGS START ---
         console.log(`Target Is Single Zone (placed in): ${targetIsSingleZone}`);
@@ -1064,13 +1177,14 @@ function placeWordInRegion(targetZoneKeyString) {
     }
 
     // This block now only executes if newCardFromPool was assigned (meaning a miss occurred)
-    if (newCardFromPool) {
-        // If drawCard() successfully returned a word (i.e., deck is not empty)
-        const newWordObj = { id: crypto.randomUUID(), text: newCardFromPool, correctZoneKey: null };
-        currentHand.push(newWordObj);
-        wordsInPlay.push(newWordObj); // Add to wordsInPlay so it can be tracked
-        console.log(`New card '${newWordObj.text}' added to hand.`);
-    } else if (!isCorrectPlacement) {
+	if (newCardFromPool) {
+		// The newCardFromPool variable is already the word object.
+		// We just need to add it to the hand and wordsInPlay arrays.
+		newCardFromPool.id = crypto.randomUUID(); // Give it a new ID since it's a fresh card
+		currentHand.push(newCardFromPool);
+		wordsInPlay.push(newCardFromPool);
+		console.log(`New card '${newCardFromPool.text}' added to hand.`);
+	} else if (!isCorrectPlacement) {
         // This condition handles the case where it was a miss, but drawCard() returned null (deck empty)
         console.log("No new card drawn for a miss because currentWordPool is empty.");
         message += " (No more cards to draw!)"; // Inform the player
@@ -1095,14 +1209,14 @@ function placeWordInRegion(targetZoneKeyString) {
     renderHand(); // Re-render hand to show the updated hand (fewer cards on perfect, same on miss)
 
     checkGameEndCondition();
-}
+}//function placeWordInRegion(targetCorrectZoneKeyForWordString)
 
 //I'm replacing the old drawCard function; this new function checks the zoneWeight before it actually draws the card
 function drawCard() {
     // Loop until a card is successfully drawn or the deck is empty
     while (currentWordPool.length > 0) {
         let cardToConsider = currentWordPool[0]; // Get the top card
-        const cardZoneKey = getCorrectZoneKeyForWord(cardToConsider, activeRules);
+        const cardZoneKey = cardToConsider.correctZoneKey;
 
         // Get the weight for this card's zone
         const zoneWeight = zoneWeights[cardZoneKey] !== undefined ? zoneWeights[cardZoneKey] : 1.0;
@@ -1113,18 +1227,18 @@ function drawCard() {
         // Generate a random number between 0 and 1
         const randomNumber = Math.random();
 
-        console.log(`Considering drawing '${cardToConsider}'. Zone: '${cardZoneKey}', Weight: ${zoneWeight.toFixed(2)}, Chance to move to bottom: ${chanceToMoveToBottom.toFixed(2)}, Random: ${randomNumber.toFixed(2)}`);
+        console.log(`Considering drawing '${cardToConsider.text}'. Zone: '${cardZoneKey}', Weight: ${zoneWeight.toFixed(2)}, Chance to move to bottom: ${chanceToMoveToBottom.toFixed(2)}, Random: ${randomNumber.toFixed(2)}`);
 
         if (randomNumber < chanceToMoveToBottom) {
             // If the random number suggests moving to bottom, do so
             const movedCard = currentWordPool.shift(); // Remove from top
             currentWordPool.push(movedCard);          // Add to bottom
-            console.log(`'${movedCard}' moved to bottom of deck due to zone weight.`);
+            console.log(`'${movedCard.text}' moved to bottom of deck due to zone weight.`);
             // The loop will continue to the next iteration to consider the new top card
         } else {
             // If the random number suggests drawing, draw the card and exit the loop
             const drawnCard = currentWordPool.shift(); // Remove from top and return
-            console.log(`'${drawnCard}' drawn.`);
+            console.log(`'${drawnCard.text}' drawn.`);
 			
             return drawnCard; // A card was drawn, exit the function
         }
@@ -1165,7 +1279,7 @@ function copyToClipboard(text) {
     document.body.removeChild(textarea);
 }
 
-// NEW: Function to check for win or loss
+// Function to check for win or loss
 async function checkGameEndCondition() { 
     if (currentHand.length === 0) {
         // Win condition (all cards placed correctly)
@@ -1256,90 +1370,6 @@ function updateLivesSetting(value) {
     localStorage.setItem('userSetLives', userSetLives);
 }
 
-
-function seedInitialZones(pool) {
-    const initialZoneKeys = ['1', '2', '3'];
-    const wordsPlaced = new Set();
-    for (let i = 0; i < initialZoneKeys.length; i++) {
-        const targetZoneKey = initialZoneKeys[i];
-        const targetRuleIndex = parseInt(targetZoneKey) - 1;
-        const candidates = pool.filter(w => !wordsPlaced.has(w));
-        const shuffled = shuffleArray([...candidates], 20 + i);
-        let chosenWord = shuffled.find(word => matchesOnlyOneRule(word, targetRuleIndex))
-            || shuffled.find(word => activeRules[targetRuleIndex].test(chosenWord));
-
-        if (chosenWord) {
-            wordsPlaced.add(chosenWord);
-            wordsInPlay.push({
-                id: crypto.randomUUID(),
-                text: chosenWord,
-                correctZoneKey: targetZoneKey,
-                isInitialSeed: true // Mark as initially seeded for rendering logic
-			});
-			zoneWeights[targetZoneKey] /= 4; // If a word gets placed in a zone, make it half as likely to be chosen again
-			console.log(`Initial placement of ` + chosenWord + ' in zone ' + targetZoneKey + ', weight changed to ' + zoneWeights[targetZoneKey] );
-        } else {
-            console.warn(`[startGame] Could not find word for Rule ${targetZoneKey} (${activeRules[targetRuleIndex]?.name || 'N/A'})`);
-        }
-        console.log(`rule ${i + 1} : ${activeRules[i]?.name}`);
-    }
-}
-
-
-function generateActiveRules(gameSeed) {
-    const locationCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'location')], gameSeed + 1);
-    const characteristicCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'characteristic')], gameSeed + 2);
-    const spellingCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'spelling')], gameSeed + 3);
-    
-	return [
-	  locationCandidates.length > 0 ? locationCandidates[0] : fallbackLocationRule,
-	  characteristicCandidates.length > 0 ? characteristicCandidates[0] : fallbackCharacteristicRule,
-	  spellingCandidates.length > 0 ? spellingCandidates[0] : fallbackspellingRule
-	];
-}
-
-// =========================================
-// generateActiveRulesWithOverlap()
-// -----------------------------------------
-// Called by: startGame()
-// Returns: an array of 3 rules [location, characteristic, spelling]
-// Ensures sufficient pairwise and triple overlaps before accepting
-// =========================================
-function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 3, minTripleOverlap = 1, maxAttempts = 1000) {
-    const locationRules = allRules.filter(r => r.categoryType === 'location' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
-    const characteristicRules = allRules.filter(r => r.categoryType === 'characteristic' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
-    const spellingRules = allRules.filter(r => r.categoryType === 'spelling' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
-
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        const loc = shuffleArray([...locationRules], seed + attempt * 3 + 1)[0];
-        const chr = shuffleArray([...characteristicRules], seed + attempt * 3 + 2)[0];
-        const wrd = shuffleArray([...spellingRules], seed + attempt * 3 + 3)[0];
-
-        const candidateSet = [loc, chr, wrd];
-        const zoneBuckets = getWeightedWordList(candidateSet);
-
-        const sharedZones = ['1-2', '1-3', '2-3', '1-2-3'];
-        const totalSharedCount = sharedZones.reduce((sum, zone) => sum + (zoneBuckets[zone]?.length || 0), 0);
-        const tripleOverlapCount = zoneBuckets['1-2-3']?.length || 0;
-
-        if (tripleOverlapCount >= minTripleOverlap && totalSharedCount >= minSharedWords) {
-            console.log(`✅ Found overlapping rules on attempt ${attempt + 1}`);
-
-            // Debug: print zone distribution
-            const zoneKeys = ["0", "1", "2", "3", "1-2", "1-3", "2-3", "1-2-3"];
-            console.log("🔎 Potential word distribution for selected rules (pre-weighted):");
-            for (const key of zoneKeys) {
-                const count = zoneBuckets[key]?.length || 0;
-                console.log(`  Zone ${key}: ${count} word(s)`);
-            }
-
-            return candidateSet;
-        }
-    }
-
-    console.warn("⚠️ No sufficiently overlapping rule trio found after max attempts. Falling back.");
-    return generateActiveRules(seed); // fallback to simpler selection
-}
 
 
 
