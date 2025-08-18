@@ -8,7 +8,6 @@ const CURRENT_VERSION = "1.10";
 const GAME_TITLE = "No Not There";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
-const genericLabels = ["Location", "Characteristic", "Spelling"]; //some zones get a customLabel instead
 const INITIAL_HAND_SIZE = 5;
 const MESSAGE_DISPLAY_TIME = 5000;
 const TOTAL_WORDS_IN_POOL = 200;
@@ -78,17 +77,17 @@ const zoneElements = {
     'hand': { container: document.getElementById('hand-container'), wordsDiv: document.getElementById('hand-container').querySelector('.word-cards-container') }
 };
 
+
 const zoneConfigs = {
-    '1': { id: 'zone-1', colorVar: '--zone1-bg', genericLabelIndex: 0, ruleIndices: [0], categoryTypes: ['location'] },
-    '2': { id: 'zone-2', colorVar: '--zone2-bg', genericLabelIndex: 1, ruleIndices: [1], categoryTypes: ['characteristic'] },
-    '3': { id: 'zone-3', colorVar: '--zone3-bg', genericLabelIndex: 2, ruleIndices: [2], categoryTypes: ['spelling'] }, // Added ruleIndices: [2]
+    '1': { id: 'zone-1', colorVar: '--zone1-bg', customLabel: 'Location', ruleIndices: [0], categoryTypes: ['location'] },
+    '2': { id: 'zone-2', colorVar: '--zone2-bg', customLabel: 'Characteristic', ruleIndices: [1], categoryTypes: ['characteristic'] },
+    '3': { id: 'zone-3', colorVar: '--zone3-bg', customLabel: 'Spelling', ruleIndices: [2], categoryTypes: ['spelling'] }, 
     '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: 'Location & Characteristic', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
     '1-3': { id: 'zone-1-3', colorVar: '--zone13-bg', customLabel: 'Location & Spelling', ruleIndices: [0, 2], categoryTypes: ['location', 'spelling'] },
     '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: 'Characteristic & Spelling', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'spelling'] },
     '1-2-3': { id: 'zone-1-2-3', colorVar: '--zone123-bg', customLabel: 'All Three', ruleIndices: [0, 1, 2], categoryTypes: ['location', 'characteristic', 'spelling'] },
     '0': { id: 'none-container', colorVar: '--zone0-bg', customLabel: 'None of the above', ruleIndices: [], categoryTypes: [] }
 };
-
 
 document.title = GAME_TITLE;
 
@@ -224,7 +223,7 @@ async function startGame(isDaily) {
 
     // Let's generate some rules, ok?
     activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
-	console.log("rules:" + activeRules);
+	console.log("rules:", activeRules);
 
     updateGameTitle(isDaily);
     updateDailyBadge(isDaily);
@@ -330,13 +329,14 @@ async function startGame(isDaily) {
  * 5.  **Updates Rule Box Labels**: It iterates through `zoneConfigs` to
  * update the `.box-label` for each game zone. For specific single-category
  * zones ('1', '2', '3'), it displays the `name` of the `activeRules`. For
- * other zones, it uses their `customLabel` or a `genericLabel`.
+ * other zones, it uses their `customLabel`.
  *
  * 6.  **Clears Hints**: All `.rule-hint` elements across all game zones,
  * including the hand container, are cleared of text and hidden, ensuring
  * no hints remain from the active game.
  */
 async function endGame(isWin) {
+	console.log("endGame",isWin);
     const endButtonsContainer = document.getElementById('end-screen-buttons');
 
     // Handle daily streak logic
@@ -416,32 +416,35 @@ async function endGame(isWin) {
     endButtonsContainer.appendChild(shareButton);
     endButtonsContainer.classList.add("visible"); // ✅ Show buttons now
 
-    // ✅ Update rule box labels and clear hints
-    const singleCategoryKeys = ['1', '2', '3'];
-    for (const key in zoneConfigs) {
-        const zoneConfig = zoneConfigs[key];
-        const targetElement = zoneElements[key].container;
+    // ✅ Update rule box labels (show the rule.text for the single-rule zones) and clear hints
+	const singleCategoryKeys = ['1', '2', '3']; // This array helps me check which zones should have a single rule label.
+	for (const key in zoneConfigs) {
+		const zoneConfig = zoneConfigs[key];
+		const targetElement = zoneElements[key].container;
 
-        if (targetElement) {
-            const labelSpan = targetElement.querySelector('.box-label');
-            const hintDiv = targetElement.querySelector('.rule-hint');
+		if (targetElement) {
+			const labelSpan = targetElement.querySelector('.box-label');
+			const hintDiv = targetElement.querySelector('.rule-hint');
 
-            if (labelSpan) {
-                if (singleCategoryKeys.includes(key) && zoneConfig.genericLabelIndex !== null) {
-                    labelSpan.textContent = activeRules[zoneConfig.genericLabelIndex].name;
-                    labelSpan.style.fontSize = '0.8rem';
-                } else {
-                    labelSpan.textContent = zoneConfig.customLabel || genericLabels[zoneConfig.genericLabelIndex];
-                    labelSpan.style.fontSize = '';
-                }
-            }
+			if (labelSpan) {
+				// Check if this is a single-rule zone
+				if (singleCategoryKeys.includes(key)) {
+					// This is the single-rule logic
+					// The check `zoneConfig.ruleIndices[0]` is now safe because we know the array has one element.
+					labelSpan.textContent = activeRules[zoneConfig.ruleIndices[0]].name;
+				} else {
+					// This is the multi-rule or "none" zone logic
+					// Revert to using the customLabel property
+					labelSpan.textContent = zoneConfig.customLabel;
+				}
+			}
 
-            if (hintDiv) {
-                hintDiv.textContent = '';
-                hintDiv.classList.remove("visible");
-            }
-        }
-    }
+			if (hintDiv) {
+				hintDiv.textContent = '';
+				hintDiv.classList.remove("visible");
+			}
+		}
+	}
 
     // ✅ Also clear hint from hand container
     const handHintDiv = zoneElements['hand'].container.querySelector('.rule-hint');
@@ -844,26 +847,19 @@ function getCorrectZoneKeyForWord(wordOrObject, rules) {
 
 
 
-function getZoneDisplayName(zoneKey, revealRules = false) {
+function getZoneDisplayName(zoneKey) {
+	console.log('getZoneDisplayName called with ', zoneKey);
     const zoneConfig = zoneConfigs[zoneKey];
     if (!zoneConfig) {
         console.error(`Attempted to get display name for unknown zoneKey: ${zoneKey}`);
         return "Unknown Category";
     }
     
-    if (revealRules && ['1', '2', '3'].includes(zoneKey) && zoneConfig.genericLabelIndex !== null && activeRules[zoneConfig.genericLabelIndex]) {
-        return activeRules[zoneConfig.genericLabelIndex].name;
-    }
-    
     if (zoneConfig.customLabel) {
         return zoneConfig.customLabel;
     }
-    
-    if (zoneConfig.genericLabelIndex !== null && genericLabels[zoneConfig.genericLabelIndex]) {
-        return genericLabels[zoneConfig.genericLabelIndex];
-    }
-    
-    return "General Category";
+ 
+    return "General Category"; // just a fallback; should never actually happen
 }
 
 // =========================================
@@ -1373,7 +1369,7 @@ function updateLivesSetting(value) {
 
 
 
-function updateRuleBoxLabelsAndHints(isGameOver = false) {
+function updateRuleBoxLabelsAndHints() {
     for (const key in zoneConfigs) {
         const zoneConfig = zoneConfigs[key];
         const targetElement = zoneElements[key].container;
@@ -1382,48 +1378,36 @@ function updateRuleBoxLabelsAndHints(isGameOver = false) {
             let labelSpan = targetElement.querySelector('.box-label');
             let hintDiv = targetElement.querySelector('.rule-hint');
             let iconsContainer = targetElement.querySelector('.box-icons-container');
-            
-            if (labelSpan) {
-                labelSpan.textContent = getZoneDisplayName(key, isGameOver);
-                if (isGameOver && ['1', '2', '3'].includes(key)) {
-                    labelSpan.style.fontSize = '0.8rem';
-                } else {
-                    labelSpan.style.fontSize = '';
-                }
-            }
+           
+		    labelSpan.textContent = getZoneDisplayName(key);
             
             if (hintDiv) {
                 let hintText = '';
-                if (!isGameOver) {
-                    console.log('Debug in updateRuleBoxLabelsAndHints: key=', key, 'zoneConfig=', zoneConfig, 'zoneConfig.ruleIndices=', zoneConfig.ruleIndices);
-                    
-                    const numRulesMatched = zoneConfig.ruleIndices.length; 
-                    
-                    if (numRulesMatched === 1) {
-                        let relevantCategoryType = zoneConfig.categoryTypes[0];
-                        let candidateHints = [];
-                        let currentActiveRuleName = activeRules[zoneConfig.ruleIndices[0]].name;
-                        
-                        allPossibleRules.forEach(rule => {
-                            if (rule.categoryType === relevantCategoryType && rule.name !== currentActiveRuleName) {
-                                candidateHints.push(rule.name);
-                            }
-                        });
-                        
-                        const uniqueHints = Array.from(new Set(shuffleArray(candidateHints, Date.now() + key.length))).slice(0, 5);
-                        hintText = uniqueHints.length > 0 ? "Some example rules of this type:\n\n" + uniqueHints.join('\n') : 'No other rules of this type available.';
-                    } else if (numRulesMatched === 2) {
-                        hintText = "Words in this category meet exactly 2 rules.";
-                    } else if (numRulesMatched === 3) {
-                        hintText = "Words in this category meet all three rules.";
-                    } else if (key === '0') {
-                        hintText = 'Words that do not fit any of the rules provided.';
-                    }
-                }
+				console.log('Debug in updateRuleBoxLabelsAndHints: key=', key, 'zoneConfig=', zoneConfig, 'zoneConfig.ruleIndices=', zoneConfig.ruleIndices);
+				
+				const numRulesMatched = zoneConfig.ruleIndices.length; 
+				
+				if (numRulesMatched === 1) {
+					let relevantCategoryType = zoneConfig.categoryTypes[0];
+					let candidateHints = [];
+					let currentActiveRuleName = activeRules[zoneConfig.ruleIndices[0]].name;
+					
+					allPossibleRules.forEach(rule => {
+						if (rule.categoryType === relevantCategoryType && rule.name !== currentActiveRuleName) {
+							candidateHints.push(rule.name);
+						}
+					});
+					
+					const uniqueHints = Array.from(new Set(shuffleArray(candidateHints, Date.now() + key.length))).slice(0, 5);
+					hintText = uniqueHints.length > 0 ? "Some example rules of this type:\n\n" + uniqueHints.join('\n') : 'No other rules of this type available.';
+				} else if (numRulesMatched === 2) {
+					hintText = "Words in this category meet exactly 2 rules.";
+				} else if (numRulesMatched === 3) {
+					hintText = "Words in this category meet all three rules.";
+				} else if (key === '0') {
+					hintText = 'Words that do not fit any of the rules provided.';
+				}
                 hintDiv.textContent = hintText;
-                if (isGameOver) {
-                    hintDiv.classList.remove("visible");
-                }
             }
             
             if (iconsContainer && zoneConfig.categoryTypes) {
@@ -1431,8 +1415,8 @@ function updateRuleBoxLabelsAndHints(isGameOver = false) {
             }
             
             if (targetElement && !targetElement.hasAttribute('data-hint-listeners-added')) {
-                targetElement.addEventListener('mouseover', () => { if (!isGameOver) hintDiv.classList.add("visible"); });
-                targetElement.addEventListener('mouseout', () => { if (!isGameOver) hintDiv.classList.remove("visible"); });
+                targetElement.addEventListener('mouseover', () => {  hintDiv.classList.add("visible"); });
+                targetElement.addEventListener('mouseout', () => { hintDiv.classList.remove("visible"); });
                 targetElement.setAttribute('data-hint-listeners-added', 'true');
             }
         }
