@@ -1,10 +1,11 @@
 // game-logic.js
+// Justin Smith, 2025
 
 //
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.10";
+const CURRENT_VERSION = "1.11";
 const GAME_TITLE = "No Not There";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -12,6 +13,10 @@ const INITIAL_HAND_SIZE = 5;
 const MESSAGE_DISPLAY_TIME = 5000;
 const TOTAL_WORDS_IN_POOL = 200;
 const MIN_RULE_MATCHING_WORDS_PER_CATEGORY = 3;
+
+const TUTORIAL_TEXT = `There are three broad categories, containing three different spelling rules.  The rules are hidden, but you can mouseover a category to find some example rules; there's also a button in the Settings menu that will copy all of the possible rules for your benefit. Your mission is to figure out the rules for each category, and play cards from Your Hand where they're supposed to go. If you play a card in the wrong zone, you have to draw a card to replace it. You're trying to empty your hand of cards.`;
+const ABOUT_TEXT = "I want to thank Ken Wickle, for bringing Things in Rings to our board game group, which led me to write this game."
+const BYLINE = "© 2025 Justin Smith. All Rights Reserved admiralspunky@gmail.com"
 
 let dailyMode = false;
 let wordsInPlay = [];
@@ -42,6 +47,7 @@ const modalCloseBtn = document.getElementById('modal-close-btn');
 //const newGameModalBtn = document.getElementById('new-game-modal-btn');
 const darkModeToggleBtn = document.getElementById('dark-mode-toggle-btn');
 const showAllRulesBtn = document.getElementById('showAllRulesBtn');
+const concedeButton = document.getElementById('concedeButton');
 const rulesPopupOverlay = document.getElementById('rules-popup-overlay');
 const rulesPopupContent = document.getElementById('rules-popup-content');
 
@@ -51,11 +57,20 @@ const aboutBtn = document.getElementById('about-btn');
 const difficultySlider = document.getElementById('difficulty-slider');
 const livesDisplayModal = document.getElementById('lives-display-modal');
 
+/* we don't really need icons anymore, but I'm leaving the code around for a while
+const iconSVGs = { // triangle, square, circle
+    'location': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2L2 12h20L12 2z"/></svg>`,
+    'characteristic': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M2 2h20v20H2z"/></svg>`,
+    'spelling': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>`
+};
+*/
+/*
 const iconSVGs = {
     'location': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
     'characteristic': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L23.725 9.17l-6.104 5.952 1.442 8.45L12 18.295l-7.063 3.794 1.442-8.45L.275 9.17l8.057-1.015L12 .587z"/></svg>`,
     'spelling': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7h5.5L13 3.5V9z"/></svg>`
 };
+*/
 
 const turnsDisplay = document.getElementById('turns-display');
 // Get the lives display element on the main game screen
@@ -79,12 +94,12 @@ const zoneElements = {
 
 
 const zoneConfigs = {
-    '1': { id: 'zone-1', colorVar: '--zone1-bg', customLabel: 'Location', ruleIndices: [0], categoryTypes: ['location'] },
-    '2': { id: 'zone-2', colorVar: '--zone2-bg', customLabel: 'Characteristic', ruleIndices: [1], categoryTypes: ['characteristic'] },
-    '3': { id: 'zone-3', colorVar: '--zone3-bg', customLabel: 'Spelling', ruleIndices: [2], categoryTypes: ['spelling'] }, 
-    '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: 'Location & Characteristic', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
-    '1-3': { id: 'zone-1-3', colorVar: '--zone13-bg', customLabel: 'Location & Spelling', ruleIndices: [0, 2], categoryTypes: ['location', 'spelling'] },
-    '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: 'Characteristic & Spelling', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'spelling'] },
+    '1': { id: 'zone-1', colorVar: '--zone1-bg', customLabel: '1', ruleIndices: [0], categoryTypes: ['location'] },
+    '2': { id: 'zone-2', colorVar: '--zone2-bg', customLabel: '2', ruleIndices: [1], categoryTypes: ['characteristic'] },
+    '3': { id: 'zone-3', colorVar: '--zone3-bg', customLabel: '3', ruleIndices: [2], categoryTypes: ['spelling'] }, 
+    '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: '1 & 2', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
+    '1-3': { id: 'zone-1-3', colorVar: '--zone13-bg', customLabel: '1 & 3', ruleIndices: [0, 2], categoryTypes: ['location', 'spelling'] },
+    '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: '2 & 3', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'spelling'] },
     '1-2-3': { id: 'zone-1-2-3', colorVar: '--zone123-bg', customLabel: 'All Three', ruleIndices: [0, 1, 2], categoryTypes: ['location', 'characteristic', 'spelling'] },
     '0': { id: 'none-container', colorVar: '--zone0-bg', customLabel: 'None of the above', ruleIndices: [], categoryTypes: [] }
 };
@@ -189,8 +204,11 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Missed a day. Daily streak reset to 0.");
         }
     }
-
-    if (lastPlayed !== today) {
+	
+	document.getElementById('settings-tutorial-text').textContent = TUTORIAL_TEXT;
+	document.getElementById('about-text').textContent = ABOUT_TEXT;
+    
+	if (lastPlayed !== today) {
         localStorage.setItem("lastDailyDate", today);
         console.log("Starting Daily Game for", today);
         startGame(true);
@@ -455,6 +473,69 @@ async function endGame(isWin) {
 }//async function endGame(isWin)
 
 
+//
+// generateActiveRulesWithOverlap()
+// -----------------------------------------
+// Called by: startGame()
+// Returns: an array of 3 rules [spelling, spelling, spelling]
+// Ensures sufficient pairwise and triple overlaps before accepting
+//
+function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 2, minTripleOverlap = 1, maxAttempts = 1000) {
+    // Filter for spelling rules for all three positions
+    const spellingRules = allRules.filter(r => r.categoryType === 'spelling' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY));
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        // Select three distinct spelling rules for the candidate set
+        // Shuffle the spelling rules and pick the first three
+        const shuffledSpelling = shuffleArray([...spellingRules], seed + attempt);
+        if (shuffledSpelling.length < 3) {
+            console.warn("⚠️ Not enough spelling rules to create a set of three.");
+            return generateActiveRules(seed); // Fallback to simpler selection
+        }
+        
+        const candidateSet = [
+            shuffledSpelling[0], 
+            shuffledSpelling[1], 
+            shuffledSpelling[2]
+        ];
+
+		//we're going to sort every word in the entire wordlist into 'buckets', one bucket for each zone
+        const zoneBuckets = sortWordListByZone(candidateSet);
+
+        const sharedZones = ['1-2', '1-3', '2-3', '1-2-3'];
+        const totalSharedCount = sharedZones.reduce((sum, zone) => sum + (zoneBuckets[zone]?.length || 0), 0);
+        const tripleOverlapCount = zoneBuckets['1-2-3']?.length || 0;
+		
+		//Check that all individual and shared zones meet a minimum word count
+        const singleAndSharedZones = ['1', '2', '3', '1-2', '1-3', '2-3', '1-2-3'];
+        const allZonesHaveMinWords = singleAndSharedZones.every(zone => 
+            (zoneBuckets[zone]?.length || 0) >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY
+        );
+
+          if (tripleOverlapCount >= minTripleOverlap && totalSharedCount >= minSharedWords && allZonesHaveMinWords) {
+            console.log(`✅ Found overlapping rules on attempt ${attempt + 1}`);
+
+            // Debug: print zone distribution
+            const zoneKeys = ["0", "1", "2", "3", "1-2", "1-3", "2-3", "1-2-3"];
+            console.log("🔎 Potential word distribution for selected rules (pre-weighted):");
+            for (const key of zoneKeys) {
+                const count = zoneBuckets[key]?.length || 0;
+                console.log(`  Zone ${key}: ${count} word(s)`);
+            }
+
+            return candidateSet;
+        }
+    }
+
+    console.warn("⚠️ No sufficiently overlapping rule trio found after max attempts. Falling back.");
+    return [
+        spellingRules.length > 0 ? spellingRules[0] : fallbackSpellingRule,
+        spellingRules.length > 1 ? spellingRules[1] : fallbackSpellingRule,
+        spellingRules.length > 2 ? spellingRules[2] : fallbackSpellingRule
+    ];
+}
+
+/* old non-spelling rules
 // =========================================
 // generateActiveRulesWithOverlap()
 // -----------------------------------------
@@ -473,7 +554,7 @@ function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 3, minT
         const wrd = shuffleArray([...spellingRules], seed + attempt * 3 + 3)[0];
 
         const candidateSet = [loc, chr, wrd];
-        const zoneBuckets = getWeightedWordList(candidateSet);
+        const zoneBuckets = sortWordListByZone(candidateSet);
 
         const sharedZones = ['1-2', '1-3', '2-3', '1-2-3'];
         const totalSharedCount = sharedZones.reduce((sum, zone) => sum + (zoneBuckets[zone]?.length || 0), 0);
@@ -498,6 +579,7 @@ function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 3, minT
     return generateActiveRules(seed); // fallback to simpler selection
 }
 
+
 function generateActiveRules(gameSeed) {
     const locationCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'location')], gameSeed + 1);
     const characteristicCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'characteristic')], gameSeed + 2);
@@ -509,7 +591,7 @@ function generateActiveRules(gameSeed) {
 	  spellingCandidates.length > 0 ? spellingCandidates[0] : fallbackspellingRule
 	];
 }
-
+*/
 // =========================================
 // buildDeliberateWordPool()
 // -----------------------------------------
@@ -539,7 +621,7 @@ function buildDeliberateWordPool(rules, seed) {
             rule.words.forEach(w => usedRuleWords.add(w));
         }
     }
-
+/*
     // Get all words across all rules
     const allRuleWords = new Set();
     for (const rule of allPossibleRules) {
@@ -550,8 +632,11 @@ function buildDeliberateWordPool(rules, seed) {
 
     const neutralWords = [...allRuleWords].filter(w => !usedRuleWords.has(w));
     const allWords = [...usedRuleWords, ...neutralWords];
+*/
 
-    const shuffledWords = allWords
+// just copy all the words from the wordlist and shuffle them
+	const allWords = wordList;
+	const shuffledWords = allWords
         .map(word => ({ word, sortKey: rng() }))
         .sort((a, b) => a.sortKey - b.sortKey)
         .map(obj => obj.word);
@@ -559,9 +644,10 @@ function buildDeliberateWordPool(rules, seed) {
     const zoneBuckets = {};
     const selected = [];
 
+//this loop breaks when all the zones are filled
     for (const word of shuffledWords) {
         const zoneKey = getCorrectZoneKeyForWord(word, rules);
-
+		console.log(word,zoneKey);
         if (!(zoneKey in desiredCounts)) continue;
 
         if (!zoneBuckets[zoneKey]) {
@@ -593,11 +679,50 @@ function buildDeliberateWordPool(rules, seed) {
     return selected;
 }
 
+// =========================================
+// sortWordListByZone()
+// -----------------------------------------
+// Called by: buildDeliberateWordPool()
+// Calls: shuffleArray()
+// 
+// Purpose:
+// Groups all words from the entire wordlist into buckets
+// according to their zone (e.g., "1", "1-2", "1-2-3", or "0" for unmatched).
+// Returns an object: { "1": [...], "2-3": [...], "0": [...] }
+// =========================================
+function sortWordListByZone(rules) {
+    const allWords = wordList;
+
+    const zoneBuckets = {};
+
+    // Classify each word into a zone
+    for (const word of allWords) {
+		const zoneKey = getCorrectZoneKeyForWord(word,rules);
+        if (!zoneBuckets[zoneKey]) zoneBuckets[zoneKey] = [];
+        zoneBuckets[zoneKey].push(word);
+/*Many words from the wordslist don't apply to any of the rules, and we probably don't need to be notified about all of them each time
+        if (zoneKey === "0") {
+            console.log(`🟨 "${word}" is unmatched and placed in Zone 0`);
+			
+        }
+*/
+    }
+
+/*
+    // Log full zone distribution
+    console.log("🔎 zoneBuckets (raw counts):");
+    Object.entries(zoneBuckets).forEach(([key, val]) => {
+        console.log(`  Zone ${key}: ${val.length} word(s)`);
+    });
+*/
+    return zoneBuckets;
+}
+
 // This function needs to be called after the word objects in the pool have their `correctZoneKey` property set.
 function seedInitialZones(pool) {
 	console.log("Initial Full Word Pool:", pool);
 	
-    const initialZoneKeys = ['1', '2', '3', '1-2-3'];
+    const initialZoneKeys = ['1', '2', '3', '1-2-3', '0'];
     const wordsPlaced = new Set();
     
     for (const targetZoneKey of initialZoneKeys) {
@@ -862,68 +987,7 @@ function getZoneDisplayName(zoneKey) {
     return "General Category"; // just a fallback; should never actually happen
 }
 
-// =========================================
-// getWeightedWordList()
-// -----------------------------------------
-// Called by: buildDeliberateWordPool()
-// Calls: getCorrectZoneKeyForWord(word, rules), shuffleArray()
-// 
-// Purpose:
-// Groups all words from the current active rules into buckets
-// according to their zone (e.g., "1", "1-2", "1-2-3", or "0" for unmatched).
-// Returns an object: { "1": [...], "2-3": [...], "0": [...] }
-// =========================================
-function getWeightedWordList(rules) {
-    const allWords = new Set();
-    // Collect all words from all rules
-    for (const rule of rules) {
-        if (Array.isArray(rule.words)) {
-            rule.words.forEach(w => allWords.add(w));
-        }
-    }
-    // Also add words that pass the test function but are not explicitly in words array
-    // This is important for rules that primarily rely on a test function
-    for (const rule of rules) {
-        if (typeof rule.test === 'function') {
-            // Iterate through a broader pool of words to find those matching the test
-            // For this example, we'll assume a global 'allGameWords' or similar exists,
-            // or we'll just use the words already collected.
-            // A more robust solution might involve a larger, pre-defined dictionary.
-            // For now, we'll only consider words already in 'allWords' or those explicitly
-            // added to rule.words for test-based rules.
-            // This part is tricky without a full word dictionary.
-            // For demonstration, let's just ensure words in 'allWords' are tested.
-            for (const word of allWords) {
-                if (rule.test(word)) {
-                    allWords.add(word); // Add if test passes, even if not in rule.words
-                }
-            }
-        }
-    }
 
-
-    const zoneBuckets = {};
-
-    // Classify each word into a zone
-    for (const word of allWords) {
-        const zoneKey = getCorrectZoneKeyForWord(word, rules);
-        if (!zoneBuckets[zoneKey]) zoneBuckets[zoneKey] = [];
-        zoneBuckets[zoneKey].push(word);
-
-        if (zoneKey === "0") {
-            console.log(`🟨 "${word}" is unmatched and placed in Zone 0`);
-        }
-    }
-
-/*
-    // Log full zone distribution
-    console.log("🔎 zoneBuckets (raw counts):");
-    Object.entries(zoneBuckets).forEach(([key, val]) => {
-        console.log(`  Zone ${key}: ${val.length} word(s)`);
-    });
-*/
-    return zoneBuckets;
-}
 
 //Apparently the Math.Random in js isn't seedable for some reason
 function mulberry32(seed) {
@@ -1377,7 +1441,7 @@ function updateRuleBoxLabelsAndHints() {
         if (targetElement) {
             let labelSpan = targetElement.querySelector('.box-label');
             let hintDiv = targetElement.querySelector('.rule-hint');
-            let iconsContainer = targetElement.querySelector('.box-icons-container');
+           // let iconsContainer = targetElement.querySelector('.box-icons-container');
            
 		    labelSpan.textContent = getZoneDisplayName(key);
             
@@ -1388,15 +1452,10 @@ function updateRuleBoxLabelsAndHints() {
 				const numRulesMatched = zoneConfig.ruleIndices.length; 
 				
 				if (numRulesMatched === 1) {
-					let relevantCategoryType = zoneConfig.categoryTypes[0];
 					let candidateHints = [];
 					let currentActiveRuleName = activeRules[zoneConfig.ruleIndices[0]].name;
 					
-					allPossibleRules.forEach(rule => {
-						if (rule.categoryType === relevantCategoryType && rule.name !== currentActiveRuleName) {
-							candidateHints.push(rule.name);
-						}
-					});
+					allPossibleRules.forEach(rule => { candidateHints.push(rule.name); }	);
 					
 					const uniqueHints = Array.from(new Set(shuffleArray(candidateHints, Date.now() + key.length))).slice(0, 5);
 					hintText = uniqueHints.length > 0 ? "Some example rules of this type:\n\n" + uniqueHints.join('\n') : 'No other rules of this type available.';
@@ -1409,11 +1468,11 @@ function updateRuleBoxLabelsAndHints() {
 				}
                 hintDiv.textContent = hintText;
             }
-            
+ /* We don't really need each zone to have an icon anymore, now that we're just using 3 different spelling rules           
             if (iconsContainer && zoneConfig.categoryTypes) {
                 iconsContainer.innerHTML = getBoxIconsSVG(zoneConfig.categoryTypes);
             }
-            
+*/            
             if (targetElement && !targetElement.hasAttribute('data-hint-listeners-added')) {
                 targetElement.addEventListener('mouseover', () => {  hintDiv.classList.add("visible"); });
                 targetElement.addEventListener('mouseout', () => { hintDiv.classList.remove("visible"); });
@@ -1464,7 +1523,7 @@ function hideRulesPopup() {
 //I initially tried to output this list in an HTML div, but that was exceedingly difficult for some reason, so instead I'm just copying the list to the clipboard
 
 function buildRulesHTML() {
-    let rulesHTML = 'All Rules by Category\n'; // Moved initial string into the variable
+    let rulesHTML = 'All Rules\n'; // Moved initial string into the variable
     const rulesByCategory = allPossibleRules.reduce((acc, rule) => {
         const category = rule.categoryType;
         if (!acc[category]) acc[category] = [];
@@ -1544,6 +1603,22 @@ if (showAllRulesBtn) {
 		*/
     });
 }
+
+if (concedeButton) {
+	concedeButton.addEventListener('click', () => {
+		// Show a confirmation dialog
+        const userConfirmed = confirm("Are you sure you want to concede? You will lose this game.");
+        // If the user clicks "OK", then proceed with ending the game
+        if (userConfirmed) {
+            // Call the endGame function with `false` to indicate a loss or concession
+			endGame(false);
+            
+            // Hide the settings modal after conceding
+            hideModal();
+        }
+    });
+}
+
 
 settingsModalOverlay.addEventListener('click', (event) => {
     if (event.target === settingsModalOverlay) {

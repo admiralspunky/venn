@@ -2,29 +2,23 @@
 <html lang="en">
 <head>
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VJJHBK294Z"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-VJJHBK294Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
 
-  gtag('config', 'G-VJJHBK294Z');
-</script>		
-	
-<script>
-    const TUTORIAL_TEXT = `There are three broad categories, Location, Characteristic, and Spelling. In each game, each of those categories contains some hidden rule. You can mouseover each category to find example rules. Your mission is to figure out the rules for each category, and play cards from Your Hand where they're supposed to go. If you play a card in the wrong zone, you have to draw a card to replace it. You're trying to empty your hand of cards.`;
-	const ABOUT_TEXT = "I want to thank Ken Wickle, for bringing Things in Rings to our board game group, which led me to write this game."
-	const BYLINE = "© 2025 Justin Smith. All Rights Reserved admiralspunky@gmail.com"
-</script>
-<script src="rules.js"> </script>
-<script src="wordList.js"> </script>
-<script src="game-logic.js" defer></script>
+	  gtag('config', 'G-VJJHBK294Z');
+	</script>		
+		
+	<script src="rules.js"> </script>
+	<script src="wordList.js"> </script>
+	<script src="game-logic.js" defer></script>
 
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Venn Diagram Game</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Venn Diagram Game</title>
 	<link rel="icon" type="image/x-icon" href="/venn/favicon.ico">
 	
     <style>
@@ -254,7 +248,7 @@
         #zone-2 { background-color: var(--zone2-bg); border-color: var(--zone2-border); color: var(--zone2-text); }
         #zone-3 { background-color: var(--zone3-bg); border-color: var(--zone3-border); color: var(--zone3-text); }
         #zone-1-2 { background-color: var(--zone12-bg); border-color: var(--zone12-border); color: var(--zone12-text); }
-        #red-yellow-overlap-container { background-color: var(--zone13-bg); border-color: var(--zone13-border); color: var(--zone13-text); }
+        #zone-1-3{ background-color: var(--zone13-bg); border-color: var(--zone13-border); color: var(--zone13-text); }
         #zone-2-3 { background-color: var(--zone23-bg); border-color: var(--zone23-border); color: var(--zone23-text); }
         #zone-1-2-3 { background-color: var(--zone123-bg); border-color: var(--zone123-border); color: var(--zone123-text); }
         #none-container { background-color: var(--zone0-bg); border-color: var(--zone0-border); color: var(--zone0-text); }
@@ -900,6 +894,7 @@
 				<!--<button id="new-game-modal-btn" title="Start New Game">&#x21BB;</button> -->
 				<!--<button id="about-btn" title="About and Acknowledgements">&#x21BB;</button> -->
 				<button id="showAllRulesBtn" class="icon-btn" title="Show All Rules" >✅</button>
+				<button id="concedeButton" class="icon-btn" title="Concede">🏳️</button>
 
 			</div>
 
@@ -915,12 +910,7 @@
 			<p class="mt-4 mb-6" id="settings-tutorial-text"></p>
 			
 			<p class="mt-4 mb-6" id="about-text"></p>
-				<script>
-					document.getElementById('settings-tutorial-text').textContent = TUTORIAL_TEXT;
-				</script>
-				<script>
-					document.getElementById('about-text').textContent = ABOUT_TEXT;
-				</script>
+
             <div id="version-display">v0.XX</div> </div>
     </div>
 
