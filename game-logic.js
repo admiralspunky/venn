@@ -480,7 +480,7 @@ async function endGame(isWin) {
 //
 function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 2, minTripleOverlap = 1, maxAttempts = 1000) {
     // Filter for spelling rules for all three positions
-    const spellingRules = allRules.filter(r => r.categoryType === 'spelling' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY));
+    const spellingRules = allRules.filter(r => (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         // Select three distinct spelling rules for the candidate set
@@ -1521,22 +1521,9 @@ function hideRulesPopup() {
 //I initially tried to output this list in an HTML div, but that was exceedingly difficult for some reason, so instead I'm just copying the list to the clipboard
 
 function buildRulesHTML() {
-    let rulesHTML = 'All Rules\n'; // Moved initial string into the variable
-    const rulesByCategory = allPossibleRules.reduce((acc, rule) => {
-        const category = rule.categoryType;
-        if (!acc[category]) acc[category] = [];
-        acc[category].push(rule.name);
-        return acc;
-    }, {});
-    for (const category in rulesByCategory) {
-        rulesHTML += `\n${category.charAt(0).toUpperCase() + category.slice(1)}:\n`; // Added a colon and newline
-        
-        // This is the corrected part
-        rulesHTML += rulesByCategory[category].map(name => `- ${name}`).join('\n');
-
-        rulesHTML += '\n'; // Add a blank line between categories
-    }
-    return rulesHTML.trim(); // Trim any trailing whitespace
+    let rulesHTML = 'All Rules\n\n';
+    rulesHTML += allPossibleRules.map(rule => `- ${rule.name}`).join('\n');
+    return rulesHTML.trim();
 }
 
 function applyTheme() {
