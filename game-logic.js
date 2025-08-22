@@ -37,9 +37,7 @@ let lastDailyCompletionDate = localStorage.getItem('lastDailyCompletionDate') ||
 //after a word is played into a zone, that zone's words are less likely to be drawn
 let zoneWeights = {};
 
-// Define fallback rules to prevent undefined errors if rule candidates are empty
-const fallbackLocationRule = { name: 'General Location', categoryType: 'location', words: [], test: () => false };
-const fallbackCharacteristicRule = { name: 'General Characteristic', categoryType: 'characteristic', words: [], test: () => false };
+// Define a fallback rule to prevent undefined errors if rule candidates are empty
 const fallbackSpellingRule = { name: 'General Spelling', categoryType: 'spelling', words: [], test: () => false };
 
 const settingsModalOverlay = document.getElementById('settings-modal-overlay');
@@ -94,14 +92,14 @@ const zoneElements = {
 
 
 const zoneConfigs = {
-    '1': { id: 'zone-1', colorVar: '--zone1-bg', customLabel: '1', ruleIndices: [0], categoryTypes: ['location'] },
-    '2': { id: 'zone-2', colorVar: '--zone2-bg', customLabel: '2', ruleIndices: [1], categoryTypes: ['characteristic'] },
-    '3': { id: 'zone-3', colorVar: '--zone3-bg', customLabel: '3', ruleIndices: [2], categoryTypes: ['spelling'] }, 
-    '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: '1 & 2', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
-    '1-3': { id: 'zone-1-3', colorVar: '--zone13-bg', customLabel: '1 & 3', ruleIndices: [0, 2], categoryTypes: ['location', 'spelling'] },
-    '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: '2 & 3', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'spelling'] },
-    '1-2-3': { id: 'zone-1-2-3', colorVar: '--zone123-bg', customLabel: 'All Three', ruleIndices: [0, 1, 2], categoryTypes: ['location', 'characteristic', 'spelling'] },
-    '0': { id: 'none-container', colorVar: '--zone0-bg', customLabel: 'None of the above', ruleIndices: [], categoryTypes: [] }
+    '1': { id: 'zone-1', colorVar: '--zone1-bg', customLabel: '1', ruleIndices: [0] },
+    '2': { id: 'zone-2', colorVar: '--zone2-bg', customLabel: '2', ruleIndices: [1] },
+    '3': { id: 'zone-3', colorVar: '--zone3-bg', customLabel: '3', ruleIndices: [2] }, 
+    '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: '1 & 2', ruleIndices: [0, 1] },
+    '1-3': { id: 'zone-1-3', colorVar: '--zone13-bg', customLabel: '1 & 3', ruleIndices: [0, 2] },
+    '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: '2 & 3', ruleIndices: [1, 2] },
+    '1-2-3': { id: 'zone-1-2-3', colorVar: '--zone123-bg', customLabel: 'All Three', ruleIndices: [0, 1, 2] },
+    '0': { id: 'none-container', colorVar: '--zone0-bg', customLabel: 'None of the above', ruleIndices: [] }
 };
 
 document.title = GAME_TITLE;
