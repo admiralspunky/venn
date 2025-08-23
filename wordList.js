@@ -2619,7 +2619,6 @@ var wordList = [
 "webmaster",
 "copies",
 "recipe",
-"zum",
 "permit",
 "seeing",
 "proof",
@@ -6645,7 +6644,6 @@ var wordList = [
 "dies",
 "terrace",
 "bacteria",
-"pts",
 "replied",
 "seafood",
 "novels",
@@ -6708,11 +6706,9 @@ var wordList = [
 "hart",
 "bernard",
 "resolutions",
-"ment",
 "accessing",
 "tubes",
 "attempted",
-"col",
 "midlands",
 "priest",
 "ronald",
@@ -6726,5 +6722,7 @@ var wordList = [
 'poodle',
 'banana',
 'madam',
-
+'avuncular',
+'defenestration'
 ];
+
