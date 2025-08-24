@@ -5,7 +5,6 @@ const allPossibleRules = [
   // === spelling Rules ===
   {
     name: 'Has a consecutive double letter',
-    words: ['apple', 'coffee', 'book', 'balloon', 'committee', 'common', 'mirror', 'sweet', 'see', 'spell', 'street', 'door', 'hall', 'pool', 'pepper', 'bubble', 'spoon', 'letter', 'runner', 'pillow', 'shampoo'],
     test: (word) => {
       const lowerWord = word.toLowerCase();
       for (let i = 0; i < lowerWord.length - 1; i++) {
@@ -150,4 +149,5 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
