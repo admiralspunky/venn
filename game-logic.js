@@ -478,9 +478,8 @@ async function endGame(isWin) {
 // Returns: an array of 3 rules [spelling, spelling, spelling]
 // Ensures sufficient pairwise and triple overlaps before accepting
 //
-function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 2, minTripleOverlap = 1, maxAttempts = 1000) {
-    // Filter for spelling rules for all three positions
-    const spellingRules = allRules.filter(r => (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
+function generateActiveRulesWithOverlap(seed, spellingRules, minSharedWords = 2, minTripleOverlap = 1, maxAttempts = 1000) {
+    // TODO: I don't think that we need to filter the rules at all anymore, do we? const spellingRules = allRules.filter(r => (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         // Select three distinct spelling rules for the candidate set
