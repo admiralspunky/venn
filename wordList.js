@@ -6723,6 +6723,9 @@ var wordList = [
 'banana',
 'madam',
 'avuncular',
-'defenestration'
+'defenestration',
+'vexillology',
+'latibulate',
 ];
+
 
