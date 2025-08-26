@@ -1,3 +1,4 @@
+setting to change number of circles (2-4)
 apply for copyright
 Is there a way to encourage the words to have an even distribution, without forcing each zone to fill up at a certain number of words? The way the game is now, after I play 3 words into a zone, I know that no other words will ever go in that zone.
 record a tutorial video
@@ -6,12 +7,12 @@ setting for number of starting hint cards? - maybe, instead of placing hints in 
 let the user log in, to carry their streak across browsers and devices, and we'll need that anyway for mp
 Setting to switch between Venn Diagram and Grid displays
 audio feedback
-setting to change number of circles (2-4)
 option to change the number of hand cards (but remember that Dailies should always use the same number)
-translate to other languages (wow, that's going to be an undertaking; not only does every single bit of on-screen text have to reference a separate file, but there will need to be an entire rules.js for every additional language)
+translate to other languages (wow, that's going to be an undertaking; not only does every single bit of on-screen text have to reference a separate file, but there will need to be an entire rules.js and wordlist for every additional language)
 QR code
 even with the icons, I sometimes have trouble telling which tier 2 Zone is the overlap between two specific tier 1 Zones. Maybe, while you mouseover a tier 2 Zone, the relevant tier 1 Zones can change visually somehow? Maybe just make the titles bold, but only while the overlap Zone is being moused over.
 add multiplayer functionality
-screen to show ALL the names of the rules, but dynamically, all of the rules that are currently in the file (well, I have a button that copies the list to the clipboard - it's not great, but it works for now)
+the buttons have onclicklisteners scattered throughout the game-logic.js; it'd probably be cleaner to have them in the html: <button onclick="openRulesInNewTab()">Copy All Rules</button>
+
 
 
