@@ -6485,7 +6485,6 @@ var wordList = [
 "twins",
 "developmental",
 "rip",
-"zope",
 "regulated",
 "triangle",
 "amend",
@@ -6547,8 +6546,6 @@ var wordList = [
 "subcommittee",
 "sap",
 "gather",
-"suse",
-"maternity",
 "backed",
 "alfred",
 "colonial",
@@ -6717,9 +6714,10 @@ var wordList = [
 'madam',
 'avuncular',
 'defenestration',
-'vexillology',
+'vexillologist',
 'latibulate',
 ];
+
 
 
 
