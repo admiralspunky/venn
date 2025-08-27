@@ -62,6 +62,14 @@ const allPossibleRules = [
       return false;
     }
   },
+{
+    name: 'Begins with a consonant',
+    test: (word) => /^[^aeiou]/i.test(word)
+  },
+  {
+    name: 'Ends with a consonant',
+    test: (word) => /[^aeiou]$/i.test(word)
+  },
   {
     name: 'Begins with a vowel',
     test: (word) => /^[aeiou]/i.test(word)
@@ -127,6 +135,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	}];	
+
 
 
 
