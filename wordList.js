@@ -6670,7 +6670,9 @@ var wordList = [
 'vexillologist',
 'latibulate',
 'cogitate',
+'divest',
 ];
+
 
 
 
