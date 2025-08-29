@@ -6656,7 +6656,9 @@ var wordList = [
 'latibulate',
 'cogitate',
 'divest',
+'moribund',
 ];
+
 
 
 
