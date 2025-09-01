@@ -1,0 +1,39 @@
+/* I'm splitting my main CSS style, so I can let the user change the number of rules in his game */
+
+/* Rules Grid Container (for the 8 zones + hand) */
+#rules-grid-container {
+	display: grid; 
+	grid-template-columns: repeat(4, 1fr); /* 4 columns for desktop */
+	gap: 1rem;
+	/*we have to fix the same problem 3 separate times, because CSS is fantastic and makes perfect sense */
+	flex-grow: 1; /* Allows the grid to take available space */
+	max-width: 100%; /* Ensure it doesn't overflow */
+	min-width: 0; /* Add this to prevent overflow */
+}
+
+/* Add min-width to the rule boxes themselves as well, so the grid doesn't overflow, seriously this time */
+.rule-box {
+  min-width: 0;
+}
+
+/* Hide all zones by default */
+.rule-box{
+    display: none;
+}
+
+/* Show the specific zones you want for the 4-rule game */
+#zone-1, #zone-2, #zone-3, #zone-4,
+#zone-1-2, #zone-1-3, #zone-1-4,
+#zone-2-3, #zone-2-4, #zone-3-4,
+#zone-1-2-3, #zone-1-2-4, #zone-1-3-4,
+#zone-2-3-4, #zone-1-2-3-4,
+#none-container, #hand-container {
+    display: flex;
+}
+
+/* -- Mobile Layout -- */
+@media (max-width: 767px) {
+    #rules-grid-container {
+        grid-template-columns: 1fr; /* This changes it to a single column */
+    }
+}

@@ -110,9 +110,12 @@ const allPossibleRules = [
       return true;
     }
   },
+    {
+    name: 'Contains the letter "p"',
+    test: (word) => /p/i.test(word)
+  },
   {
     name: 'Contains the letter "j"',
-    words: ['jump','jaguar','projector','injection'],
     test: (word) => /j/i.test(word)
   },
   {
@@ -134,7 +137,33 @@ const allPossibleRules = [
 	    }
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
-	}];	
+	},
+ {
+  name: 'Has a vowel as the second letter',
+  test: (word) => {
+    const vowels = 'aeiou';
+    const lowerWord = word.toLowerCase();
+    return lowerWord.length >= 2 && vowels.includes(lowerWord[1]);
+  }
+ },	
+ {
+  name: 'Has a vowel as the third letter',
+  test: (word) => {
+    const vowels = 'aeiou';
+    const lowerWord = word.toLowerCase();
+    return lowerWord.length >= 3 && vowels.includes(lowerWord[2]);
+  }
+ },	
+  {
+  name: 'Has a vowel as the fourth letter',
+  test: (word) => {
+    const vowels = 'aeiou';
+    const lowerWord = word.toLowerCase();
+    return lowerWord.length >= 4 && vowels.includes(lowerWord[3]);
+    }
+  },	
+];	
+
 
 
 
