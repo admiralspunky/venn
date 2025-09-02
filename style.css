@@ -1,3 +1,6 @@
+/* style for No Not There - there's a separate layout sheet for each rule count */
+
+/*light mode colors*/
 :root {
 --bg-body: #f0f4f8;
 --bg-container: #ffffff;
@@ -10,18 +13,18 @@
 --text-word-card-hand: white;
 
 --zone1-bg: #fee2e2; --zone1-border: #ef4444; --zone1-text: #991b1b;
---zone2-bg: #dbeafe; --zone2-border: #3b82f6; --zone2-text: #1e40af;
---zone3-bg: #fefce8; --zone3-border: #facc15; --zone3-text: #92400e;
+--zone2-bg: #fefce8; --zone2-border: #facc15; --zone2-text: #92400e;
+--zone3-bg: #dbeafe; --zone3-border: #3b82f6; --zone3-text: #1e40af;
 --zone4-bg: #f9e2ff; --zone4-border: #d8b4fe; --zone4-text: #5b21b6;
 
---zone12-bg: #ede9fe; --zone12-border: #a855f7; --zone12-text: #581c87;
---zone13-bg: #f5e9fc; --zone13-border: #c298e3; --zone13-text: #7b29a8;
+--zone12-bg: #FFF5EE; --zone12-border: #F28500; --zone12-text: #B45309;
+--zone13-bg: #ede9fe; --zone13-border: #a855f7; --zone13-text: #581c87;
 --zone14-bg: #fef2f2; --zone14-border: #fca5a5; --zone14-text: #dc2626;
 --zone23-bg: #e5f9e9; --zone23-border: #8fd0a3; --zone23-text: #2c6e3c;
 --zone24-bg: #e0e7ff; --zone24-border: #93c5fd; --zone24-text: #2563eb;
 --zone34-bg: #fffbe6; --zone34-border: #fde68a; --zone34-text: #b45309;
 
---zone123-bg: #e0f2fe; --zone123-border: #74a2cc; --zone123-text: #2d5a7d;
+--zone123-bg: #f2d0a2; --zone123-border: #D2B48C; --zone123-text: #472100;
 --zone124-bg: #eef2ff; --zone124-border: #a5b4fc; --zone124-text: #4f46e5;
 --zone134-bg: #f3e8ff; --zone134-border: #d946ef; --zone134-text: #9333ea;
 --zone234-bg: #dcfce7; --zone234-border: #34d399; --zone234-text: #047857;
@@ -62,12 +65,12 @@ html.dark {
 --text-word-card-hand: white;
 
 --zone1-bg: #7f1d1d; --zone1-border: #b91c1c; --zone1-text: #fecaca;
---zone2-bg: #1e3a8a; --zone2-border: #2563eb; --zone2-text: #bfdbfe;
---zone3-bg: #78350f; --zone3-border: #d97706; --zone3-text: #fed7aa;
+--zone2-bg: #a6a23f; --zone2-border: #827f30; --zone2-text: #fed7aa;
+--zone3-bg: #1e3a8a; --zone3-border: #2563eb; --zone3-text: #bfdbfe;
 --zone4-bg: #581c87; --zone4-border: #a855f7; --zone4-text: #e9d5ff;
 
---zone12-bg: #581c87; --zone12-border: #7e22ce; --zone12-text: #e9d5ff;
---zone13-bg: #4a2d80; --zone13-border: #8b5cf6; --zone13-text: #c4b5fd;
+--zone12-bg: #78350f; --zone12-border: #d97706; --zone12-text: #fed7aa;
+--zone13-bg: #581c87; --zone13-border: #7e22ce; --zone13-text: #e9d5ff;
 --zone14-bg: #7c2d12; --zone14-border: #c2410c; --zone14-text: #fed7aa;
 --zone23-bg: #064e3b; --zone23-border: #059669; --zone23-text: #a7f3d0;
 --zone24-bg: #1e3a8a; --zone24-border: #2563eb; --zone24-text: #bfdbfe;
