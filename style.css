@@ -105,6 +105,13 @@ html.dark {
 
 }
 
+.logo {
+  width: 30%;
+  max-width: 300px;  /* Keeps it from getting too big */
+  min-width: 150px;  /* Keeps it from getting too small */
+  height: auto;
+}
+
 body {
 display: flex;
 flex-direction: column;
