@@ -1,4 +1,4 @@
-prettify bg colors
+make logo/ rename (Voozo?)
 apply for copyright
 Is there a way to encourage the words to have an even distribution, without forcing each zone to fill up at a certain number of words? The way the game is now, after I play 3 words into a zone, I know that no other words will ever go in that zone.
 record a tutorial video
@@ -15,3 +15,5 @@ QR code
 even with the icons, I sometimes have trouble telling which tier 2 Zone is the overlap between two specific tier 1 Zones. Maybe, while you mouseover a tier 2 Zone, the relevant tier 1 Zones can change visually somehow? Maybe just make the titles bold, but only while the overlap Zone is being moused over.
 add multiplayer functionality
 When I want to expand this game to 5+ rules, I'll need to do something entirely different with the presentation, but I think I already know what I'm going to do: you have one zone for your Hand and one big Played zone. Forget drawing the individual zones. Instead, when you click on a word in your Hand, you get a drop-down of where you want to play it, and when a word is in the Played zone, just rename it to indicate which zone it's in, which rules it follows
+prettify bg colors
+
