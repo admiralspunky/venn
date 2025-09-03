@@ -261,37 +261,6 @@
 <div id="byline-display"></div>
 
 </body>
-<script>
-// Tutorial Modal Logic
-const tutorialModalOverlay = document.getElementById('tutorial-modal-overlay');
-const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
-const tutorialOkBtn = document.getElementById('tutorial-ok-btn');
-const tutorialTextElement = document.getElementById('tutorial-text');
-const bylineDisplayElement = document.getElementById('byline-display'); // Get the BYLINE element
-
-if (tutorialTextElement && typeof TUTORIAL_TEXT !== 'undefined') {
-    tutorialTextElement.textContent = TUTORIAL_TEXT;
-}
-
-if (bylineDisplayElement && typeof BYLINE !== 'undefined') {
-    bylineDisplayElement.textContent = BYLINE;
-}
-
-
-if (!localStorage.getItem('hasSeenTutorial')) {
-    setTimeout(() => {
-        tutorialModalOverlay.classList.add('visible');
-    }, 500);
-}
-
-function hideTutorial() {
-    tutorialModalOverlay.classList.remove('visible');
-    localStorage.setItem('hasSeenTutorial', 'true');
-}
-
-tutorialCloseBtn?.addEventListener('click', hideTutorial);
-tutorialOkBtn?.addEventListener('click', hideTutorial);
-</script>
 
 
 </html>

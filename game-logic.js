@@ -294,7 +294,38 @@ document.addEventListener("DOMContentLoaded", () => {
 	
 	document.getElementById('settings-tutorial-text').textContent = TUTORIAL_TEXT;
 	document.getElementById('about-text').textContent = ABOUT_TEXT;
+	
+	// Tutorial Modal Logic (only on the first time you play)
+	const tutorialModalOverlay = document.getElementById('tutorial-modal-overlay');
+	const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
+	const tutorialOkBtn = document.getElementById('tutorial-ok-btn');
+	const tutorialTextElement = document.getElementById('tutorial-text');
+	const bylineDisplayElement = document.getElementById('byline-display'); // Get the BYLINE element
+
+	if (tutorialTextElement && typeof TUTORIAL_TEXT !== 'undefined') {
+		tutorialTextElement.textContent = TUTORIAL_TEXT;
+	}
+
+	if (bylineDisplayElement && typeof BYLINE !== 'undefined') {
+		bylineDisplayElement.textContent = BYLINE;
+	}
+
+
+	if (!localStorage.getItem('hasSeenTutorial')) {
+		setTimeout(() => {
+			tutorialModalOverlay.classList.add('visible');
+		}, 500);
+	}
+
+	function hideTutorial() {
+		tutorialModalOverlay.classList.remove('visible');
+		localStorage.setItem('hasSeenTutorial', 'true');
+	}
+
+	tutorialCloseBtn?.addEventListener('click', hideTutorial);
+	tutorialOkBtn?.addEventListener('click', hideTutorial);
     
+	//start game here
 	if (lastPlayed !== today) {
         localStorage.setItem("lastDailyDate", today);
         console.log("Starting Daily Game for", today);
