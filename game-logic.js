@@ -6,7 +6,7 @@
 //
 
 const CURRENT_VERSION = "1.12";
-const GAME_TITLE = "No Not There";
+const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
 const INITIAL_HAND_SIZE = 5;
@@ -216,7 +216,6 @@ function getZoneConfigs(numRules) {
  * This function calls:
  * - `getDailySeed()`: To retrieve the daily deterministic seed (if `isDaily` is true).
  * - `generateActiveRulesWithOverlap()`: To determine the rules for the current game.
- * - `updateGameTitle()`: To update the display based on game mode.
  * - `updateDailyBadge()`: To show/hide the daily badge.
  * - `resetGameState()`: To clear previous game data.
  * - `buildDeliberateWordPool()`: To create the initial set of available words.
@@ -242,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //if (versionEl) versionEl.textContent = 'Version ' + CURRENT_VERSION;
     if (versionEl) versionEl.textContent = URL + ' v' + CURRENT_VERSION; 
 	
-	if (titleEl) titleEl.textContent = GAME_TITLE;
+//	if (titleEl) titleEl.textContent = GAME_TITLE;
     
     // Safe theme setup, do we want to start in dark or light mode?
     applyTheme();
@@ -340,7 +339,6 @@ async function startGame(isDaily) {
     activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
 	console.log("rules:", activeRules);
 
-    updateGameTitle(isDaily);
     updateDailyBadge(isDaily);
     resetGameState();
 	
@@ -1568,50 +1566,14 @@ async function checkGameEndCondition() {
 
 
 
-function updateGameTitle(isDaily) {
-    const titleTextElement = document.getElementById("game-title-text");
-
-    if (titleTextElement) {
-        let fullTitleString;
-
-        if (isDaily) {
-            fullTitleString = `${GAME_TITLE} - ${getTodayDateString()}`;
-        } else {
-            fullTitleString = GAME_TITLE;
-        }
-
-        // --- Start of the secure line break insertion logic ---
-
-        // Clear any existing content within the title element
-        // This is important if updateGameTitle can be called multiple times
-        titleTextElement.textContent = ''; // Safely clear all child nodes
-
-        // Split the full title string into parts where you want line breaks
-        const parts = fullTitleString.split(' - ');
-
-        parts.forEach((part, index) => {
-            // Create a text node for each part of the title
-            const textNode = document.createTextNode(part.trim()); // .trim() to clean up whitespace
-
-            // Append the text node to the title element
-            titleTextElement.appendChild(textNode);
-
-            // Add a <br> tag after each part except the very last one
-            if (index < parts.length - 1) {
-                const brElement = document.createElement('br');
-                titleTextElement.appendChild(brElement);
-            }
-        });
-
-        // --- End of the secure line break insertion logic ---
-    }
-}
-
 function updateDailyBadge(isDaily) {
+	console.log('updateDailyBadge(isDaily) ', isDaily);
     const badge = document.getElementById("daily-badge");
-    if (badge) {
-        badge.style.display = isDaily ? 'inline-block' : 'none';
+    if (badge && isDaily ) {
+        badge.style.display = 'inline-block';
+		badge.textContent = `daily for ${getTodayDateString()}`;
     }
+	else badge.style.display = 'none';
 }
 
 function resetGameState() {
