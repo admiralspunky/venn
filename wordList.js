@@ -6617,7 +6617,11 @@ var wordList = [
 'lessees',
 'lessor',
 'lessors',
+'cogitate',
+'limpid',
+'miasma'
 ];
+
 
 
 
