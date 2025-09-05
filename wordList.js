@@ -5970,7 +5970,6 @@ var wordList = [
 "dresses",
 "baptist",
 "scientist",
-"starsmerchant",
 "hiring",
 "clocks",
 "arthritis",
@@ -6062,7 +6061,6 @@ var wordList = [
 "chem",
 "fastest",
 "butler",
-"shopzilla",
 "injured",
 "decorating",
 "payroll",
@@ -6621,6 +6619,7 @@ var wordList = [
 'limpid',
 'miasma'
 ];
+
 
 
 
