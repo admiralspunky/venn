@@ -5965,7 +5965,6 @@ var wordList = [
 "surfaces",
 "terrible",
 "routers",
-"cruz",
 "pendant",
 "dresses",
 "baptist",
@@ -6617,8 +6616,10 @@ var wordList = [
 'lessors',
 'cogitate',
 'limpid',
-'miasma'
+'miasma',
+'voozo',
 ];
+
 
 
 
