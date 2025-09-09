@@ -5,7 +5,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.12";
+const CURRENT_VERSION = "1.13";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -75,38 +75,16 @@ const iconSVGs = {
 };
 */
 
-const turnsDisplay = document.getElementById('turns-display');
-// Get the lives display element on the main game screen
-const livesDisplay = document.getElementById('lives-display'); 
+const livesDisplay = document.getElementById('lives-display');
+const timerDisplay = document.getElementById('timer-display');
 const settingsBtn = document.getElementById('settings-btn'); // This is now just the settings opener
 const messageBox = document.getElementById('message-box');
 const handContainer = document.getElementById('hand-container');
 
-/*
-const zoneElements = {
-    '1': { container: document.getElementById('zone-1'), wordsDiv: document.getElementById('zone-1').querySelector('.word-cards-container') },
-    '2': { container: document.getElementById('zone-2'), wordsDiv: document.getElementById('zone-2').querySelector('.word-cards-container') },
-    '3': { container: document.getElementById('zone-3'), wordsDiv: document.getElementById('zone-3').querySelector('.word-cards-container') },
-    '1-2': { container: document.getElementById('zone-1-2'), wordsDiv: document.getElementById('zone-1-2').querySelector('.word-cards-container') },
-    '1-3': { container: document.getElementById('zone-1-3'), wordsDiv: document.getElementById('zone-1-3').querySelector('.word-cards-container') },
-    '2-3': { container: document.getElementById('zone-2-3'), wordsDiv: document.getElementById('zone-2-3').querySelector('.word-cards-container') },
-    '1-2-3': { container: document.getElementById('zone-1-2-3'), wordsDiv: document.getElementById('zone-1-2-3').querySelector('.word-cards-container') },
-    '0': { container: document.getElementById('none-container'), wordsDiv: document.getElementById('none-container').querySelector('.word-cards-container') },
-    'hand': { container: document.getElementById('hand-container'), wordsDiv: document.getElementById('hand-container').querySelector('.word-cards-container') }
-};
-
-
-const zoneConfigs = {
-    '1': { id: 'zone-1', colorVar: '--zone1-bg', customLabel: '1', ruleIndices: [0], categoryTypes: ['location'] },
-    '2': { id: 'zone-2', colorVar: '--zone2-bg', customLabel: '2', ruleIndices: [1], categoryTypes: ['characteristic'] },
-    '3': { id: 'zone-3', colorVar: '--zone3-bg', customLabel: '3', ruleIndices: [2], categoryTypes: ['spelling'] }, 
-    '1-2': { id: 'zone-1-2', colorVar: '--zone12-bg', customLabel: '1 & 2', ruleIndices: [0, 1], categoryTypes: ['location', 'characteristic'] },
-    '1-3': { id: 'zone-1-3', colorVar: '--zone13-bg', customLabel: '1 & 3', ruleIndices: [0, 2], categoryTypes: ['location', 'spelling'] },
-    '2-3': { id: 'zone-2-3', colorVar: '--zone23-bg', customLabel: '2 & 3', ruleIndices: [1, 2], categoryTypes: ['characteristic', 'spelling'] },
-    '1-2-3': { id: 'zone-1-2-3', colorVar: '--zone123-bg', customLabel: 'All Three', ruleIndices: [0, 1, 2], categoryTypes: ['location', 'characteristic', 'spelling'] },
-    '0': { id: 'none-container', colorVar: '--zone0-bg', customLabel: 'None of the above', ruleIndices: [], categoryTypes: [] }
-};
-*/
+// Timers in JS are vastly more complicated than they need to be
+let startTime;
+let timerInterval;
+let formattedTime;
 
 // A function to get all of the zone elements from the DOM dynamically
 function getZoneElements() {
@@ -343,10 +321,9 @@ async function startGame(isDaily) {
     // Use the daily seed for ALL randomization steps in daily mode
     const seed = isDaily ? getDailySeed() : Math.floor(Math.random() * 100000);
 	
-	
-	//These are the probabilities that, when a new card is drawn, it will belong to a certain zone, and I divide these weights every time a card is played in that zone 
-	//The initial zones each start off with a card, so I'm reducing their weights before the start of the game, before the first hand is drawn
-
+	// winding up the timer
+	startTime = Date.now();
+    timerInterval = setInterval(updateTimer, 1000);
 
     
     // You can set different weights here if you want.
@@ -355,7 +332,7 @@ async function startGame(isDaily) {
         zoneWeights[key] = 1;
     });
 
-    // Or you could set a specific weight for 'None' and 'All' zones
+    // And now we set a specific weight for 'None' zone
     if (zoneWeights['0']) {
         zoneWeights['0'] = 0.5; // Example: Words are half as likely to land in the 'None' zone
     }
@@ -492,6 +469,9 @@ async function startGame(isDaily) {
  */
 async function endGame(isWin) {
 	console.log("endGame",isWin);
+	
+	clearInterval(timerInterval);
+	
     const endButtonsContainer = document.getElementById('end-screen-buttons');
 
     // Handle daily streak logic
@@ -547,7 +527,7 @@ async function endGame(isWin) {
 	    // Calculate incorrect guesses directly from lives (I'm assuming that these two variables actually represent their names)
         const incorrectGuessesMade = userSetLives - livesRemaining;
 	    
-        let fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns, with ${incorrectGuessesMade} incorrect guesses!`;
+        let fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns, with ${incorrectGuessesMade} incorrect guesses, in ${formattedTime}!`;
         if (dailyMode && isWin) {
             fullShareText += ` ${dailyStreak} in a row!`;
         }
@@ -1391,7 +1371,6 @@ function placeWordInRegion(targetCorrectZoneKeyForWordString) {
     }
 
     turns++;
-    turnsDisplay.textContent = turns;
 
     const selectedWordObj = wordsInPlay.find(w => w.id === selectedWordId);
     const correctZoneKey = getCorrectZoneKeyForWord(selectedWordObj.text, activeRules);
@@ -1611,7 +1590,6 @@ function resetGameState() {
 	document.querySelectorAll('.word-cards-container').forEach(container => { container.replaceChildren(); });
     turns = 0;
     selectedWordId = null;
-    turnsDisplay.textContent = turns;
     // Initialize lives and update display using userSetLives
     livesRemaining = userSetLives; 
     updateLivesDisplay(); 
@@ -1846,4 +1824,14 @@ for (const key in zoneElements) {
             }
         });
     }
+}
+
+function updateTimer() {
+    const elapsedTime = Date.now() - startTime;
+    const minutes = Math.floor(elapsedTime / 60000);
+    const seconds = Math.floor((elapsedTime % 60000) / 1000);
+    
+    // Format the time to always show two digits for seconds
+    formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    timerDisplay.textContent = formattedTime;
 }

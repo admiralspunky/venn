@@ -26,15 +26,20 @@
 <body>
 	<div id="message-box" class="message-box"></div>
 
-    <div class="game-container">
+	<!-- status bar always visible at the top of the screen -->
+	<div id="status-bar">
+	    <span>Lives: <span id="lives-display">0</span></span>
+		<span id="timer-display">0:00</span>
+	</div>
+	
+	<div class="game-container">
         <div class="top-bar">
             <div class="top-left-ui">
-                <span>Turns: <span id="turns-display">0</span></span>
-                <span>Lives: <span id="lives-display">3</span></span>
+
             </div>
             <h1 class="top-bar-title">
                 <span id="game-title-text"><img src="logo.png" alt="put the words in the proper place" class="logo"></span>
-                <span id="daily-badge" class="ml-2 px-2 py-0.5 bg-green-600 text-white text-xs font-semibold rounded hidden align-middle whitespace-nowrap">DAILY</span>
+                <span id="daily-badge" >DAILY</span>
             </h1>
             <div class="top-right-ui">
                 <button id="settings-btn" class="icon-btn">
@@ -212,7 +217,7 @@
             <div class="modal-setting-item">
                 <label for="difficulty-slider" class="setting-label">Lives:</label>
                 <div class="slider-container">
-                    <input type="range" id="difficulty-slider" min="1" max="9" value="9">
+                    <input type="range" id="difficulty-slider" min="1" max="5" value="3">
                     <span id="lives-display-modal" class="slider-value">3</span>
                 </div>
             </div>
@@ -257,7 +262,7 @@
 
 <div id="zone-feedback-bubble" class="fixed text-white px-3 py-2 rounded shadow-lg text-sm z-[1001] transition-opacity duration-300 hidden pointer-events-none"></div>
 
-<!-- BYLINE Display at the bottom of the screen -->
+<!-- BYLINE Display always visible at the bottom of the screen -->
 <div id="byline-display"></div>
 
 </body>

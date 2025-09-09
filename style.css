@@ -112,6 +112,60 @@ html.dark {
   height: auto;
 }
 
+#status-bar {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+padding: 0.5rem 1rem;
+background-color: var(--bg-container);
+color: var(--text-secondary);
+font-size: 1.00rem;
+font-weight: bold;
+text-align: center;
+box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+z-index: 999;
+transition: background-color 0.3s ease, color 0.3s ease;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+display: flex;
+justify-content: space-between;
+}
+
+#lives-display { left:0; }
+#timer-display {  position: absolute; right: 3em; }
+
+.top-bar {
+display: flex;
+justify-content: space-between;
+width: 100%;
+margin-bottom: 1rem;
+align-items: center;
+}
+
+.top-bar-title {
+flex-grow: 1;
+text-align: center;
+margin: 0 auto;
+color: var(--text-primary);
+font-size: 2.25rem;
+font-weight: 700;
+transition: color 0.3s ease;
+line-height: 1;
+}
+
+.top-left-ui, .top-right-ui {
+font-size: 1.0rem;
+font-weight: 600;
+color: var(--text-secondary);
+transition: color 0.3s ease;
+gap: 0.25rem;
+text-align: center;
+}
+
+#daily-badge {
+font-size: 1.00rem;
+}
+
 body {
 display: flex;
 flex-direction: column;
@@ -151,35 +205,7 @@ align-items: stretch;
 justify-content: flex-start;
 }
 
-.top-left-ui, .top-right-ui {
-font-size: 1.1rem;
-font-weight: 600;
-color: var(--text-secondary);
-transition: color 0.3s ease;
-display: flex;
-flex-direction: column;
-gap: 0.25rem;
-text-align: center;
-}
 
-.top-bar {
-display: flex;
-justify-content: space-between;
-width: 100%;
-margin-bottom: 1rem;
-align-items: center;
-}
-
-.top-bar-title {
-flex-grow: 1;
-text-align: center;
-margin: 0 auto;
-color: var(--text-primary);
-font-size: 2.25rem;
-font-weight: 700;
-transition: color 0.3s ease;
-line-height: 1;
-}
 
 .icon-btn {
 padding: 0.75rem 1rem;
@@ -237,7 +263,7 @@ color: var(--text-rule-box-default);
 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 cursor: pointer;
 position: relative;
-min-height: 150px;
+min-height: 7em;
 box-sizing: border-box;
 z-index: 1;
 transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
@@ -645,6 +671,8 @@ color: var(--text-primary);
 min-width: 20px;
 text-align: center;
 }
+
+
 
 #byline-display {
 position: fixed;
