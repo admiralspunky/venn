@@ -6576,16 +6576,19 @@ var wordList = [
 'limpid',
 'miasma',
 'voozo',
+'faux',
+'prefix',
+'paradox',
+'maze',
+'zenith',
+'gizzard',
+'zany',
+'pizzazz',
+'fizz',
+'glaze',
+'sneeze',
+
 ];
-
-
-
-
-
-
-
-
-
 
 
 
