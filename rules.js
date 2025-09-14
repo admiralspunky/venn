@@ -123,7 +123,10 @@ const allPossibleRules = [
     test: (word) => /x/i.test(word)
   },
   {
-    //defines a function named test that takes a word as input and returns true if the word contains the letter "z" (case-insensitive), and false otherwise.
+    name: 'Contains the letter "w"',
+    test: (word) => /w/i.test(word)
+  },
+  {
     name: 'Contains the letter "z"',
     test: (word) => /z/i.test(word)
   },
@@ -161,8 +164,27 @@ const allPossibleRules = [
     const lowerWord = word.toLowerCase();
     return lowerWord.length >= 4 && vowels.includes(lowerWord[3]);
     }
-  },	
+  },
+
+//digraphs:
+{
+  name: 'Contains the letters "gh"',
+  test: (word) => /gh/i.test(word)
+},
+{
+  name: 'Contains the letters "th"',
+  test: (word) => /th/i.test(word)
+},
+{
+  name: 'Contains the letters "ph"',
+  test: (word) => /ph/i.test(word)
+},
+{
+  name: 'Contains the letters "sh"',
+  test: (word) => /sh/i.test(word)
+}
 ];	
+
 
 
 
