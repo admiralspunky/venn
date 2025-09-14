@@ -6587,8 +6587,16 @@ var wordList = [
 'fizz',
 'glaze',
 'sneeze',
-
+'wax',
+'jeapordize',
+'oxidize',
+'maximize',
+'exorcize',
+'jinx',
+'juxtapose',
+'extrajudicial',
 ];
+
 
 
 
