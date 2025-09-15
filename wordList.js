@@ -1779,7 +1779,6 @@ var wordList = [
 "claim",
 "driving",
 "permission",
-"surgery",
 "patch",
 "heat",
 "wild",
@@ -1804,7 +1803,6 @@ var wordList = [
 "leader",
 "diamond",
 "israel",
-"se",
 "processes",
 "soft",
 "servers",
@@ -1866,7 +1864,6 @@ var wordList = [
 "steps",
 "errors",
 "shops",
-"del",
 "efforts",
 "informed",
 "thoughts",
@@ -6596,6 +6593,7 @@ var wordList = [
 'juxtapose',
 'extrajudicial',
 ];
+
 
 
 
