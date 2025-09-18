@@ -6579,7 +6579,6 @@ var wordList = [
 'maze',
 'zenith',
 'gizzard',
-'zany',
 'pizzazz',
 'fizz',
 'glaze',
@@ -6592,7 +6591,13 @@ var wordList = [
 'jinx',
 'juxtapose',
 'extrajudicial',
+'cruciverbalist',
+'juneteenth',
+'whiplash',
+'xenophobe',
+'extremophile',
 ];
+
 
 
 
