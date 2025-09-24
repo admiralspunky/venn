@@ -64,19 +64,19 @@ const allPossibleRules = [
   },
 {
     name: 'Begins with a consonant',
-    test: (word) => /^[^aeiou]/i.test(word)
+    test: (word) => /^[^aeiouẏ]/i.test(word)
   },
   {
     name: 'Ends with a consonant',
-    test: (word) => /[^aeiou]$/i.test(word)
+    test: (word) => /[^aeiouẏ]$/i.test(word)
   },
   {
     name: 'Begins with a vowel',
-    test: (word) => /^[aeiou]/i.test(word)
+    test: (word) => /^[aeiouẏ]/i.test(word)
   },
   {
     name: 'Ends with a vowel',
-    test: (word) => /[aeiou]$/i.test(word)
+    test: (word) => /[aeiouẏ]$/i.test(word)
   },
   {
     name: 'Contains exactly 1 vowel',
@@ -88,14 +88,14 @@ const allPossibleRules = [
 	  {
     name: 'Contains exactly 2 vowels',
    test: (word) => {
-      const vowels = word.match(/[aeiou]/gi);
+      const vowels = word.match(/[aeiouẏ]/gi);
       return vowels && vowels.length === 2;
     }
   },
   {
     name: 'Contains exactly 3 vowels',
    test: (word) => {
-      const vowels = word.match(/[aeiou]/gi);
+      const vowels = word.match(/[aeiouẏ]/gi);
       return vowels && vowels.length === 3;
     }
   },
@@ -144,7 +144,7 @@ const allPossibleRules = [
  {
   name: 'Has a vowel as the second letter',
   test: (word) => {
-    const vowels = 'aeiou';
+    const vowels = 'aeiouẏ';
     const lowerWord = word.toLowerCase();
     return lowerWord.length >= 2 && vowels.includes(lowerWord[1]);
   }
@@ -152,7 +152,7 @@ const allPossibleRules = [
  {
   name: 'Has a vowel as the third letter',
   test: (word) => {
-    const vowels = 'aeiou';
+    const vowels = 'aeiouẏ';
     const lowerWord = word.toLowerCase();
     return lowerWord.length >= 3 && vowels.includes(lowerWord[2]);
   }
@@ -160,7 +160,7 @@ const allPossibleRules = [
   {
   name: 'Has a vowel as the fourth letter',
   test: (word) => {
-    const vowels = 'aeiou';
+    const vowels = 'aeiouẏ';
     const lowerWord = word.toLowerCase();
     return lowerWord.length >= 4 && vowels.includes(lowerWord[3]);
     }
@@ -184,6 +184,7 @@ const allPossibleRules = [
   test: (word) => /sh/i.test(word)
 }
 ];	
+
 
 
 
