@@ -1,4 +1,6 @@
-//2025-08-20 - I previously use rules from three different categories: location, Characteristic, and Wordplay; but I've decided to switch to using three Spelling clues instead.
+// last updated: 2025-10-11
+
+//2025-08-20 - I previously used rules from three different categories: location, Characteristic, and Wordplay; but I've decided to switch to using three Spelling clues instead.
 
 const allPossibleRules = [
  
@@ -23,20 +25,12 @@ const allPossibleRules = [
     }
   },
   {
-    name: 'Has exactly 3 letters',
-    test: (word) => word.length === 3
+    name: 'Has fewer than 7 letters',
+    test: (word) => word.length < 7
   },
   {
-    name: 'Has exactly 4 letters',
-    test: (word) => word.length === 4
-  },
-  {
-    name: 'Has exactly 5 letters',
-    test: (word) => word.length === 5
-  },
-  {
-    name: 'Has exactly 6 letters',
-    test: (word) => word.length === 6
+    name: 'Has at least 7 letters',
+    test: (word) => word.length >= 7
   },
   {
     name: 'First letter is repeated within the word',
@@ -64,19 +58,19 @@ const allPossibleRules = [
   },
 {
     name: 'Begins with a consonant',
-    test: (word) => /^[^aeiouẏ]/i.test(word)
+    test: (word) => /^[^aeiou]/i.test(word)
   },
   {
     name: 'Ends with a consonant',
-    test: (word) => /[^aeiouẏ]$/i.test(word)
+    test: (word) => /[^aeiou]$/i.test(word)
   },
   {
     name: 'Begins with a vowel',
-    test: (word) => /^[aeiouẏ]/i.test(word)
+    test: (word) => /^[aeiou]/i.test(word)
   },
   {
     name: 'Ends with a vowel',
-    test: (word) => /[aeiouẏ]$/i.test(word)
+    test: (word) => /[aeiou]$/i.test(word)
   },
   {
     name: 'Contains exactly 1 vowel',
@@ -88,14 +82,14 @@ const allPossibleRules = [
 	  {
     name: 'Contains exactly 2 vowels',
    test: (word) => {
-      const vowels = word.match(/[aeiouẏ]/gi);
+      const vowels = word.match(/[aeiou]/gi);
       return vowels && vowels.length === 2;
     }
   },
   {
     name: 'Contains exactly 3 vowels',
    test: (word) => {
-      const vowels = word.match(/[aeiouẏ]/gi);
+      const vowels = word.match(/[aeiou]/gi);
       return vowels && vowels.length === 3;
     }
   },
@@ -123,10 +117,7 @@ const allPossibleRules = [
     test: (word) => /x/i.test(word)
   },
   {
-    name: 'Contains the letter "w"',
-    test: (word) => /w/i.test(word)
-  },
-  {
+    //defines a function named test that takes a word as input and returns true if the word contains the letter "z" (case-insensitive), and false otherwise.
     name: 'Contains the letter "z"',
     test: (word) => /z/i.test(word)
   },
@@ -144,7 +135,7 @@ const allPossibleRules = [
  {
   name: 'Has a vowel as the second letter',
   test: (word) => {
-    const vowels = 'aeiouẏ';
+    const vowels = 'aeiou';
     const lowerWord = word.toLowerCase();
     return lowerWord.length >= 2 && vowels.includes(lowerWord[1]);
   }
@@ -152,7 +143,7 @@ const allPossibleRules = [
  {
   name: 'Has a vowel as the third letter',
   test: (word) => {
-    const vowels = 'aeiouẏ';
+    const vowels = 'aeiou';
     const lowerWord = word.toLowerCase();
     return lowerWord.length >= 3 && vowels.includes(lowerWord[2]);
   }
@@ -160,32 +151,12 @@ const allPossibleRules = [
   {
   name: 'Has a vowel as the fourth letter',
   test: (word) => {
-    const vowels = 'aeiouẏ';
+    const vowels = 'aeiou';
     const lowerWord = word.toLowerCase();
     return lowerWord.length >= 4 && vowels.includes(lowerWord[3]);
     }
-  },
-
-//digraphs:
-{
-  name: 'Contains the letters "gh"',
-  test: (word) => /gh/i.test(word)
-},
-{
-  name: 'Contains the letters "th"',
-  test: (word) => /th/i.test(word)
-},
-{
-  name: 'Contains the letters "ph"',
-  test: (word) => /ph/i.test(word)
-},
-{
-  name: 'Contains the letters "sh"',
-  test: (word) => /sh/i.test(word)
-}
+  },	
 ];	
-
-
 
 
 

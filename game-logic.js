@@ -5,14 +5,14 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.13";
+const CURRENT_VERSION = "1.14";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
 const INITIAL_HAND_SIZE = 5;
 const MESSAGE_DISPLAY_TIME = 5000;
 const TOTAL_WORDS_IN_POOL = 200;
-const MIN_RULE_MATCHING_WORDS_PER_CATEGORY = 3;
+const MIN_RULE_MATCHING_WORDS_PER_CATEGORY = 1;
 
 const TUTORIAL_TEXT = `There are three hidden spelling rules for you to deduce, by sorting words into the correct zones.  The rules are hidden, but there's a button in the Settings menu that will display all of the possible rules for your benefit. If you play a card in the wrong zone, you have to draw a card to replace it. You're trying to empty your hand of cards.`;
 const ABOUT_TEXT = "I want to thank Ken Wickle, for bringing Things in Rings to our board game group, which led me to write this game."
@@ -602,7 +602,7 @@ async function endGame(isWin) {
 // Called by: startGame()
 // Returns: an array of N rules from rules.js, while guaranteeing that each set of rules contains overlapping rules, so each zone can be filled
 //
-function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 2, minTripleOverlap = 1, maxAttempts = 1000) {
+function generateActiveRulesWithOverlap(seed, allRules, maxAttempts = 1000) {
     console.log(`🔎 Attempting to find ${numRules} rules`);
 
     const spellingRules = allRules;
@@ -629,10 +629,6 @@ function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 2, minT
         // Your existing logic for checking for overlaps and word counts
         const zoneConfigs = getZoneConfigs(numRules);
         const zoneBuckets = sortWordListByZone(candidateSet);
-        const sharedZoneKeys = Object.keys(zoneConfigs).filter(key => key.includes('-'));
-        const totalSharedCount = sharedZoneKeys.reduce((sum, zone) => sum + (zoneBuckets[zone]?.length || 0), 0);
-        const allRulesKey = Object.keys(zoneConfigs).find(key => key.split('-').length === numRules);
-        const allOverlapCount = zoneBuckets[allRulesKey]?.length || 0;
         
         const allZonesHaveMinWords = Object.keys(zoneConfigs).every(zoneKey => {
             if (zoneKey !== '0') {
@@ -641,7 +637,8 @@ function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 2, minT
             return true;
         });
 
-        if (allOverlapCount >= minTripleOverlap && totalSharedCount >= minSharedWords && allZonesHaveMinWords && (zoneBuckets['0']?.length || 0) > 0) {
+		//does the ruleset include at least the minimum number of words that fall into each zone, including 'distractor' words that don't meet any of the rules?
+        if (allZonesHaveMinWords && (zoneBuckets['0']?.length > 1) ) {
             console.log(`✅ Found overlapping rules on attempt ${attempt + 1}`);
             console.log("🔎 Potential word distribution for selected rules (pre-weighted):");
             for (const key of Object.keys(zoneBuckets)) {
