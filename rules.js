@@ -104,10 +104,12 @@ const allPossibleRules = [
       return true;
     }
   },
+/* this rule appears a little too frequently for now	
     {
     name: 'Contains the letter "p"',
     test: (word) => /p/i.test(word)
   },
+*/
 {
   name: 'Contains a Rare Letter (j, q, x, or z)',
   test: (word) => /j|q|x|z/i.test(word)
@@ -148,6 +150,7 @@ const allPossibleRules = [
     }
   },	
 ];	
+
 
 
 
