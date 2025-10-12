@@ -1,4 +1,4 @@
-// last updated: 2025-10-11
+// last updated: 2025-10-12
 
 //2025-08-20 - I previously used rules from three different categories: location, Characteristic, and Wordplay; but I've decided to switch to using three Spelling clues instead.
 
@@ -108,19 +108,10 @@ const allPossibleRules = [
     name: 'Contains the letter "p"',
     test: (word) => /p/i.test(word)
   },
-  {
-    name: 'Contains the letter "j"',
-    test: (word) => /j/i.test(word)
-  },
-  {
-    name: 'Contains the letter "x"',
-    test: (word) => /x/i.test(word)
-  },
-  {
-    //defines a function named test that takes a word as input and returns true if the word contains the letter "z" (case-insensitive), and false otherwise.
-    name: 'Contains the letter "z"',
-    test: (word) => /z/i.test(word)
-  },
+{
+  name: 'Contains a Rare Letter (j, q, x, or z)',
+  test: (word) => /j|q|x|z/i.test(word)
+},
 	{
 	  name: 'Contains 4 or fewer unique letters',
 	  test: (word) => {
@@ -157,6 +148,7 @@ const allPossibleRules = [
     }
   },	
 ];	
+
 
 
 
