@@ -37,6 +37,8 @@ let livesRemaining = 0;
 let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || '0', 10);
 let lastDailyCompletionDate = localStorage.getItem('lastDailyCompletionDate') || '';
 
+let previousResults = []; //we're keeping track of the results of the previous guesses, so we can build a pretty Share dialog
+
 
 // Define fallback rules to prevent undefined errors if rule candidates are empty
 const fallbackLocationRule = { name: 'General Location', categoryType: 'location', words: [], test: () => false };
@@ -521,17 +523,18 @@ async function endGame(isWin) {
     shareButton.title = "Share Results";
     shareButton.addEventListener('click', () => {
         console.log("share button clicked, dailyMode =", dailyMode);
- 	    const dateLabel = dailyMode ? ` – ${getTodayDateString()}` : " (Random Game)";
+ 	    const dateLabel = dailyMode ? ` – ${getTodayDateString()}` : " (Anytime Mode)";
         const gameLabel = GAME_TITLE + dateLabel;
         const winLossStatus = isWin ? "Won" : "Lost";
 	    // Calculate incorrect guesses directly from lives (I'm assuming that these two variables actually represent their names)
         const incorrectGuessesMade = userSetLives - livesRemaining;
 	    
-        let fullShareText = `${gameLabel}: ${winLossStatus} in ${turns} turns, with ${incorrectGuessesMade} incorrect guesses, in ${formattedTime}!`;
+        let fullShareText = `${gameLabel}: ${winLossStatus} with ${numRules} rules, and ${userSetLives} lives, in ${formattedTime}!`;
+		fullShareText+= '\n' + previousResults;
         if (dailyMode && isWin) {
-            fullShareText += ` ${dailyStreak} in a row!`;
+            fullShareText += ` \n${dailyStreak} Daily puzzles in a row!`;
         }
-        fullShareText += ` Can you beat my score? ${URL}`;
+        fullShareText += ` \n${URL}`;
         copyToClipboard(fullShareText);
     });
 
@@ -724,7 +727,6 @@ function buildDeliberateWordPool(rules, seed) {
     const rng = mulberry32(seed || Date.now());
     
     // Dynamically generate desired counts based on the number of rules
-    const numRules = rules.length;
     const desiredCounts = {};
     
     // We can assume a single desired count for all zones in the same tier.
@@ -1415,10 +1417,9 @@ function placeWordInRegion(targetCorrectZoneKeyForWordString) {
         selectedWordObj.correctZoneKey = correctZoneKey;
         message = `Correct! '${selectedWordObj.text}' belongs in this category.`;
         isErrorFeedback = false;
-        console.log(`Outcome: Perfect Match`); // Debug log
+        console.log(`Outcome: Perfect Match 🟢`); // Debug log
+		previousResults+="🟢";  // that's a green circle for the share results
         
-        // Removed: newCardFromPool = drawCard();
-        // Hand size will now decrease by 1 for perfect matches.
     } else {
         // Incorrect placement - now determine if it's a near miss or far miss
         //const targetIsSingleZone = ['1', '2', '3'].includes(targetCorrectZoneKeyForWordString);
@@ -1439,7 +1440,8 @@ function placeWordInRegion(targetCorrectZoneKeyForWordString) {
             const correctCategoryName = getZoneDisplayName(correctZoneKey, false);
             message = `Near Miss! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
             isErrorFeedback = true; // Still show as a "mistake" visually
-            console.log(`Outcome: Near Miss`); // Debug log
+            console.log(`Outcome: Near Miss 🟡`); // Debug log
+			previousResults+="🟡";  // that's a yellow circle for the share results
         } else {
             // Far miss: Lose a life and draw a new card.
             selectedWordObj.correctZoneKey = correctZoneKey; // Still mark with correct zone for visual placement
@@ -1454,7 +1456,8 @@ function placeWordInRegion(targetCorrectZoneKeyForWordString) {
             }
             message += ` Lives left: ${livesRemaining}.`;
             isErrorFeedback = true; // Definitely an error
-            console.log(`Outcome: Far Miss`); // Debug log
+            console.log(`Outcome: Far Miss 🔴`); // Debug log
+			previousResults+="🔴";  // that's a red circle for the share results
         }
     }
 
