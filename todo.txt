@@ -1,11 +1,9 @@
 highlight the relevant tier 2+ zones, when you mouseover a tier 1 zone
 When I want to expand this game to 5+ rules, I'll need to do something entirely different with the presentation, but I think I already know what I'm going to do: you have one zone for your Hand and one big Played zone. Forget drawing the individual zones. Instead, when you click on a word in your Hand, you get a drop-down of where you want to play it, and when a word is in the Played zone, just rename it to indicate which zone it's in, which rules it follows
-
+perhaps, on a Near Miss, showMessage should have a yellow bg, instead of red
 record a tutorial video
-red herrings - rules that could either be A or B, and most of the words are ambiguous
 make a portfolio/website
 option to change the number of hand cards (but remember that Dailies should always use the same number)
-make Near Miss more dynamic - '1-3' should still be a near miss for '1-2-3', because the Attempt Zone is still a subset of the Correct 
 setting for number of starting hint cards? - maybe, instead of placing hints in specific zones, I just randomly place 1-8 starting hints, per the slider
 let the user log in, to carry their streak across browsers and devices, and we'll need that anyway for mp
 Setting to switch between Venn Diagram and Grid displays
@@ -15,4 +13,3 @@ QR code
 add multiplayer functionality
 wait for copyright to come back
 Is there a way to encourage the words to have an even distribution, without forcing each zone to fill up at a certain number of words? The way the game is now, after I play 3 words into a zone, I know that no other words will ever go in that zone.
-
