@@ -5,7 +5,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.14";
+const CURRENT_VERSION = "1.15";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -1421,12 +1421,23 @@ function placeWordInRegion(targetZoneKey) {
     } else {
         // Incorrect placement - now determine if it's a near miss or far miss
 
-		//break the target and correct strings into their respective parts, and convert into numbers
-		const targetZoneKeyParts = targetZoneKey.split('-').map(Number);
-		const correctZoneKeyParts = correctZoneKey.split('-').map(Number);
+		// break the target and correct strings into parts and convert to numbers
+		const targetZoneParts = targetZoneKey.split('-').map(Number);
+		const correctZoneParts = correctZoneKey.split('-').map(Number);
+		
+		// make sets
+		const targetSet = new Set(targetZoneParts);
+		const correctSet = new Set(correctZoneParts);
+		
+		// containment: every target zone must exist in correct
+		const isContained = [...targetSet].every(z => correctSet.has(z));
+		
+		// exactly one extra zone in correct (and not an exact match)
+		const exactlyOneExtra = (correctSet.size - targetSet.size) === 1;
+		
+		// near miss: containment plus exactly one differing zone
+		const isNearMiss = isContained && exactlyOneExtra;
 
-		// All target zones must exist in the correct zones, But it must NOT be an exact match
-        const isTargetContainedInCorrectOverlap = targetZoneKeyParts.every(z => correctZoneKeyParts.includes(z)) && targetZoneKeyParts.length !== correctZoneKeyParts.length;
 
         // --- DEBUG LOGS START ---
 		console.log(`Target Zone Parts: [${targetZoneKeyParts.join(', ')}]`);
@@ -1434,15 +1445,17 @@ function placeWordInRegion(targetZoneKey) {
         console.log(`Is Target Contained In Correct Overlap: ${isTargetContainedInCorrectOverlap}`);
         // --- DEBUG LOGS END ---
 
-        if (isTargetContainedInCorrectOverlap) {
+        if (isNearMiss) {
             // Near miss: Draw a new card, but no life lost.
             selectedWordObj.correctZoneKey = correctZoneKey; // Still mark with correct zone for visual placement
-            newCardFromPool = drawCard(); // Draw a new card
+            
             const correctCategoryName = getZoneDisplayName(correctZoneKey, false);
             message = `Near Miss! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
             isErrorFeedback = true; // Still show as a "mistake" visually
             console.log(`Outcome: Near Miss 🟡`); // Debug log
 			previousResults+="🟡";  // that's a yellow circle for the share results
+
+			newCardFromPool = drawCard(); // Draw a new card
         } else {
             // Far miss: Lose a life and draw a new card.
             selectedWordObj.correctZoneKey = correctZoneKey; // Still mark with correct zone for visual placement
