@@ -1440,8 +1440,8 @@ function placeWordInRegion(targetZoneKey) {
 
 
         // --- DEBUG LOGS START ---
-		console.log(`Target Zone Parts: [${targetZoneKeyParts.join(', ')}]`);
-        console.log(`Correct Zone Parts: [${correctZoneKeyParts.join(', ')}]`);
+		console.log(`Target Zone Parts: [${targetZoneParts.join(', ')}]`);
+        console.log(`Correct Zone Parts: [${correctZoneParts.join(', ')}]`);
         console.log(`Is Target Contained In Correct Overlap: ${isTargetContainedInCorrectOverlap}`);
         // --- DEBUG LOGS END ---
 
