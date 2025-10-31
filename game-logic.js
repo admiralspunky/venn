@@ -922,21 +922,21 @@ function seedInitialZones(pool) {
 	
 	const wordsPlaced = new Set();
     	
-    for (const targetZoneKey of initialZoneKeys) {
+    for (const targetZoneKeyKey of initialZoneKeys) {
         //the two lines work together to create a randomized list of words that have not yet been used
 		const candidates = pool.filter(w => !wordsPlaced.has(w.text)); // Filter by word.text
         const shuffled = shuffleArray([...candidates]);
 		
         let chosenWord = null;
-		chosenWord = shuffled.find(word => word.correctZoneKey === targetZoneKey);
+		chosenWord = shuffled.find(word => word.correctZoneKey === targetZoneKeyKey);
 		/*
-        if (targetZoneKey === '1-2-3') {
+        if (targetZoneKeyKey === '1-2-3') {
             // Find a word that has been pre-calculated to be in the '1-2-3' zone
             chosenWord = shuffled.find(word => word.correctZoneKey === '1-2-3');
-			console.log(`For targetZoneKey === '1-2-3', chosenWord = ${chosenWord}`);
+			console.log(`For targetZoneKeyKey === '1-2-3', chosenWord = ${chosenWord}`);
         } else {
             // Find a word that has been pre-calculated to be in one of the single zones
-            chosenWord = shuffled.find(word => word.correctZoneKey === targetZoneKey);
+            chosenWord = shuffled.find(word => word.correctZoneKey === targetZoneKeyKey);
         }*/
 
         if (chosenWord) {
@@ -952,10 +952,10 @@ function seedInitialZones(pool) {
 			const indexToRemove = pool.findIndex(w => w.text === chosenWord.text);
 			if (indexToRemove !== -1) {	pool.splice(indexToRemove, 1); }
 			
-            zoneWeights[targetZoneKey] /= 4; // If a word gets placed in a zone, make that zone likely to be chosen again, when we're drawing cards for the hand
-            console.log(`Initial placement of ${chosenWord.text} in zone ${targetZoneKey}, weight changed to ${zoneWeights[targetZoneKey]}`);
+            zoneWeights[targetZoneKeyKey] /= 4; // If a word gets placed in a zone, make that zone likely to be chosen again, when we're drawing cards for the hand
+            console.log(`Initial placement of ${chosenWord.text} in zone ${targetZoneKeyKey}, weight changed to ${zoneWeights[targetZoneKeyKey]}`);
         } else {
-            console.warn(`[startGame] Could not find word for zone ${targetZoneKey}`);
+            console.warn(`[startGame] Could not find word for zone ${targetZoneKeyKey}`);
         }
     }
 }//function seedInitialZones(pool) 
@@ -1358,12 +1358,12 @@ function showZoneFeedback(message, targetElement, isError = false) {
     }, 3000);
 }
 */
-function placeWordInRegion(targetZone) {
+function placeWordInRegion(targetZoneKey) {
     if (!selectedWordId) {
         showMessage('Please select a word first!', true);
         return;
     }
-    if (targetZone === 'hand') {
+    if (targetZoneKey === 'hand') {
         showMessage('You cannot place words into your hand. Select a rule box or "None"!', true);
         return;
     }
@@ -1372,7 +1372,7 @@ function placeWordInRegion(targetZone) {
     const selectedWordObj = wordsInPlay.find(w => w.id === selectedWordId);
     const correctZoneKey = getCorrectZoneKeyForWord(selectedWordObj.text, activeRules);
     const correctZoneElement = zoneElements[correctZoneKey]?.container;
-    const targetZoneElement = zoneElements[targetZone]?.container;
+    const targetZoneKeyKeyElement = zoneElements[targetZoneKeyKey]?.container;
 	
 	//regardless of correctness, the word was placed in the correctZoneKey, so make the correctZoneKey's cards less likely to be chosen again
 	zoneWeights[correctZoneKey] /= 4; 
@@ -1402,14 +1402,14 @@ function placeWordInRegion(targetZone) {
     console.log(`--- Placement Attempt ---`);
     console.log(`Word: '${selectedWordObj.text}'`);
     console.log(`Correct Zone Key: '${correctZoneKey}'`);
-    console.log(`Target Zone Key (placed in): '${targetZone}'`);
+    console.log(`Target Zone Key (placed in): '${targetZoneKey}'`);
     // --- DEBUG LOGS END ---
 
     // This variable will hold the new card drawn from the pool
     // Initialize to null, it will only be assigned if a new card is to be drawn (on a miss)
     let newCardFromPool = null; 
 
-    if (correctZoneKey === targetZone) {
+    if (correctZoneKey === targetZoneKey) {
         // Perfect match: Hand size decreases, NO new card is drawn.
         isCorrectPlacement = true;
         selectedWordObj.correctZoneKey = correctZoneKey;
@@ -1422,11 +1422,11 @@ function placeWordInRegion(targetZone) {
         // Incorrect placement - now determine if it's a near miss or far miss
 
 		//break the target and correct strings into their respective parts, and convert into numbers
-		const targetZoneParts = targetZoneKey.split('-').map(Number);
+		const targetZoneKeyParts = targetZoneKey.split('-').map(Number);
 		const correctZoneParts = correctZoneKey.split('-').map(Number);
 
 		// All target zones must exist in the correct zones, But it must NOT be an exact match
-        const isTargetContainedInCorrectOverlap = targetZoneParts.every(z => correctZoneParts.includes(z)) && targetZoneParts.length !== correctZoneParts.length;
+        const isTargetContainedInCorrectOverlap = targetZoneKeyParts.every(z => correctZoneParts.includes(z)) && targetZoneKeyParts.length !== correctZoneParts.length;
 
         // --- DEBUG LOGS START ---
         console.log(`Target Is Single Zone (placed in): ${targetIsSingleZone}`);
@@ -1478,7 +1478,7 @@ function placeWordInRegion(targetZone) {
 
 
     // Show feedback bubble (currently disabled by you)
-    // showZoneFeedback(message, targetZoneElement, isErrorFeedback);
+    // showZoneFeedback(message, targetZoneKeyElement, isErrorFeedback);
 
     // Regardless of correctness, place the card visually
     const placedCard = createWordCard(selectedWordObj.text, selectedWordObj.id, selectedWordObj.correctZoneKey, true);
@@ -1495,7 +1495,7 @@ function placeWordInRegion(targetZone) {
     renderHand(); // Re-render hand to show the updated hand (fewer cards on perfect, same on miss)
 
     checkGameEndCondition();
-}//function placeWordInRegion(targetZone)
+}//function placeWordInRegion(targetZoneKey)
 
 //I'm replacing the old drawCard function; this new function checks the zoneWeight before it actually draws the card
 function drawCard() {
