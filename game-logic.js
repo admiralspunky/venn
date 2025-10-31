@@ -1372,7 +1372,7 @@ function placeWordInRegion(targetZoneKey) {
     const selectedWordObj = wordsInPlay.find(w => w.id === selectedWordId);
     const correctZoneKey = getCorrectZoneKeyForWord(selectedWordObj.text, activeRules);
     const correctZoneElement = zoneElements[correctZoneKey]?.container;
-    const targetZoneKeyKeyElement = zoneElements[targetZoneKey]?.container;
+    const targetZoneKeyElement = zoneElements[targetZoneKey]?.container;
 	
 	//regardless of correctness, the word was placed in the correctZoneKey, so make the correctZoneKey's cards less likely to be chosen again
 	zoneWeights[correctZoneKey] /= 4; 
