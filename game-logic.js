@@ -1423,14 +1423,14 @@ function placeWordInRegion(targetZoneKey) {
 
 		//break the target and correct strings into their respective parts, and convert into numbers
 		const targetZoneKeyParts = targetZoneKey.split('-').map(Number);
-		const correctZoneParts = correctZoneKey.split('-').map(Number);
+		const correctZoneKeyParts = correctZoneKey.split('-').map(Number);
 
 		// All target zones must exist in the correct zones, But it must NOT be an exact match
-        const isTargetContainedInCorrectOverlap = targetZoneKeyParts.every(z => correctZoneParts.includes(z)) && targetZoneKeyParts.length !== correctZoneParts.length;
+        const isTargetContainedInCorrectOverlap = targetZoneKeyParts.every(z => correctZoneKeyParts.includes(z)) && targetZoneKeyParts.length !== correctZoneKeyParts.length;
 
         // --- DEBUG LOGS START ---
-        console.log(`Target Is Single Zone (placed in): ${targetIsSingleZone}`);
-        console.log(`Correct Zone Parts: [${correctZoneParts.join(', ')}]`);
+		console.log(`Target Zone Parts: [${targetZoneKeyParts.join(', ')}]`);
+        console.log(`Correct Zone Parts: [${correctZoneKeyParts.join(', ')}]`);
         console.log(`Is Target Contained In Correct Overlap: ${isTargetContainedInCorrectOverlap}`);
         // --- DEBUG LOGS END ---
 
