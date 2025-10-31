@@ -1442,7 +1442,7 @@ function placeWordInRegion(targetZoneKey) {
         // --- DEBUG LOGS START ---
 		console.log(`Target Zone Parts: [${targetZoneParts.join(', ')}]`);
         console.log(`Correct Zone Parts: [${correctZoneParts.join(', ')}]`);
-        console.log(`Is Target Contained In Correct Overlap: ${isTargetContainedInCorrectOverlap}`);
+        console.log(`Is Target Contained In Correct Overlap: ${isNearMiss}`);
         // --- DEBUG LOGS END ---
 
         if (isNearMiss) {
