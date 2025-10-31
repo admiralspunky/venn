@@ -921,7 +921,7 @@ var wordList = [
 'build',
 'screen',
 'exchange',
-'types',
+'tẏpes',
 'soon',
 'sponsored',
 'lines',
@@ -933,7 +933,7 @@ var wordList = [
 'season',
 'someone',
 'held',
-'anything',
+'anẏthing',
 'printer',
 'condition',
 'effective',
@@ -982,7 +982,6 @@ var wordList = [
 'homepage',
 'hour',
 'gas',
-'skills',
 'six',
 'bush',
 'islands',
@@ -992,22 +991,17 @@ var wordList = [
 'decision',
 'leave',
 'british',
-'teens',
 'pre',
 'huge',
 'sat',
 'woman',
-'facilities',
 'zip',
 'bid',
 'kind',
-'sellers',
 'middle',
 'move',
 'cable',
-'opportunities',
 'taking',
-'values',
 'division',
 'coming',
 'tuesday',
@@ -6524,6 +6518,7 @@ var wordList = [
 
 
 ];
+
 
 
 
