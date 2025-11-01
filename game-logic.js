@@ -1434,9 +1434,12 @@ function placeWordInRegion(targetZoneKey) {
 		
 		// exactly one extra zone in correct (and not an exact match)
 		const exactlyOneExtra = (correctSet.size - targetSet.size) === 1;
-		
+
 		// near miss: containment plus exactly one differing zone
-		const isNearMiss = isContained && exactlyOneExtra;
+		let isNearMiss;
+		
+		if (targetSet.has(0) && correctSet.size == 1) isNearMiss = true; //special case for 'None of the Above' Zone
+		else isNearMiss = isContained && exactlyOneExtra;
 
 
         // --- DEBUG LOGS START ---
