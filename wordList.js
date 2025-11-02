@@ -950,7 +950,7 @@ var wordList = [
 'menu',
 'volume',
 'cross',
-'anyone',
+'anẏone',
 'mortgage',
 'hope',
 'silver',
@@ -984,7 +984,6 @@ var wordList = [
 'gas',
 'six',
 'bush',
-'islands',
 'advice',
 'career',
 'rental',
@@ -1013,7 +1012,6 @@ var wordList = [
 'length',
 'nice',
 'score',
-'statistics',
 'client',
 'returns',
 'capital',
@@ -1055,9 +1053,7 @@ var wordList = [
 'degree',
 'contract',
 'button',
-'releases',
 'wed',
-'homes',
 'super',
 'male',
 'matter',
@@ -1080,7 +1076,6 @@ var wordList = [
 'fall',
 'featured',
 'idea',
-'rooms',
 'female',
 'responsible',
 'communications',
@@ -1088,7 +1083,6 @@ var wordList = [
 'associated',
 'thomas',
 'cancer',
-'numbers',
 'reason',
 'tool',
 'browser',
@@ -6505,19 +6499,20 @@ var wordList = [
 'jigsaw',
 'axe',
 'flex',
-'oxygen',
+'oxẏgen',
 'daze',
 'zeal',
 'hazẏ',
 'freeze',
-'poetry',
+'poetrẏ',
 'equalize',
 'jazzed',
 'equinox',
-'jubilee'
-
+'jubilee',
+'querulous'
 
 ];
+
 
 
 
