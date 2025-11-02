@@ -125,6 +125,7 @@ const allPossibleRules = [
 	    return uniques.size <= 4; // Check the size of the Set
 	  }	
 	},
+/* vowel 2nd, 3rd, or 4th are all pretty annoying to spot, and those rules come up too frequently, and crowd out the more interesting rules
  {
   name: 'Has a vowel as the second letter',
   test: (word) => {
@@ -148,8 +149,10 @@ const allPossibleRules = [
     const lowerWord = word.toLowerCase();
     return lowerWord.length >= 4 && vowels.includes(lowerWord[3]);
     }
-  },	
+  },
+*/
 ];	
+
 
 
 
