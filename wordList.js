@@ -1,4 +1,4 @@
-// last updated: 2025-10-11
+// last updated: 2025-11-02
 
 //I adapted this wordlist from a file in my Wordliness folder, google-100000-english-no-swears. I've tried to prune it for obvious non-words, and also for words that use 'y' as a vowel, because those words tend to screw with my rules.
 //I'm starting to add back in some words that use y as a vowel, but with a diacritical ẏ so the rules can differentiate.
@@ -5783,10 +5783,6 @@ var wordList = [
 'loud',
 'conjunction',
 'bride',
-'rats',
-'defines',
-'airports',
-'instances',
 'indigenous',
 'begun',
 'brunette',
@@ -5798,7 +5794,6 @@ var wordList = [
 'corruption',
 'stat',
 'trigger',
-'incentives',
 'cholesterol',
 'gathered',
 'essex',
@@ -5826,7 +5821,6 @@ var wordList = [
 'taxation',
 'fever',
 'cuisine',
-'practitioners',
 'transcript',
 'theorem',
 'inflation',
@@ -5835,12 +5829,10 @@ var wordList = [
 'pray',
 'compounds',
 'pope',
-'drums',
 'contracting',
 'arnold',
 'structured',
 'jeep',
-'chicks',
 'bare',
 'hung',
 'cattle',
@@ -6509,9 +6501,11 @@ var wordList = [
 'jazzed',
 'equinox',
 'jubilee',
-'querulous'
+'querulous',
+'coquettish',
 
 ];
+
 
 
 
