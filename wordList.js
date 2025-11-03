@@ -6503,8 +6503,10 @@ var wordList = [
 'jubilee',
 'querulous',
 'coquettish',
+'enclave',
 
 ];
+
 
 
 
