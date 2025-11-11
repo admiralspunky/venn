@@ -1415,8 +1415,8 @@ function placeWordInRegion(targetZoneKey) {
         selectedWordObj.correctZoneKey = correctZoneKey;
         message = `Correct! '${selectedWordObj.text}' belongs in this category.`;
         isErrorFeedback = false;
-        console.log(`Outcome: Perfect Match 🟢`); // Debug log
-		previousResults+="🟢";  // that's a green circle for the share results
+        console.log(`Outcome: Perfect Match ✅`); // Debug log
+		previousResults+="✅";  // that's a green check for the share results
         
     } else {
         // Incorrect placement - now determine if it's a near miss or far miss
@@ -1473,8 +1473,8 @@ function placeWordInRegion(targetZoneKey) {
             }
             message += ` Lives left: ${livesRemaining}.`;
             isErrorFeedback = true; // Definitely an error
-            console.log(`Outcome: Far Miss 🔴`); // Debug log
-			previousResults+="🔴";  // that's a red circle for the share results
+            console.log(`Outcome: Far Miss ❌`); // Debug log
+			previousResults+="❌";  // that's a red X for the share results
         }
     }
 
