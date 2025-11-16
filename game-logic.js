@@ -5,7 +5,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.15";
+const CURRENT_VERSION = "1.16";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -1223,10 +1223,15 @@ function mulberry32(seed) {
     };
 }
 
-function showMessage(message, isError = false) {
+function showMessage(message, color) {
     messageBox.innerHTML = message;
     messageBox.classList.remove("error");
-    if (isError) {
+	messageBox.classList.remove("warning");
+	
+    if (color=='yellow') {
+        messageBox.classList.add("warning");
+    }
+	if (color=='red') {
         messageBox.classList.add("error");
     }
     messageBox.classList.add("visible");
@@ -1360,11 +1365,11 @@ function showZoneFeedback(message, targetElement, isError = false) {
 */
 function placeWordInRegion(targetZoneKey) {
     if (!selectedWordId) {
-        showMessage('Please select a word first!', true);
+        showMessage('Please select a word first!', 'red');
         return;
     }
     if (targetZoneKey === 'hand') {
-        showMessage('You cannot place words into your hand. Select a rule box or "None"!', true);
+        showMessage('You cannot place words into your hand. Select a rule box or "None"!', 'red');
         return;
     }
     turns++;
@@ -1454,7 +1459,7 @@ function placeWordInRegion(targetZoneKey) {
             
             const correctCategoryName = getZoneDisplayName(correctZoneKey, false);
             message = `Near Miss! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
-            isErrorFeedback = true; // Still show as a "mistake" visually
+            isErrorFeedback = 'yellow'; // Still show as a "mistake" visually
             console.log(`Outcome: Near Miss 🟡`); // Debug log
 			previousResults+="🟡";  // that's a yellow circle for the share results
 
@@ -1472,7 +1477,7 @@ function placeWordInRegion(targetZoneKey) {
                 message += `   Only ${currentWordPool.length} card${currentWordPool.length === 1 ? '' : 's'} left!`;
             }
             message += ` Lives left: ${livesRemaining}.`;
-            isErrorFeedback = true; // Definitely an error
+            isErrorFeedback = 'red'; // Definitely an error
             console.log(`Outcome: Far Miss ❌`); // Debug log
 			previousResults+="❌";  // that's a red X for the share results
         }
@@ -1576,7 +1581,7 @@ function copyToClipboard(text) {
         showMessage('Results copied to clipboard!');
     } catch (err) {
         console.error('Failed to copy text: ', err);
-        showMessage('Failed to copy results. Please try again or copy manually.', true);
+        showMessage('Failed to copy results. Please try again or copy manually.', 'red');
     }
     document.body.removeChild(textarea);
 }
