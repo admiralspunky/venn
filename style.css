@@ -465,6 +465,11 @@ background-color: #fee2e2;
 color: #991b1b;
 }
 
+.message-box.warning {
+background-color: #f5f7dc;
+color: #9c7368;
+}
+
 .modal-overlay {
 position: fixed;
 top: 0;
