@@ -1,9 +1,6 @@
-perhaps, on a Near Miss, showMessage should have a yellow bg, instead of red
-
 highlight the relevant tier 2+ zones, when you mouseover a tier 1 zone
 When I want to expand this game to 5+ rules, I'll need to do something entirely different with the presentation, but I think I already know what I'm going to do: you have one zone for your Hand and one big Played zone. Forget drawing the individual zones. Instead, when you click on a word in your Hand, you get a drop-down of where you want to play it, and when a word is in the Played zone, just rename it to indicate which zone it's in, which rules it follows
 record a tutorial video
-make a portfolio/website
 option to change the number of hand cards (but remember that Dailies should always use the same number)
 setting for number of starting hint cards? - maybe, instead of placing hints in specific zones, I just randomly place 1-8 starting hints, per the slider
 let the user log in, to carry their streak across browsers and devices, and we'll need that anyway for mp
