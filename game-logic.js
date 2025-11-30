@@ -1433,18 +1433,20 @@ function placeWordInRegion(targetZoneKey) {
 		// make sets
 		const targetSet = new Set(targetZoneParts);
 		const correctSet = new Set(correctZoneParts);
-		
-		// containment: every target zone must exist in correct
-		const isContained = [...targetSet].every(z => correctSet.has(z));
-		
-		// exactly one extra (or missing) zone in correct (and not an exact match)
-		const exactlyOneExtra = Math.abs(correctSet.size - targetSet.size) === 1;
 
-		// near miss: containment plus exactly one differing zone
-		let isNearMiss;
+		let isNearMiss = false;
+		// Special case: 'None of the Above' (Zone 0)
+		if (targetSet.has(0) && correctSet.size === 1) {
+		    isNearMiss = true;
+		} else {
+		    // Compute symmetric difference count
+		    const missing = [...targetSet].filter(z => !correctSet.has(z)).length;
+		    const extra   = [...correctSet].filter(z => !targetSet.has(z)).length;
+		    const diffCount = missing + extra;
 		
-		if (targetSet.has(0) && correctSet.size == 1) isNearMiss = true; //special case for 'None of the Above' Zone
-		else isNearMiss = isContained && exactlyOneExtra;
+		    // Near miss if exactly one zone differs
+		    isNearMiss = diffCount === 1;
+		}
 
 
         // --- DEBUG LOGS START ---
