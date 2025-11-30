@@ -1,5 +1,3 @@
-off by one still doesn't quite work: 1-2-3 should count as a Near Miss for 2-3
-
 Is there a way to encourage the words to have an even distribution, without forcing each zone to fill up at a certain number of words? The way the game is now, after I play 3 words into a zone, I know that no other words will ever go in that zone.
 highlight the relevant tier 2+ zones, when you mouseover a tier 1 zone
 When I want to expand this game to 5+ rules, I'll need to do something entirely different with the presentation, but I think I already know what I'm going to do: you have one zone for your Hand and one big Played zone. Forget drawing the individual zones. Instead, when you click on a word in your Hand, you get a drop-down of where you want to play it, and when a word is in the Played zone, just rename it to indicate which zone it's in, which rules it follows
@@ -13,4 +11,5 @@ translate to other languages
 QR code
 add multiplayer functionality
 wait for copyright to come back
+
 
