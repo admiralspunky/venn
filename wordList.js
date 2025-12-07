@@ -6466,7 +6466,10 @@ var wordList = [
 'enclave',
 'quetzalcoatlus',
 'exclusionarẏ',
+'lumpen',
+
 ];
+
 
 
 
