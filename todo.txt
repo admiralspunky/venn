@@ -11,5 +11,5 @@ translate to other languages
 QR code
 add multiplayer functionality
 wait for copyright to come back
-
+currently, I use a diacritical ẏ to differentiate between vowels and consonants. I might be able to use a single function to make that determination, but (a) that's a tricky function to write, and (b) where would I put that function?
 
