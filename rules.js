@@ -115,6 +115,15 @@ const allPossibleRules = [
     test: (word) => /p/i.test(word)
   },
 */
+	
+{
+    name: 'Contains the vowel "ẏ"',
+    test: (word) => /ẏ/i.test(word)
+},	
+{
+    name: 'Contains the consonant "y"',
+    test: (word) => /y/i.test(word)
+},	
 {
   name: 'Contains a Rare Letter (j, q, x, or z)',
   test: (word) => /j|q|x|z/i.test(word)
@@ -167,6 +176,7 @@ const allPossibleRules = [
   },
 */
 ];	
+
 
 
 
