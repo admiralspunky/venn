@@ -125,7 +125,7 @@ var wordList = [
 'them',
 'should',
 'product',
-'system',
+'sẏstem',
 'post',
 'her',
 'add',
@@ -270,7 +270,6 @@ var wordList = [
 'network',
 'down',
 'computer',
-'systems',
 'three',
 'total',
 'place',
@@ -283,7 +282,6 @@ var wordList = [
 'access',
 'think',
 'north',
-'resources',
 'current',
 'posts',
 'big',
@@ -2004,7 +2002,6 @@ var wordList = [
 'shirts',
 'profit',
 'leaders',
-'posters',
 'institutions',
 'assistant',
 'variable',
@@ -6441,3 +6438,4 @@ var wordList = [
 'lẏre',
 'yearlẏ',
 ];
+
