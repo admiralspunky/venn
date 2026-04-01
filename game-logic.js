@@ -5,7 +5,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.16";
+const CURRENT_VERSION = "1.17";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -411,7 +411,8 @@ async function startGame(isDaily) {
 	console.log("Weighted Hand before renderHand:", weightedHand);
     renderHand();
 
-	showMessage("Select a card in Your Hand, then play it in one of the other 8 zones.");
+	//This message will remain on display until it gets overwritten
+	showMessage("Select a card in Your Hand, then play it in one of the other 8 zones.", displayTime = 0);
 	
 	//the rules list popup in the settings menu
 	const rulesListContainer = document.getElementById('rules-list-container');
@@ -1223,8 +1224,18 @@ function mulberry32(seed) {
     };
 }
 
-function showMessage(message, color) {
-    messageBox.innerHTML = message;
+//this is the function that I call whenever I want to display a message at the bottom of the screen, either after a guess or at the start of the game
+//displayTime defaults to MESSAGE_DISPLAY_TIME, which I set at the top of the program; but if I pass in a 0, then the message stays on the screen until it's overwritten
+function showMessage(message, color = null, displayTime = MESSAGE_DISPLAY_TIME) {
+	console.log('displayTime=',displayTime);
+    
+	// If color is actually a number (if the call omits setting a color, and instead just sets a displaytime), shift args
+    if (typeof color === "number") {
+        displayTime = color;
+        color = null;
+    }
+	
+	messageBox.innerHTML = message;
     messageBox.classList.remove("error");
 	messageBox.classList.remove("warning");
 	
@@ -1234,12 +1245,15 @@ function showMessage(message, color) {
 	if (color=='red') {
         messageBox.classList.add("error");
     }
-    messageBox.classList.add("visible");
-    
     clearTimeout(messageBox.timeoutId);
-    messageBox.timeoutId = setTimeout(() => {
-        messageBox.classList.remove("visible");
-    }, MESSAGE_DISPLAY_TIME);
+
+	messageBox.classList.add("visible");
+
+    if (displayTime > 0) {
+        messageBox.timeoutId = setTimeout(() => {
+            messageBox.classList.remove("visible");
+        }, displayTime);
+    }
 }
 
 function renderHand() {
