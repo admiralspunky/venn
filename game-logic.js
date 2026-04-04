@@ -5,7 +5,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.17";
+const CURRENT_VERSION = "1.18";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -517,6 +517,7 @@ async function endGame(isWin) {
     zoneElements['hand'].wordsDiv.appendChild(summaryHeader);
 
     // ✅ Build share button
+	// TODO: there's a bunch of text here that I should really be defining somewhere else - but I'm not just defining the text here, I'm assembling the entire fullShareText according to several variables. Still.
     const shareButton = document.createElement('button');
     shareButton.classList.add("icon-btn", "share-results-btn");
     // Changed to direct Unicode character for clipboard
@@ -533,9 +534,12 @@ async function endGame(isWin) {
         let fullShareText = `${gameLabel}: ${winLossStatus} with ${numRules} rules, and ${userSetLives} lives, in ${formattedTime}!`;
 		fullShareText+= '\n' + previousResults;
         if (dailyMode && isWin) {
-            fullShareText += ` \n${dailyStreak} Daily puzzles in a row!`;
+            fullShareText += `\n${dailyStreak} Daily puzzles in a row!`;
         }
-        fullShareText += ` \n${URL}`;
+
+		if (dailyMode) fullShareText += `\nCome back tomorrow for another puzzle.`;
+			
+		fullShareText += ` \n${URL}`;
         copyToClipboard(fullShareText);
     });
 
