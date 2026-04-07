@@ -5,7 +5,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.18";
+const CURRENT_VERSION = "1.19";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -48,6 +48,7 @@ const fallbackSpellingRule = { name: 'General Spelling', categoryType: 'spelling
 const settingsModalOverlay = document.getElementById('settings-modal-overlay');
 const modalCloseBtn = document.getElementById('modal-close-btn');
 const darkModeToggleBtn = document.getElementById('dark-mode-toggle-btn');
+const hintBtn = document.getElementById('hintBtn');
 const showAllRulesBtn = document.getElementById('showAllRulesBtn');
 const concedeButton = document.getElementById('concedeButton');
 const rulesPopupOverlay = document.getElementById('rules-popup-overlay');
@@ -420,12 +421,13 @@ async function startGame(isDaily) {
 		rulesListContainer.innerHTML = buildRulesHTML();
 	}
 	
+	/*
 	//This will assign .exampleHints to all rules
 	for (const rule of allPossibleRules) {
-    if (!rule.exampleHints || !Array.isArray(rule.exampleHints)) {
-        rule.exampleHints = generateExampleHintsFor(rule, allPossibleRules);
+		if (!rule.exampleHints || !Array.isArray(rule.exampleHints)) {
+		rule.exampleHints = generateExampleHintsFor(rule, allPossibleRules); }
     }
-}
+	*/
 }//async function startGame(isDaily)
 
 
@@ -517,7 +519,6 @@ async function endGame(isWin) {
     zoneElements['hand'].wordsDiv.appendChild(summaryHeader);
 
     // ✅ Build share button
-	// TODO: there's a bunch of text here that I should really be defining somewhere else - but I'm not just defining the text here, I'm assembling the entire fullShareText according to several variables. Still.
     const shareButton = document.createElement('button');
     shareButton.classList.add("icon-btn", "share-results-btn");
     // Changed to direct Unicode character for clipboard
@@ -536,10 +537,8 @@ async function endGame(isWin) {
         if (dailyMode && isWin) {
             fullShareText += `\n${dailyStreak} Daily puzzles in a row!`;
         }
-
 		if (dailyMode) fullShareText += `\nCome back tomorrow for another puzzle.`;
-			
-		fullShareText += ` \n${URL}`;
+        fullShareText += `\n${URL}`;
         copyToClipboard(fullShareText);
     });
 
@@ -1172,6 +1171,7 @@ function matchesOnlyOneRule(wordText, targetRuleIndex) {
     return matchedTargetRule && matchCount === 1;
 }
 
+/* I think this is legacy code
 //each rule displays the names of 5 other rules in that category
 function generateExampleHintsFor(rule, allRules ) {
     const count = 5;
@@ -1182,6 +1182,7 @@ function generateExampleHintsFor(rule, allRules ) {
     const shuffled = [...sameCategory].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, count).map(r => r.name);
 }
+*/
 
 // Updated function to handle both strings and objects
 function getCorrectZoneKeyForWord(wordOrObject, rules) {
@@ -1806,11 +1807,31 @@ if (darkModeToggleBtn) {
     darkModeToggleBtn.addEventListener('click', toggleDarkMode);
 }
 
+if (hintBtn) {
+    hintBtn.addEventListener('click', (event) => {
+
+        console.log('Hint button clicked from settings modal.');
+		
+        // Pick a random card from the hand
+        const randIndex = Math.floor(Math.random() * currentHand.length);
+        const card = currentHand[randIndex];
+
+        // Get its correct zone (assuming your card object or helper function provides this)
+        const targetZone = getCorrectZoneKeyForWord(card, activeRules); // or card.target if already stored
+
+        // Show the hint
+        const hintMessage = `Hint: One of your cards, "${card.text}", should go into Zone ${targetZone}.`;
+        showMessage(hintMessage, null, 0); // displayTime = 0 keeps it until overwritten
+
+		hideModal();
+    });
+}
+
 if (showAllRulesBtn) {
     showAllRulesBtn.addEventListener('click', (event) => {
 
         console.log('Rules button clicked from settings modal.');
-		openRulesInNewTab()
+		openRulesInNewTab();
     });
 }
 
