@@ -14,8 +14,7 @@ const MESSAGE_DISPLAY_TIME = 5000;
 const TOTAL_WORDS_IN_POOL = 200;
 const MIN_RULE_MATCHING_WORDS_PER_CATEGORY = 1;
 
-const TUTORIAL_TEXT = `There are three hidden spelling rules for you to deduce, by sorting words into the correct zones.  The rules are hidden, but there's a button in the Settings menu that will display all of the possible rules for your benefit. If you play a card in the wrong zone, you have to draw a card to replace it. You're trying to empty your hand of cards.';
-const DEMO = "<a href='https://www.youtube.com/watch?v=xQWNT3gHjAw'>demo video (1:30)</a>";
+const TUTORIAL_TEXT = `There are three hidden spelling rules for you to deduce, by sorting words into the correct zones.  The rules are hidden, but there's a button in the Settings menu that will display all of the possible rules for your benefit. If you play a card in the wrong zone, you have to draw a card to replace it. You're trying to empty your hand of cards. demo video: https://www.youtube.com/watch?v=xQWNT3gHjAw';
 const ABOUT_TEXT = "I want to thank Ken Wickle for inspiring me to write this game."
 const BYLINE = "© 2025 Justin Smith. All Rights Reserved admiralspunky@gmail.com"
 const major = 6012031;
