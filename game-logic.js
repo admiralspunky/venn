@@ -5,11 +5,11 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.20";
+const CURRENT_VERSION = "1.21";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
-const INITIAL_HAND_SIZE = 5;
+
 const MESSAGE_DISPLAY_TIME = 5000;
 const TOTAL_WORDS_IN_POOL = 200;
 const MIN_RULE_MATCHING_WORDS_PER_CATEGORY = 1;
@@ -29,8 +29,10 @@ let isDarkMode = localStorage.getItem('theme') === 'dark';
 let activeRules = [];
 // User's selected lives, retrieved from localStorage or defaulting to 3
 let userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
-// the user can also set how many rules he wants:
-const numRules = parseInt(localStorage.getItem('numRules') || '3', 10);
+// the user can also set how many rules (Venn circles) he wants:
+let numRules = parseInt(localStorage.getItem('numRules') || '3', 10);
+// the user can also set how many cards he wants in his hand:
+let INITIAL_HAND_SIZE = parseInt(localStorage.getItem('numCards') || '5', 10);
 // Current lives remaining in the game
 let livesRemaining = 0; 
 // Daily streak variables
@@ -62,6 +64,9 @@ const livesDisplayModal = document.getElementById('lives-display-modal');
 
 const rulesSlider = document.getElementById('numRules-slider');
 const rulesDisplay = document.getElementById('numRules-modal');
+
+const cardsSliderSetting = document.getElementById('numCards-slider');
+const cardsDisplaySetting = document.getElementById('numCards-modal');
 
 /* we don't really need icons anymore, but I'm leaving the code around for a while
 const iconSVGs = { // triangle, square, circle
@@ -253,7 +258,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+	// Initialize hand cards slider and display
+    if (cardsSliderSetting && cardsDisplaySetting) {
+		
+		console.log("hand card slider initialized.");
+        
+        cardsSliderSetting.value = INITIAL_HAND_SIZE;
+        cardsDisplaySetting.textContent = INITIAL_HAND_SIZE;
 
+        cardsSliderSetting.addEventListener('input', (event) => {
+			console.log("card slider moved.");
+			cardsDisplaySetting.textContent = cardsSliderSetting.value;
+			localStorage.setItem('numCards',cardsSliderSetting.value);
+        });
+    }
 
     // Existing DOMContentLoaded logic for starting game
     const today = getTodayDateString();
