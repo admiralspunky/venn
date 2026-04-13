@@ -1,4 +1,4 @@
-/* style for No Not There - there's a separate layout sheet for each rule count */
+/* style for Voozo - there's a separate layout sheet for each rule count */
 
 /*light mode colors*/
 :root {
@@ -176,6 +176,9 @@ font-family: sans-serif;
 background-color: var(--bg-body);
 color: var(--text-secondary);
 transition: background-color 0.3s ease, color 0.3s ease;
+
+/* Disables pull-to-refresh on most mobile browsers */
+  overscroll-behavior-y: contain;
 }
 
 .game-container {
