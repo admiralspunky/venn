@@ -1,4 +1,7 @@
 Use TTS to make a Youtube playthrough video
+centralized GameState object
+different game modes - '10 turns' and '60-second time attack'
+
 settings paywall - make the 2-zone, 3-card daily game free, but make people pay for the harder modes
 javascript-obfuscator
 in-game link to https://youtu.be/xQWNT3gHjAw
