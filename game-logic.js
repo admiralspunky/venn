@@ -5,7 +5,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.21";
+const CURRENT_VERSION = "1.22";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -41,12 +41,6 @@ let lastDailyCompletionDate = localStorage.getItem('lastDailyCompletionDate') ||
 
 let previousResults = []; //we're keeping track of the results of the previous guesses, so we can build a pretty Share dialog
 
-
-// Define fallback rules to prevent undefined errors if rule candidates are empty
-const fallbackLocationRule = { name: 'General Location', categoryType: 'location', words: [], test: () => false };
-const fallbackCharacteristicRule = { name: 'General Characteristic', categoryType: 'characteristic', words: [], test: () => false };
-const fallbackSpellingRule = { name: 'General Spelling', categoryType: 'spelling', words: [], test: () => false };
-
 const settingsModalOverlay = document.getElementById('settings-modal-overlay');
 const modalCloseBtn = document.getElementById('modal-close-btn');
 const darkModeToggleBtn = document.getElementById('dark-mode-toggle-btn');
@@ -68,20 +62,6 @@ const rulesDisplay = document.getElementById('numRules-modal');
 const cardsSliderSetting = document.getElementById('numCards-slider');
 const cardsDisplaySetting = document.getElementById('numCards-modal');
 
-/* we don't really need icons anymore, but I'm leaving the code around for a while
-const iconSVGs = { // triangle, square, circle
-    'location': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2L2 12h20L12 2z"/></svg>`,
-    'characteristic': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M2 2h20v20H2z"/></svg>`,
-    'spelling': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>`
-};
-*/
-/*
-const iconSVGs = {
-    'location': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
-    'characteristic': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L23.725 9.17l-6.104 5.952 1.442 8.45L12 18.295l-7.063 3.794 1.442-8.45L.275 9.17l8.057-1.015L12 .587z"/></svg>`,
-    'spelling': `<svg class="rule-icon" fill="currentColor" width="18" height="18" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7h5.5L13 3.5V9z"/></svg>`
-};
-*/
 
 const livesDisplay = document.getElementById('lives-display');
 const timerDisplay = document.getElementById('timer-display');
@@ -95,6 +75,7 @@ let timerInterval;
 let formattedTime;
 
 // A function to get all of the zone elements from the DOM dynamically
+// I am currently just keeping track of the game elements by where they are on the screen, which is fragile
 function getZoneElements() {
     const zones = {};
     const zoneElements = document.querySelectorAll('#rules-grid-container .rule-box');
@@ -116,6 +97,7 @@ function getZoneElements() {
 }
 
 // A function to generate the zone configurations dynamically
+// This function is the "Venn Diagram Generator." Its job is to calculate every possible combination of your rules so the game can create "Intersection Zones." If you have 3 rules, this function doesn't just create 3 zones; it creates $2^n$ zones (in this case, 8) to account for cards that might satisfy Rule 1, Rule 2, and Rule 3 simultaneously.
 function getZoneConfigs(numRules) {
     const configs = {};
     
@@ -126,7 +108,8 @@ function getZoneConfigs(numRules) {
         let customLabel = '';
 
         for (let j = 0; j < numRules; j++) {
-            if ((i >> j) & 1) {
+            if ((i >> j) & 1) //bit arithmetic
+			{
                 ruleIndices.push(j + 1);
             }
         }
@@ -161,59 +144,7 @@ function getZoneConfigs(numRules) {
 	let zoneKeys = Object.keys(zoneConfigs);
 
 
-/**
- * Asynchronously initializes and starts a new game session, supporting both
- * standard and daily challenge modes.
- *
- * This function is typically invoked by a user interface event, such as clicking
- * a "Start Game" or "Play Daily" button. It orchestrates the entire game setup
- * process, ensuring a consistent and reproducible game state, especially in daily mode.
- *
- * @param {boolean} isDaily - True if starting a daily challenge, false for a regular game.
- * In daily mode, game generation is deterministic based on the day's seed.
- *
- * The function performs the following steps:
- * 1.  Sets the `dailyMode` flag based on the `isDaily` parameter.
- * 2.  Determines a **deterministic seed** for game generation:
- * - For daily mode, it uses `getDailySeed()`.
- * - For regular mode, it generates a random seed.
- * 3.  Generates `activeRules` for the current game using the main seed, potentially
- * creating overlaps based on `allPossibleRules`.
- * 4.  Updates the game's visual title and daily badge according to `isDaily`.
- * 5.  Resets all global game state variables to their initial values via `resetGameState()`.
- * 6.  Generates the `initialFullWordPool` using a **seeded random number generator**
- * (main seed + 1) to ensure the full list of available words is deterministic.
- * 7.  **Seeds initial words into specific zones** on the game board using `seedInitialZones()`,
- * drawing from the `initialFullWordPool`. This process also makes sure these
- * words are immediately rendered in their respective regions using `renderWordsInRegions()`.
- * 8.  Filters out words already placed on the board from `initialFullWordPool` to create
- * `currentWordPool`, then **deterministically shuffles** the remaining words
- * (main seed + 2).
- * 9.  Performs a critical check to ensure enough unique words are available for the initial hand.
- * 10. Selects the initial `weightedHand` of words, applying probabilities based on `activeRules`
- * and using a **deterministic seeded random generator** (main seed + 3) to ensure
- * hand selection is reproducible.
- * 11. Performs another critical check for sufficient words in the `weightedHand`.
- * 12. Removes the selected hand words from `currentWordPool`.
- * 13. Assigns unique IDs to each word in the `weightedHand`, adds them to `currentHand`
- * and `wordsInPlay`.
- * 14. Finally, renders the `currentHand` to the user interface using `renderHand()`.
- *
- * This function calls:
- * - `getDailySeed()`: To retrieve the daily deterministic seed (if `isDaily` is true).
- * - `generateActiveRulesWithOverlap()`: To determine the rules for the current game.
- * - `updateDailyBadge()`: To show/hide the daily badge.
- * - `resetGameState()`: To clear previous game data.
- * - `buildDeliberateWordPool()`: To create the initial set of available words.
- * - `seedInitialZones()`: To place words on the board at the start.
- * - `renderWordsInRegions()`: To display the pre-seeded words.
- * - `shuffleArray()`: To deterministically shuffle the word pool.
- * - `createSeededRandom()`: To get a seeded random number generator for deterministic processes.
- * - `generateWordPoolWithProbabilities()`: To select words for the hand based on rules.
- * - `showMessage()`: To display critical error messages to the user.
- * - `crypto.randomUUID()`: To generate unique IDs for words.
- * - `renderHand()`: To display the player's initial hand.
- */
+
  
 console.log("Venn Diagram Game script loaded." + CURRENT_VERSION);
 
@@ -335,6 +266,60 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 }); 
  
+ 
+/**
+ * Asynchronously initializes and starts a new game session, supporting both
+ * standard and daily challenge modes.
+ *
+ * This function is typically invoked by a user interface event, such as clicking
+ * a "Start Game" or "Play Daily" button. It orchestrates the entire game setup
+ * process, ensuring a consistent and reproducible game state, especially in daily mode.
+ *
+ * @param {boolean} isDaily - True if starting a daily challenge, false for a regular game.
+ * In daily mode, game generation is deterministic based on the day's seed.
+ *
+ * The function performs the following steps:
+ * 1.  Sets the `dailyMode` flag based on the `isDaily` parameter.
+ * 2.  Determines a **deterministic seed** for game generation:
+ * - For daily mode, it uses `getDailySeed()`.
+ * - For regular mode, it generates a random seed.
+ * 3.  Generates `activeRules` for the current game using the main seed, potentially
+ * creating overlaps based on `allPossibleRules`.
+ * 4.  Updates the game's visual title and daily badge according to `isDaily`.
+ * 5.  Resets all global game state variables to their initial values via `resetGameState()`.
+ * 6.  Generates the `initialFullWordPool` using a **seeded random number generator**
+ * (main seed + 1) to ensure the full list of available words is deterministic.
+ * 7.  **Seeds initial words into specific zones** on the game board using `seedInitialZones()`,
+ * drawing from the `initialFullWordPool`. This process also makes sure these
+ * words are immediately rendered in their respective regions using `renderWordsInRegions()`.
+ * 8.  Filters out words already placed on the board from `initialFullWordPool` to create
+ * `currentWordPool`, then **deterministically shuffles** the remaining words
+ * (main seed + 2).
+ * 9.  Performs a critical check to ensure enough unique words are available for the initial hand.
+ * 10. Selects the initial `weightedHand` of words, applying probabilities based on `activeRules`
+ * and using a **deterministic seeded random generator** (main seed + 3) to ensure
+ * hand selection is reproducible.
+ * 11. Performs another critical check for sufficient words in the `weightedHand`.
+ * 12. Removes the selected hand words from `currentWordPool`.
+ * 13. Assigns unique IDs to each word in the `weightedHand`, adds them to `currentHand`
+ * and `wordsInPlay`.
+ * 14. Finally, renders the `currentHand` to the user interface using `renderHand()`.
+ *
+ * This function calls:
+ * - `getDailySeed()`: To retrieve the daily deterministic seed (if `isDaily` is true).
+ * - `generateActiveRulesWithOverlap()`: To determine the rules for the current game.
+ * - `updateDailyBadge()`: To show/hide the daily badge.
+ * - `resetGameState()`: To clear previous game data.
+ * - `buildDeliberateWordPool()`: To create the initial set of available words.
+ * - `seedInitialZones()`: To place words on the board at the start.
+ * - `renderWordsInRegions()`: To display the pre-seeded words.
+ * - `shuffleArray()`: To deterministically shuffle the word pool.
+ * - `createSeededRandom()`: To get a seeded random number generator for deterministic processes.
+ * - `generateWordPoolWithProbabilities()`: To select words for the hand based on rules.
+ * - `showMessage()`: To display critical error messages to the user.
+ * - `crypto.randomUUID()`: To generate unique IDs for words.
+ * - `renderHand()`: To display the player's initial hand.
+ */ 
 async function startGame(isDaily) {
     console.log("startGame(isDaily)", isDaily);
     dailyMode = isDaily;
@@ -438,14 +423,7 @@ async function startGame(isDaily) {
 	if (rulesListContainer) {
 		rulesListContainer.innerHTML = buildRulesHTML();
 	}
-	
-	/*
-	//This will assign .exampleHints to all rules
-	for (const rule of allPossibleRules) {
-		if (!rule.exampleHints || !Array.isArray(rule.exampleHints)) {
-		rule.exampleHints = generateExampleHintsFor(rule, allPossibleRules); }
-    }
-	*/
+
 }//async function startGame(isDaily)
 
 
@@ -680,63 +658,7 @@ function generateActiveRulesWithOverlap(seed, allRules, maxAttempts = 1000) {
     return spellingRules.slice(0, numRules);
 }
 
-/* old non-spelling rules
-// =========================================
-// generateActiveRulesWithOverlap()
-// -----------------------------------------
-// Called by: startGame()
-// Returns: an array of 3 rules [location, characteristic, spelling]
-// Ensures sufficient pairwise and triple overlaps before accepting
-// =========================================
-function generateActiveRulesWithOverlap(seed, allRules, minSharedWords = 3, minTripleOverlap = 1, maxAttempts = 1000) {
-    const locationRules = allRules.filter(r => r.categoryType === 'location' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
-    const characteristicRules = allRules.filter(r => r.categoryType === 'characteristic' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
-    const spellingRules = allRules.filter(r => r.categoryType === 'spelling' && (r.text || r.words.length >= MIN_RULE_MATCHING_WORDS_PER_CATEGORY) );
 
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        const loc = shuffleArray([...locationRules], seed + attempt * 3 + 1)[0];
-        const chr = shuffleArray([...characteristicRules], seed + attempt * 3 + 2)[0];
-        const wrd = shuffleArray([...spellingRules], seed + attempt * 3 + 3)[0];
-
-        const candidateSet = [loc, chr, wrd];
-        const zoneBuckets = sortWordListByZone(candidateSet);
-
-        const sharedZones = ['1-2', '1-3', '2-3', '1-2-3'];
-        const totalSharedCount = sharedZones.reduce((sum, zone) => sum + (zoneBuckets[zone]?.length || 0), 0);
-        const tripleOverlapCount = zoneBuckets['1-2-3']?.length || 0;
-
-        if (tripleOverlapCount >= minTripleOverlap && totalSharedCount >= minSharedWords) {
-            console.log(`✅ Found overlapping rules on attempt ${attempt + 1}`);
-
-            // Debug: print zone distribution
-            const zoneKeys = ["0", "1", "2", "3", "1-2", "1-3", "2-3", "1-2-3"];
-            console.log("🔎 Potential word distribution for selected rules (pre-weighted):");
-            for (const key of zoneKeys) {
-                const count = zoneBuckets[key]?.length || 0;
-                console.log(`  Zone ${key}: ${count} word(s)`);
-            }
-
-            return candidateSet;
-        }
-    }
-
-    console.warn("⚠️ No sufficiently overlapping rule trio found after max attempts. Falling back.");
-    return generateActiveRules(seed); // fallback to simpler selection
-}
-
-
-function generateActiveRules(gameSeed) {
-    const locationCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'location')], gameSeed + 1);
-    const characteristicCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'characteristic')], gameSeed + 2);
-    const spellingCandidates = shuffleArray([...allPossibleRules.filter(rule => rule.categoryType === 'spelling')], gameSeed + 3);
-    
-	return [
-	  locationCandidates.length > 0 ? locationCandidates[0] : fallbackLocationRule,
-	  characteristicCandidates.length > 0 ? characteristicCandidates[0] : fallbackCharacteristicRule,
-	  spellingCandidates.length > 0 ? spellingCandidates[0] : fallbackspellingRule
-	];
-}
-*/
 // =========================================
 // buildDeliberateWordPool()
 // -----------------------------------------
@@ -814,75 +736,6 @@ function buildDeliberateWordPool(rules, seed) {
     return selected;
 }
 
-/*old hard-coded buildDeliberateWordPool
-function buildDeliberateWordPool(rules, seed) {
-    const rng = mulberry32(seed || Date.now());
-    
-    const desiredCounts = {
-        '1': 3,
-        '2': 3,
-        '3': 3,
-        '1-2': 3,
-        '1-3': 3,
-        '2-3': 3,
-        '1-2-3': 3,
-        '0': 3,
-    };
-
-    // Get all words used by the current active rules
-    const usedRuleWords = new Set();
-    for (const rule of rules) {
-        if (Array.isArray(rule.words)) {
-            rule.words.forEach(w => usedRuleWords.add(w));
-        }
-    }
-
-
-// just copy all the words from the wordlist and shuffle them
-	const allWords = wordList;
-	const shuffledWords = allWords
-        .map(word => ({ word, sortKey: rng() }))
-        .sort((a, b) => a.sortKey - b.sortKey)
-        .map(obj => obj.word);
-
-    const zoneBuckets = {};
-    const selected = [];
-
-//this loop breaks when all the zones are filled
-    for (const word of shuffledWords) {
-        const zoneKey = getCorrectZoneKeyForWord(word, rules);
-		//console.log(word,zoneKey);
-        if (!(zoneKey in desiredCounts)) continue;
-
-        if (!zoneBuckets[zoneKey]) {
-            zoneBuckets[zoneKey] = [];
-        }
-
-        if (zoneBuckets[zoneKey].length < desiredCounts[zoneKey]) {
-            // Here's the key change: push an object with both the word and its zone key.
-            const wordObject = {
-                text: word,
-                correctZoneKey: zoneKey
-            };
-            zoneBuckets[zoneKey].push(wordObject);
-            selected.push(wordObject);
-        }
-
-        const allZonesFilled = Object.entries(desiredCounts).every(([zone, count]) =>
-            (zoneBuckets[zone] || []).length >= count
-        );
-        if (allZonesFilled) break;
-    }
-    
-    console.log("✅ buildDeliberateWordPool complete. Zone distribution:");
-    for (const [zone, target] of Object.entries(desiredCounts)) {
-        const actual = (zoneBuckets[zone] || []).length;
-        console.log(`  Zone ${zone}: ${actual} / ${target}`);
-    }
-
-    return selected;
-}
-*/
 // =========================================
 // sortWordListByZone()
 // -----------------------------------------
@@ -928,7 +781,7 @@ function seedInitialZones(pool) {
 	console.log("weights in seedInitialZones:", zoneWeights);
 	
 	//at the start of the game, place a word into these zones, and also the All Rules zone
-	//TODO: this list should maybe be created dynamically
+//TODO: this list should maybe be created dynamically
 	let initialZoneKeys = ['1', '2', '3', '4', '0'];
     
     // Generate the correct data-zone-key based on the number of circles
@@ -1052,6 +905,7 @@ function weightedRandomPick(weights, rng) {
 }
 
 // Main generator function
+// This function is your Curated Dealer. Its job isn't just to give the player random cards, but to ensure the player's hand has a "fair" distribution of difficulty by picking words based on which zones they belong to. Without this function, a player might end up with a hand where every single word belongs in the "None" zone, which would be boring and wouldn't help them deduce the rules.
 function generateWordPoolWithProbabilities(ruleResults, wordPool, count, rng) {
 
 	//first, we generate an array of desired zoneProbabilities, dynamically based on numRules
@@ -1163,44 +1017,8 @@ function shuffleArray(array, seed = null) {
     }
     return array;
 }
-/*
-function getBoxIconsSVG(categoryTypes) {
-    let iconsHtml = '';
-    categoryTypes.forEach(type => {
-        iconsHtml += iconSVGs[type] || '';
-    });
-    return iconsHtml;
-}
-*/
-function matchesOnlyOneRule(wordText, targetRuleIndex) {
-    let matchCount = 0;
-    let matchedTargetRule = false;
-    
-    for (let i = 0; i < activeRules.length; i++) {
-        const rule = activeRules[i];
-        if (doesWordMatchRule(wordText, rule)) {
-            matchCount++;
-            if (i === targetRuleIndex) {
-                matchedTargetRule = true;
-            }
-        }
-    }
-    
-    return matchedTargetRule && matchCount === 1;
-}
 
-/* I think this is legacy code
-//each rule displays the names of 5 other rules in that category
-function generateExampleHintsFor(rule, allRules ) {
-    const count = 5;
-	const sameCategory = allRules.filter(r =>
-    r.categoryType === rule.categoryType
-    );
-    
-    const shuffled = [...sameCategory].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, count).map(r => r.name);
-}
-*/
+
 
 // Updated function to handle both strings and objects
 function getCorrectZoneKeyForWord(wordOrObject, rules) {
@@ -1279,6 +1097,7 @@ function showMessage(message, color = null, displayTime = MESSAGE_DISPLAY_TIME) 
     }
 }
 
+//The renderHand() function is the "Visual Refresh" for the player's cards. It translates the data stored in your currentHand array into actual interactive HTML elements on the screen.
 function renderHand() {
     const handWordsDiv = zoneElements['hand'].wordsDiv;
     handWordsDiv.textContent = '';
@@ -1380,7 +1199,7 @@ function renderWordsInRegions() {
 }
 
 /*
-// Show a feedback bubble near a zone or element
+// Show a feedback bubble near a zone or element (I might want to put this back in at some point, but for now I'm just using showMessage()
 function showZoneFeedback(message, targetElement, isError = false) {
     const bubble = document.getElementById('zone-feedback-bubble');
     if (!bubble || !targetElement) return;
@@ -1558,6 +1377,7 @@ function placeWordInRegion(targetZoneKey) {
 }//function placeWordInRegion(targetZoneKey)
 
 //I'm replacing the old drawCard function; this new function checks the zoneWeight before it actually draws the card
+//when you play a card into a zone, you're less likely to draw another card for that zone:   zoneWeights[targetZoneKeyKey] /= 4; // If a word gets placed in a zone, make that zone likely to be chosen again, when we're drawing cards for the hand
 function drawCard() {
     // Loop until a card is successfully drawn or the deck is empty
     while (currentWordPool.length > 0) {
@@ -1595,20 +1415,7 @@ function drawCard() {
     return null; // Or handle game end/shuffle
 }
 
-/*
-function drawCard() {
-    if (currentWordPool.length > 0) {
-		//console.log("currentWordPool before pop:", [...currentWordPool]); // Log a copy before pop
-        const newWordText = currentWordPool.pop();
-		//console.log("Word drawn:", newWordText); // Log the word being drawn
-        const newWordObj = { id: crypto.randomUUID(), text: newWordText, correctZoneKey: null };
-        currentHand.push(newWordObj);
-        wordsInPlay.push(newWordObj);
-    } else {
-        showMessage('No more cards to draw from the pool! Try to clear your hand.', true);
-    }
-}
-*/
+
 
 function copyToClipboard(text) {
     const textarea = document.createElement('textarea');
@@ -1757,7 +1564,7 @@ function hideModal() {
     }, 300);
 }
 
-// NEW: Functions to show/hide the separate rules pop-up
+/* I used to have a complicated Show Rules popup. Now I just open that text in a new tab. I can probably delete this code.
 function showRulesPopup() {
     if (rulesPopupOverlay) {
         rulesPopupOverlay.classList.add('visible');
@@ -1771,9 +1578,9 @@ function hideRulesPopup() {
         console.log('Rules popup hidden.');
     }
 }
+*/
 
 //when the Show Rules button is clicked, it calls this function, which opens the rules in a new tab
-
 function openRulesInNewTab() {
   let rulesContent = 'All Rules\n';
   rulesContent += allPossibleRules.map(rule => `- ${rule.name}`).join('\n');
