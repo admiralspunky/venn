@@ -11,7 +11,6 @@ const GAME_TITLE = "Voozo";
 const URL = "https://admiralspunky.github.io/venn/";
 
 const MESSAGE_DISPLAY_TIME = 5000;
-const TOTAL_WORDS_IN_POOL = 200;
 const MIN_RULE_MATCHING_WORDS_PER_CATEGORY = 1;
 
 const TUTORIAL_TEXT = `There are three hidden spelling rules for you to deduce, by sorting words into the correct zones.  The rules are hidden, but there's a button in the Settings menu that will display all of the possible rules for your benefit. If you play a card in the wrong zone, you have to draw a card to replace it. You're trying to empty your hand of cards. https://www.youtube.com/watch?v=xQWNT3gHjAw`;
@@ -19,27 +18,46 @@ const ABOUT_TEXT = "I want to thank Ken Wickle for inspiring me to write this ga
 const BYLINE = "© 2025 Justin Smith. All Rights Reserved admiralspunky@gmail.com"
 const major = 6012031;
 
-let dailyMode = false;
-let wordsInPlay = [];
-let currentWordPool = [];
-let currentHand = [];
-let turns = 0;
+//these variables belong to the current game, as opposed to settings which cover many games
+const session = {
+	// Basic Stats
+	turns: 0, // how many times has the player submitted a word?
+	livesRemaining: 0,	// when the player makes an incorrect guess, he loses a life
+	dailyMode: false, // is this the player's first game today?
+	
+	// Board State
+    wordsInPlay: [], //these words are somewhere on the board, think of it as a no-duplicate list
+	currentWordPool: [], //these words are still in the deck
+	currentHand: [], //these words are currently in your hand (duh)
+	activeRules: [], 
+	
+	// Reporting
+    previousResults: "", //we're keeping track of the results of the previous guesses, so we can build a pretty Share dialog
+	
+	// Timer
+	timerID: null,
+    startTime: null,
+    formattedTime: "0:00", //updateTimer sets this string to `${minutes}:${seconds.toString().padStart(2, '0')}`;
+	
+	// Zones (areas where you can play a card)
+	zoneWeights: [],// If a word gets placed in a zone, make that zone likely to be chosen again, when we're drawing cards for the hand
+	zoneKeys: [], //this is the list of zones (or just their names, I'm not certain)
+};
+
+
 let selectedWordId = null; // Used for click-to-place, will also be used for drag-and-drop
 let isDarkMode = localStorage.getItem('theme') === 'dark';
-let activeRules = [];
+
 // User's selected lives, retrieved from localStorage or defaulting to 3
 let userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
 // the user can also set how many rules (Venn circles) he wants:
 let numRules = parseInt(localStorage.getItem('numRules') || '3', 10);
 // the user can also set how many cards he wants in his hand:
 let INITIAL_HAND_SIZE = parseInt(localStorage.getItem('numCards') || '5', 10);
-// Current lives remaining in the game
-let livesRemaining = 0; 
+
 // Daily streak variables
 let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || '0', 10);
 let lastDailyCompletionDate = localStorage.getItem('lastDailyCompletionDate') || '';
-
-let previousResults = []; //we're keeping track of the results of the previous guesses, so we can build a pretty Share dialog
 
 const settingsModalOverlay = document.getElementById('settings-modal-overlay');
 const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -65,14 +83,9 @@ const cardsDisplaySetting = document.getElementById('numCards-modal');
 
 const livesDisplay = document.getElementById('lives-display');
 const timerDisplay = document.getElementById('timer-display');
-const settingsBtn = document.getElementById('settings-btn'); // This is now just the settings opener
+const settingsBtn = document.getElementById('settings-btn');
 const messageBox = document.getElementById('message-box');
 const handContainer = document.getElementById('hand-container');
-
-// Timers in JS are vastly more complicated than they need to be
-let startTime;
-let timerInterval;
-let formattedTime;
 
 // A function to get all of the zone elements from the DOM dynamically
 // I am currently just keeping track of the game elements by where they are on the screen, which is fragile
@@ -132,16 +145,16 @@ function getZoneConfigs(numRules) {
     return configs;
 }
 
-	// Call these functions to get your dynamic objects
-	const zoneElements = getZoneElements(); //This object is a map of your HTML elements. Its job is to provide a quick reference to the physical parts of your game board.
-	const zoneConfigs = getZoneConfigs(numRules); // This object holds all the logical data about each zone. It tells the game how a zone works.
-	//console.log("at the start of the game, ", zoneConfigs);
-	
-	document.title = GAME_TITLE;
+// Call these functions to get your dynamic objects
+const zoneElements = getZoneElements(); //This object is a map of your HTML elements. Its job is to provide a quick reference to the physical parts of your game board.
+const zoneConfigs = getZoneConfigs(numRules); // This object holds all the logical data about each zone. It tells the game how a zone works.
+//console.log("at the start of the game, ", zoneConfigs);
 
-	// Dynamically generate zone weights based on the number of rules
-	let zoneWeights = {};
-	let zoneKeys = Object.keys(zoneConfigs);
+document.title = GAME_TITLE;
+
+// Dynamically generate zone weights based on the number of rules
+session.zoneWeights = {};
+session.zoneKeys = Object.keys(zoneConfigs);
 
 
 
@@ -322,36 +335,34 @@ document.addEventListener("DOMContentLoaded", () => {
  */ 
 async function startGame(isDaily) {
     console.log("startGame(isDaily)", isDaily);
-    dailyMode = isDaily;
+    session.dailyMode = isDaily;
 
     // Use the daily seed for ALL randomization steps in daily mode
     const seed = isDaily ? getDailySeed() : Math.floor(Math.random() * 100000);
 	
 	// winding up the timer
-	startTime = Date.now();
-    timerInterval = setInterval(updateTimer, 1000);
-
+	session.timerID = setInterval(updateTimer, 1000);
+	session.startTime = Date.now();
     
-    // You can set different weights here if you want.
     // For now, let's give every zone an equal weight of 1.
-    zoneKeys.forEach(key => {
-        zoneWeights[key] = 1;
+    session.zoneKeys.forEach(key => {
+        session.zoneWeights[key] = 1;
     });
 
     // And now we set a specific weight for 'None' zone
-    if (zoneWeights['0']) {
-        zoneWeights['0'] = 0.5; // Example: Words are half as likely to land in the 'None' zone
+    if (session.zoneWeights['0']) {
+        session.zoneWeights['0'] = 0.5; // Words are half as likely to land in the 'None' zone
     }
-    const allRulesKey = zoneKeys.find(key => key.split('-').length === numRules);
+    const allRulesKey = session.zoneKeys.find(key => key.split('-').length === numRules);
     if (allRulesKey) {
-        zoneWeights[allRulesKey] = 2; // Example: Words are twice as likely to land in the 'All' zone
+        session.zoneWeights[allRulesKey] = 2; // Words are twice as likely to land in the 'All' zone
     }
 
-	console.log("weights:", zoneWeights);
+	console.log("weights:", session.zoneWeights);
 
     // Let's generate some rules, ok?
-    activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
-	console.log("rules:", activeRules);
+    session.activeRules = generateActiveRulesWithOverlap(seed, allPossibleRules);
+	console.log("rules:", session.activeRules);
 
     updateDailyBadge(isDaily);
     resetGameState();
@@ -369,25 +380,25 @@ async function startGame(isDaily) {
 	}
 
     // Use deterministic seed for the full word pool
-	const initialFullWordPool = buildDeliberateWordPool(activeRules, seed + 1);
+	const initialFullWordPool = buildDeliberateWordPool(session.activeRules, seed + 1);
 
     // a few words get played as hints at the start of the game
     seedInitialZones(initialFullWordPool);
 	renderWordsInRegions(); // we have to actually draw those words
 
     // Remove seeded (already placed) words from pool, deterministic shuffle for remaining pool
-    currentWordPool = initialFullWordPool.filter(w => !wordsInPlay.some(obj => obj.text === w));
-    shuffleArray(currentWordPool, seed + 2);
+    session.currentWordPool = initialFullWordPool.filter(w => !session.wordsInPlay.some(obj => obj.text === w));
+    shuffleArray(session.currentWordPool, seed + 2);
 
-    if (currentWordPool.length < INITIAL_HAND_SIZE) {
+    if (session.currentWordPool.length < INITIAL_HAND_SIZE) {
         showMessage("Critical Error: Not enough unique words for game. Please refresh.", true);
         return;
     }
 
     // Use deterministic seed for hand selection
     const weightedHand = generateWordPoolWithProbabilities(
-        activeRules,
-        currentWordPool,
+        session.activeRules,
+        session.currentWordPool,
         INITIAL_HAND_SIZE,
         createSeededRandom(seed + 3)
     );
@@ -399,8 +410,8 @@ async function startGame(isDaily) {
     }
 
     // Remove words selected for the hand from the currentWordPool
-    // This is the line added/corrected to prevent duplicates in hand
-    currentWordPool = currentWordPool.filter(word => !weightedHand.includes(word));
+    // This is to prevent duplicates in hand
+    session.currentWordPool = session.currentWordPool.filter(word => !weightedHand.includes(word));
 
 	// Corrected loop for populating currentHand and wordsInPlay
 	for (const wordObjFromWeightedHand of weightedHand) {
@@ -409,8 +420,8 @@ async function startGame(isDaily) {
 			text: wordObjFromWeightedHand.text, 
 			correctZoneKey: wordObjFromWeightedHand.correctZoneKey 
 		};
-		currentHand.push(wordObj);
-		wordsInPlay.push(wordObj);
+		session.currentHand.push(wordObj);
+		session.wordsInPlay.push(wordObj);
 	}
 	console.log("Weighted Hand before renderHand:", weightedHand);
     renderHand();
@@ -471,12 +482,12 @@ async function startGame(isDaily) {
 async function endGame(isWin) {
 	console.log("endGame",isWin);
 	
-	clearInterval(timerInterval);
+	clearInterval(session.timerID);
 	
     const endButtonsContainer = document.getElementById('end-screen-buttons');
 
     // Handle daily streak logic
-    if (dailyMode) {
+    if (session.dailyMode) {
         const today = getTodayDateString();
         if (isWin) {
             if (lastDailyCompletionDate !== today) {
@@ -499,8 +510,8 @@ async function endGame(isWin) {
 
     // ✅ Show message box
     const messageText = isWin
-        ? `🎉 You Win! Game Over in ${turns} turns!`
-        : `💀 Game Over! You ran out of guesses. Try the difficulty sliders in the Settings menu. Total turns: ${turns}`;
+        ? `🎉 You Win! Game Over in ${session.turns} turns!`
+        : `💀 Game Over! You ran out of guesses. Try the difficulty sliders in the Settings menu. Total turns: ${session.turns}`;
     messageBox.textContent = messageText;
     messageBox.classList.add("visible");
 
@@ -521,19 +532,19 @@ async function endGame(isWin) {
     shareButton.textContent = `📋`; 
     shareButton.title = "Share Results";
     shareButton.addEventListener('click', () => {
-        console.log("share button clicked, dailyMode =", dailyMode);
- 	    const dateLabel = dailyMode ? ` – ${getTodayDateString()}` : " (Anytime Mode)";
+        console.log("share button clicked, dailyMode =", session.dailyMode);
+ 	    const dateLabel = session.dailyMode ? ` – ${getTodayDateString()}` : " (Anytime Mode)";
         const gameLabel = GAME_TITLE + dateLabel;
         const winLossStatus = isWin ? "Won" : "Lost";
 	    // Calculate incorrect guesses directly from lives (I'm assuming that these two variables actually represent their names)
-        const incorrectGuessesMade = userSetLives - livesRemaining;
+        const incorrectGuessesMade = userSetLives - session.livesRemaining;
 	    
-        let fullShareText = `${gameLabel}: ${winLossStatus} with ${numRules} rules, and ${userSetLives} lives, in ${formattedTime}!`;
-		fullShareText+= '\n' + previousResults;
-        if (dailyMode && isWin) {
+        let fullShareText = `${gameLabel}: ${winLossStatus} with ${numRules} rules, and ${userSetLives} lives, in ${session.formattedTime}!`;
+		fullShareText+= '\n' + session.previousResults;
+        if (session.dailyMode && isWin) {
             fullShareText += `\n${dailyStreak} Daily puzzles in a row!`;
         }
-		if (dailyMode) fullShareText += `\nCome back tomorrow for another puzzle.`;
+		if (session.dailyMode) fullShareText += `\nCome back tomorrow for another puzzle.`;
         fullShareText += `\n${URL}`;
         copyToClipboard(fullShareText);
     });
@@ -575,7 +586,7 @@ async function endGame(isWin) {
 				if (singleCategoryKeys.includes( Number(key) ) ) {
 					// This is the single-rule logic
 					// The check `zoneConfig.ruleIndices[0]` is now safe because we know the array has one element.
-					labelSpan.textContent = activeRules[zoneConfig.ruleIndices[0]].name;
+					labelSpan.textContent = session.activeRules[zoneConfig.ruleIndices[0]].name;
 				} else {
 					// This is the multi-rule or "none" zone logic
 					// Revert to using the customLabel property
@@ -778,7 +789,7 @@ function sortWordListByZone(rules) {
 // This function needs to be called after the word objects in the pool have their `correctZoneKey` property set.
 function seedInitialZones(pool) {
 	//console.log("Initial Full Word Pool:", pool);
-	console.log("weights in seedInitialZones:", zoneWeights);
+	console.log("weights in seedInitialZones:", session.zoneWeights);
 	
 	//at the start of the game, place a word into these zones, and also the All Rules zone
 //TODO: this list should maybe be created dynamically
@@ -816,7 +827,7 @@ function seedInitialZones(pool) {
 
         if (chosenWord) {
             wordsPlaced.add(chosenWord.text); // Add the word's text to the set
-            wordsInPlay.push({
+            session.wordsInPlay.push({
                 id: crypto.randomUUID(),
                 text: chosenWord.text,
                 correctZoneKey: chosenWord.correctZoneKey,
@@ -827,8 +838,8 @@ function seedInitialZones(pool) {
 			const indexToRemove = pool.findIndex(w => w.text === chosenWord.text);
 			if (indexToRemove !== -1) {	pool.splice(indexToRemove, 1); }
 			
-            zoneWeights[targetZoneKeyKey] /= 4; // If a word gets placed in a zone, make that zone likely to be chosen again, when we're drawing cards for the hand
-            console.log(`Initial placement of ${chosenWord.text} in zone ${targetZoneKeyKey}, weight changed to ${zoneWeights[targetZoneKeyKey]}`);
+            session.zoneWeights[targetZoneKeyKey] /= 4; // If a word gets placed in a zone, make that zone likely to be chosen again, when we're drawing cards for the hand
+            console.log(`Initial placement of ${chosenWord.text} in zone ${targetZoneKeyKey}, weight changed to ${session.zoneWeights[targetZoneKeyKey]}`);
         } else {
             console.warn(`[startGame] Could not find word for zone ${targetZoneKeyKey}`);
         }
@@ -1104,7 +1115,7 @@ function renderHand() {
     
     zoneElements['hand'].container.classList.remove("game-over-summary");
     
-    currentHand.forEach(wordObj => {
+    session.currentHand.forEach(wordObj => {
         const card = document.createElement('div');
         card.classList.add("word-card");
         card.id = `card-${wordObj.id}`;
@@ -1135,7 +1146,7 @@ function selectWord(id) {
     
     selectedWordId = id;
     document.getElementById(`card-${selectedWordId}`).classList.add("selected");
-    showMessage(`Selected: ${wordsInPlay.find(w => w.id === id).text}. Now click a box to place it.`);
+    showMessage(`Selected: ${session.wordsInPlay.find(w => w.id === id).text}. Now click a box to place it.`);
 }
 
 /**
@@ -1180,7 +1191,7 @@ function renderWordsInRegions() {
     }
 
     // Step 2: Add each placed word (those with a correctZoneKey)
-    const playedWords = wordsInPlay.filter(wordObj => wordObj.correctZoneKey !== null);
+    const playedWords = session.wordsInPlay.filter(wordObj => wordObj.correctZoneKey !== null);
 
     playedWords.forEach(wordObj => {
         const zoneKey = wordObj.correctZoneKey;
@@ -1228,19 +1239,19 @@ function placeWordInRegion(targetZoneKey) {
         showMessage('You cannot place words into your hand. Select a rule box or "None"!', 'red');
         return;
     }
-    turns++;
+    session.turns++;
 
-    const selectedWordObj = wordsInPlay.find(w => w.id === selectedWordId);
-    const correctZoneKey = getCorrectZoneKeyForWord(selectedWordObj.text, activeRules);
+    const selectedWordObj = session.wordsInPlay.find(w => w.id === selectedWordId);
+    const correctZoneKey = getCorrectZoneKeyForWord(selectedWordObj.text, session.activeRules);
     const correctZoneElement = zoneElements[correctZoneKey]?.container;
     const targetZoneKeyElement = zoneElements[targetZoneKey]?.container;
 	
 	//regardless of correctness, the word was placed in the correctZoneKey, so make the correctZoneKey's cards less likely to be chosen again
-	zoneWeights[correctZoneKey] /= 4; 
-	console.log(` placement of ` + selectedWordObj.text + ' in zone ' + correctZoneKey + ', weight changed to ' + zoneWeights[correctZoneKey] );
+	session.zoneWeights[correctZoneKey] /= 4; 
+	console.log(` placement of ` + selectedWordObj.text + ' in zone ' + correctZoneKey + ', weight changed to ' + session.zoneWeights[correctZoneKey] );
 
 
-    currentHand = currentHand.filter(w => w.id !== selectedWordId);
+    session.currentHand = session.currentHand.filter(w => w.id !== selectedWordId);
     const cardElement = document.getElementById(`card-${selectedWordId}`);
     if (cardElement) {
         cardElement.classList.remove("selected");
@@ -1277,7 +1288,7 @@ function placeWordInRegion(targetZoneKey) {
         message = `Correct! '${selectedWordObj.text}' belongs in this category.`;
         isErrorFeedback = false;
         console.log(`Outcome: Perfect Match ✅`); // Debug log
-		previousResults+="✅";  // that's a green check for the share results
+		session.previousResults+="✅";  // that's a green check for the share results
         
     } else {
         // Incorrect placement - now determine if it's a near miss or far miss
@@ -1319,25 +1330,25 @@ function placeWordInRegion(targetZoneKey) {
             message = `Near Miss! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
             isErrorFeedback = 'yellow'; // Still show as a "mistake" visually
             console.log(`Outcome: Near Miss 🟡`); // Debug log
-			previousResults+="🟡";  // that's a yellow circle for the share results
+			session.previousResults+="🟡";  // that's a yellow circle for the share results
 
 			newCardFromPool = drawCard(); // Draw a new card
         } else {
             // Far miss: Lose a life and draw a new card.
             selectedWordObj.correctZoneKey = correctZoneKey; // Still mark with correct zone for visual placement
-            livesRemaining--; // Lose a life
+            session.livesRemaining--; // Lose a life
             updateLivesDisplay();
             newCardFromPool = drawCard(); // Draw a new card
 
             const correctCategoryName = getZoneDisplayName(correctZoneKey, false);
             message = `Oops! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
-            if (currentWordPool.length <= 3) {
-                message += `   Only ${currentWordPool.length} card${currentWordPool.length === 1 ? '' : 's'} left!`;
+            if (session.currentWordPool.length <= 3) {
+                message += `   Only ${session.currentWordPool.length} card${session.currentWordPool.length === 1 ? '' : 's'} left!`;
             }
-            message += ` Lives left: ${livesRemaining}.`;
+            message += ` Lives left: ${session.livesRemaining}.`;
             isErrorFeedback = 'red'; // Definitely an error
             console.log(`Outcome: Far Miss ❌`); // Debug log
-			previousResults+="❌";  // that's a red X for the share results
+			session.previousResults+="❌";  // that's a red X for the share results
         }
     }
 
@@ -1346,8 +1357,8 @@ function placeWordInRegion(targetZoneKey) {
 		// The newCardFromPool variable is already the word object.
 		// We just need to add it to the hand and wordsInPlay arrays.
 		newCardFromPool.id = crypto.randomUUID(); // Give it a new ID since it's a fresh card
-		currentHand.push(newCardFromPool);
-		wordsInPlay.push(newCardFromPool);
+		session.currentHand.push(newCardFromPool);
+		session.wordsInPlay.push(newCardFromPool);
 		console.log(`New card '${newCardFromPool.text}' added to hand.`);
 	} else if (!isCorrectPlacement) {
         // This condition handles the case where it was a miss, but drawCard() returned null (deck empty)
@@ -1380,12 +1391,12 @@ function placeWordInRegion(targetZoneKey) {
 //when you play a card into a zone, you're less likely to draw another card for that zone:   zoneWeights[targetZoneKeyKey] /= 4; // If a word gets placed in a zone, make that zone likely to be chosen again, when we're drawing cards for the hand
 function drawCard() {
     // Loop until a card is successfully drawn or the deck is empty
-    while (currentWordPool.length > 0) {
-        let cardToConsider = currentWordPool[0]; // Get the top card
+    while (session.currentWordPool.length > 0) {
+        let cardToConsider = session.currentWordPool[0]; // Get the top card
         const cardZoneKey = cardToConsider.correctZoneKey;
 
         // Get the weight for this card's zone
-        const zoneWeight = zoneWeights[cardZoneKey] !== undefined ? zoneWeights[cardZoneKey] : 1.0;
+        const zoneWeight = session.zoneWeights[cardZoneKey] !== undefined ? session.zoneWeights[cardZoneKey] : 1.0;
 
         // Calculate the probability of *not* drawing this card (moving it to bottom)
         const chanceToMoveToBottom = 1 - zoneWeight;
@@ -1397,13 +1408,13 @@ function drawCard() {
 
         if (randomNumber < chanceToMoveToBottom) {
             // If the random number suggests moving to bottom, do so
-            const movedCard = currentWordPool.shift(); // Remove from top
-            currentWordPool.push(movedCard);          // Add to bottom
+            const movedCard = session.currentWordPool.shift(); // Remove from top
+            session.currentWordPool.push(movedCard);          // Add to bottom
             console.log(`'${movedCard.text}' moved to bottom of deck due to zone weight.`);
             // The loop will continue to the next iteration to consider the new top card
         } else {
             // If the random number suggests drawing, draw the card and exit the loop
-            const drawnCard = currentWordPool.shift(); // Remove from top and return
+            const drawnCard = session.currentWordPool.shift(); // Remove from top and return
             console.log(`'${drawnCard.text}' drawn.`);
 			
             return drawnCard; // A card was drawn, exit the function
@@ -1434,10 +1445,10 @@ function copyToClipboard(text) {
 
 // Function to check for win or loss
 async function checkGameEndCondition() { 
-    if (currentHand.length === 0) {
+    if (session.currentHand.length === 0) {
         // Win condition (all cards placed correctly)
         endGame(true);
-    } else if (livesRemaining <= 0) { // Loss condition: lives run out
+    } else if (session.livesRemaining <= 0) { // Loss condition: lives run out
         endGame(false);
     }
 }
@@ -1454,12 +1465,13 @@ function updateDailyBadge(isDaily) {
 	else badge.style.display = 'none';
 }
 
+//currently, every variable that resetGameState resets is already being reset when the page is refreshed, so I'm not sure if we even need this function
 function resetGameState() {
 	document.querySelectorAll('.word-cards-container').forEach(container => { container.replaceChildren(); });
-    turns = 0;
+    session.turns = 0;
     selectedWordId = null;
     // Initialize lives and update display using userSetLives
-    livesRemaining = userSetLives; 
+    session.livesRemaining = userSetLives; 
     updateLivesDisplay(); 
     messageBox.classList.remove("visible");
     messageBox.style.height = '';
@@ -1467,15 +1479,15 @@ function resetGameState() {
     messageBox.style.textAlign = '';
     hideModal();
     updateRuleBoxLabelsAndHints();
-    wordsInPlay = [];
-    currentHand = [];
+    session.wordsInPlay = [];
+    session.currentHand = [];
     renderWordsInRegions();
 }
 
 // Function to update the lives display on the main game screen
 function updateLivesDisplay() { 
     if (livesDisplay) {
-        livesDisplay.textContent = livesRemaining;
+        livesDisplay.textContent = session.livesRemaining;
     }
 }
 
@@ -1638,11 +1650,11 @@ if (hintBtn) {
         console.log('Hint button clicked from settings modal.');
 		
         // Pick a random card from the hand
-        const randIndex = Math.floor(Math.random() * currentHand.length);
-        const card = currentHand[randIndex];
+        const randIndex = Math.floor(Math.random() * session.currentHand.length);
+        const card = session.currentHand[randIndex];
 
         // Get its correct zone (assuming your card object or helper function provides this)
-        const targetZone = getCorrectZoneKeyForWord(card, activeRules); // or card.target if already stored
+        const targetZone = getCorrectZoneKeyForWord(card, session.activeRules); // or card.target if already stored
 
         // Show the hint
         const hintMessage = `Hint: One of your cards, "${card.text}", should go into Zone ${targetZone}.`;
@@ -1715,11 +1727,11 @@ for (const key in zoneElements) {
 }
 
 function updateTimer() {
-    const elapsedTime = Date.now() - startTime;
+    const elapsedTime = Date.now() - session.startTime;
     const minutes = Math.floor(elapsedTime / 60000);
     const seconds = Math.floor((elapsedTime % 60000) / 1000);
     
     // Format the time to always show two digits for seconds
-    formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    timerDisplay.textContent = formattedTime;
+    session.formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    timerDisplay.textContent = session.formattedTime;
 }
