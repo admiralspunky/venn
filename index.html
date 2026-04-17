@@ -213,15 +213,6 @@
 				<button id="concedeButton" class="icon-btn" title="Concede">🏳️</button>
 
 			</div>
-
-            <!-- Number of Lives Slider -->
-            <div class="modal-setting-item">
-                <label for="difficulty-slider" class="setting-label">Lives:</label>
-                <div class="slider-container">
-                    <input type="range" id="difficulty-slider" min="1" max="5" value="3">
-                    <span id="lives-display-modal" class="slider-value">3</span>
-                </div>
-            </div>
 			
 			<!-- Number of Rules Slider -->
             <div class="modal-setting-item">
@@ -232,6 +223,22 @@
                 </div>
             </div>
 			
+			<!-- I'm eventually going to want to let the player select a game mode, but this section is still under construction -->
+			<!-- Game Mode Selector -->
+			<div class="mode-selector" hidden>
+				<button class="mode-btn active" data-mode="classic">Classic</button>
+				<button class="mode-btn" data-mode="timed">Turn Limited</button>
+	    	</div>
+			
+            <!-- Number of Lives Slider -->
+            <div class="modal-setting-item">
+                <label for="difficulty-slider" class="setting-label">Lives:</label>
+                <div class="slider-container">
+                    <input type="range" id="difficulty-slider" min="1" max="5" value="3">
+                    <span id="lives-display-modal" class="slider-value">3</span>
+                </div>
+            </div>
+						
 			<!-- Number of Hand Cards Slider -->
             <div class="modal-setting-item">
                 <label for="numCards-slider" class="setting-label">cards in hand</label>
@@ -245,7 +252,9 @@
 			
 			<p class="mt-4 mb-6" id="about-text"></p>
 
-            <div id="version-display">v0.XX</div> </div>
+			<div id="url-display" style="text-align:left;">something.something</div>
+			
+            <div id="version-display" style="text-align:right;">v0.XX</div>
     </div>
 
     

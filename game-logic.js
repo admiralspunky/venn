@@ -5,7 +5,7 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.22";
+const CURRENT_VERSION = "1.23";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -13,7 +13,23 @@ const URL = "https://admiralspunky.github.io/venn/";
 const MESSAGE_DISPLAY_TIME = 5000;
 const MIN_RULE_MATCHING_WORDS_PER_CATEGORY = 1;
 
-const TUTORIAL_TEXT = `There are three hidden spelling rules for you to deduce, by sorting words into the correct zones.  The rules are hidden, but there's a button in the Settings menu that will display all of the possible rules for your benefit. If you play a card in the wrong zone, you have to draw a card to replace it. You're trying to empty your hand of cards. https://www.youtube.com/watch?v=xQWNT3gHjAw`;
+//I'm transitioning to having separate game modes, but now each mode needs to have its own, slightly different, tutorial text
+function getTutorialText(mode) {
+    const baseRules = "Voozo is a logic puzzle where you sort words into zones based on hidden spelling rules. Place each word from your hand into the correct zone. If you're wrong, the card moves to the correct spot.";
+    
+    const goals = {
+        classic: "Your goal is to **empty your hand** of cards. If you place a card in the wrong zone, you must draw a replacement.",
+        turnLimit: "Your goal is to **place as many words as possible** within the turn limit.",
+        timeAttack: "Your goal is to **clear your hand as fast as possible** before the clock runs out."
+    };
+
+    const closing = "Check the settings for a list of all possible rules. Try the different game modes. Come back tomorrow for a new set of words and rules.";
+    
+    return `${baseRules}\n\n${goals[mode]}\n\n${closing}`;
+	//return `There are three hidden spelling rules for you to deduce, by sorting words into the correct zones.  The rules are hidden, but there's a button in the Settings menu that will display all of the possible rules for your benefit. If you play a card in the wrong zone, you have to draw a card to replace it. You're trying to empty your hand of cards. https://www.youtube.com/watch?v=xQWNT3gHjAw`;
+	
+}
+
 const ABOUT_TEXT = "I want to thank Ken Wickle for inspiring me to write this game."
 const BYLINE = "© 2025 Justin Smith. All Rights Reserved admiralspunky@gmail.com"
 const major = 6012031;
@@ -165,13 +181,15 @@ document.addEventListener("DOMContentLoaded", () => {
 	console.log("DOMContentLoaded");
 	
     // Safe DOM setup
+	const urlEl = document.getElementById('url-display');
+    if (urlEl) urlEl.textContent = URL; 
     const versionEl = document.getElementById('version-display');
+	if (versionEl) versionEl.textContent = 'v' + CURRENT_VERSION; 
+
+/* I'm currently using the game's logo instead of a text title, and I'm setting img src="logo.png" in the HTML, so I probably don't need this code here anymore
     const titleEl = document.getElementById('game-title-text');
-	//I want to display the URL near the version number in the Settings menu, but I'm too lazy to make a whole new <div>
-    //if (versionEl) versionEl.textContent = 'Version ' + CURRENT_VERSION;
-    if (versionEl) versionEl.textContent = URL + ' v' + CURRENT_VERSION; 
-	
-//	if (titleEl) titleEl.textContent = GAME_TITLE;
+	if (titleEl) titleEl.textContent = GAME_TITLE; 
+*/
     
     // Safe theme setup, do we want to start in dark or light mode?
     applyTheme();
@@ -235,7 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 	
-	document.getElementById('settings-tutorial-text').textContent = TUTORIAL_TEXT;
+	document.getElementById('settings-tutorial-text').textContent = getTutorialText('classic');
 	document.getElementById('about-text').textContent = ABOUT_TEXT;
 	
 	// Tutorial Modal Logic (only on the first time you play)
@@ -245,8 +263,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	const tutorialTextElement = document.getElementById('tutorial-text');
 	const bylineDisplayElement = document.getElementById('byline-display'); // Get the BYLINE element
 
-	if (tutorialTextElement && typeof TUTORIAL_TEXT !== 'undefined') {
-		tutorialTextElement.textContent = TUTORIAL_TEXT;
+	if (tutorialTextElement && typeof getTutorialText === 'function') {
+		tutorialTextElement.textContent = getTutorialText('classic');
 	}
 
 	if (bylineDisplayElement && typeof BYLINE !== 'undefined') {
