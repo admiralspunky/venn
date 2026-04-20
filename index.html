@@ -1,290 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-	<!-- Google tag (gtag.js) -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-VJJHBK294Z"></script>
-	<script>
-	  window.dataLayer = window.dataLayer || [];
-	  function gtag(){dataLayer.push(arguments);}
-	  gtag('js', new Date());
-
-	  gtag('config', 'G-VJJHBK294Z');
-	</script>		
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VJJHBK294Z"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-VJJHBK294Z');
+    </script>		
 		
-	<script src="rules.js"> </script>
-	<script src="wordList.js"> </script>
-	<script src="game-logic.js" defer></script>
+    <script src="rules.js"></script>
+    <script src="wordList.js"></script>
+    <script src="game-logic.js" defer></script>
 
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="icon" type="image/x-icon" href="/venn/favicon.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/venn/favicon.ico">
 	
-	<link rel="stylesheet" href="style.css">
-	<link id="layout-stylesheet" rel="stylesheet" href="layout-3-rules.css">
+    <link rel="stylesheet" href="style.css">
+    <link id="layout-stylesheet" rel="stylesheet" href="layout-3-rules.css">
 </head>
 <body>
-	<div id="message-box" class="message-box"></div>
+    <div id="message-box" class="message-box"></div>
 
-	<!-- status bar always visible at the top of the screen -->
-	<div id="status-bar">
-	    <span>Lives: <span id="lives-display">0</span></span>
-		<span id="timer-display">0:00</span>
-	</div>
+    <div id="status-bar">
+        <span id="lives-container">Lives: <span id="lives-display">0</span></span>
+        <span id="turns-container" style="display: none;">Turns: <span id="turns-display">0</span></span>
+        <span id="timer-display">0:00</span>
+    </div>
 	
-	<div class="game-container">
+    <div class="game-container">
         <div class="top-bar">
-            <div class="top-left-ui">
-
-            </div>
+            <div class="top-left-ui"></div>
             <h1 class="top-bar-title">
                 <span id="game-title-text"><img src="logo.png" alt="put the words in the proper place" class="logo"></span>
-                <span id="daily-badge" >DAILY</span>
+                <span id="daily-badge">DAILY</span>
             </h1>
             <div class="top-right-ui">
-                <button id="settings-btn" class="icon-btn">
-                    &#x2699;
-                </button>
+                <button id="settings-btn" class="icon-btn">&#x2699;</button>
             </div>
         </div>
-         <div class="main-game-area">
-		 	<!-- I'm moving hand-container outside of the grid, so I can move it around for the 2- and 4- rule layouts -->
-			<div id="hand-container" class="rule-box">
-				<div class="box-header">
-					<span class="box-label">Your Hand:</span>
-				</div>
-				<div class="word-cards-container"></div>
-				<div id="end-screen-buttons" class="end-buttons-row hidden">
-					<!-- Buttons will be inserted here -->
-				</div>
-				<div class="rule-hint"></div>
-			</div>
+
+        <div class="main-game-area">
+            <div id="hand-container" class="rule-box">
+                <div class="box-header">
+                    <span class="box-label">Your Hand:</span>
+                </div>
+                <div class="word-cards-container"></div>
+                <div id="end-screen-buttons" class="end-buttons-row hidden"></div>
+                <div class="rule-hint"></div>
+            </div>
 
             <div id="rules-grid-container">
-				<div id="zone-1" class="rule-box" data-zone-key="1">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="zone-2" class="rule-box" data-zone-key="2">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="zone-3" class="rule-box" data-zone-key="3">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="zone-4" class="rule-box" data-zone-key="4">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
+                <div id="zone-1" class="rule-box" data-zone-key="1"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-2" class="rule-box" data-zone-key="2"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-3" class="rule-box" data-zone-key="3"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-4" class="rule-box" data-zone-key="4"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-1-2" class="rule-box" data-zone-key="1-2"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-1-3" class="rule-box" data-zone-key="1-3"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-1-4" class="rule-box" data-zone-key="1-4"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-2-3" class="rule-box" data-zone-key="2-3"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-2-4" class="rule-box" data-zone-key="2-4"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-3-4" class="rule-box" data-zone-key="3-4"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-1-2-3" class="rule-box" data-zone-key="1-2-3"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-1-2-4" class="rule-box" data-zone-key="1-2-4"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-1-3-4" class="rule-box" data-zone-key="1-3-4"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-2-3-4" class="rule-box" data-zone-key="2-3-4"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="zone-1-2-3-4" class="rule-box" data-zone-key="1-2-3-4"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+                <div id="none-container" class="rule-box" data-zone-key="0"><div class="box-header"><span class="box-label"></span><div class="box-icons-container"></div></div><div class="word-cards-container"></div><div class="rule-hint"></div></div>
+            </div>
+        </div>
 
-				<div id="zone-1-2" class="rule-box" data-zone-key="1-2">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="zone-1-3" class="rule-box" data-zone-key="1-3">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="zone-1-4" class="rule-box" data-zone-key="1-4">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="zone-2-3" class="rule-box" data-zone-key="2-3">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="zone-2-4" class="rule-box" data-zone-key="2-4">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="zone-3-4" class="rule-box" data-zone-key="3-4">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
+        <div id="settings-modal-overlay" class="modal-overlay">
+            <div class="modal-content">
+                <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+                <h2 class="text-2xl font-bold mb-4" style="text-align:center;">settings and such</h2>
 
-				<div id="zone-1-2-3" class="rule-box" data-zone-key="1-2-3">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="zone-1-2-4" class="rule-box" data-zone-key="1-2-4">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="zone-1-3-4" class="rule-box" data-zone-key="1-3-4">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="zone-2-3-4" class="rule-box" data-zone-key="2-3-4">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				
-				<div id="zone-1-2-3-4" class="rule-box" data-zone-key="1-2-3-4">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-				<div id="none-container" class="rule-box" data-zone-key="0">
-					<div class="box-header">
-						<span class="box-label"></span>
-						<div class="box-icons-container"></div>
-					</div>
-					<div class="word-cards-container"></div>
-					<div class="rule-hint"></div>
-				</div>
-			</div>
-			
-			
+                <div class="settings-button-row">
+                    <button id="dark-mode-toggle-btn" class="icon-btn" title="Toggle Dark Mode">&#9728;</button>
+                    <button id="hintBtn" class="icon-btn" title="Hint">💡</button>
+                    <button id="showAllRulesBtn" class="icon-btn" title="Show All Rules">✅</button>
+                    <button id="concedeButton" class="icon-btn" title="Concede">🏳️</button>
+                </div>
+                
+                <div class="modal-setting-item">
+                    <label for="numRules-slider" class="setting-label">rules (Venn circles)</label>
+                    <div class="slider-container">
+                        <input type="range" id="numRules-slider" min="2" max="4" value="3">
+                        <span id="numRules-modal" class="slider-value">3</span>
+                    </div>
+                </div>
+                
+                <div class="modal-setting-item">
+                    <label for="numCards-slider" class="setting-label">cards in hand</label>
+                    <div class="slider-container">
+                        <input type="range" id="numCards-slider" min="3" max="7" value="5">
+                        <span id="numCards-modal" class="slider-value">5</span>
+                    </div>
+                </div>
+                
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="classic">Lives Limit</button>
+                    <button class="mode-btn" data-mode="turnsLimit">Turn Test</button>
+                </div>
+
+                <div id="dynamic-settings-container" class="mode-classic">
+                    <div class="modal-setting-item toggle-lives">
+                        <label for="lives-slider" class="setting-label">Lives:</label>
+                        <div class="slider-container">
+                            <input type="range" id="lives-slider" min="1" max="5" value="3">
+                            <span id="lives-display-modal" class="slider-value">3</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-setting-item toggle-turns">
+                        <label for="turns-slider" class="setting-label">Turn Limit:</label>
+                        <div class="slider-container">
+                            <input type="range" id="turns-slider" min="3" max="15" value="10">
+                            <span id="turns-display-modal" class="slider-value">5</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="mt-4 mb-6" id="settings-tutorial-text"></p>
+                <p class="mt-4 mb-6" id="about-text"></p>
+
+                <div class="settings-footer">
+                    <div id="url-display" style="text-align:left;">something.something</div>
+                    <div id="version-display" style="text-align:right;">v0.XX</div>
+                </div>
+            </div> </div> </div> <div id="tutorial-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <button id="tutorial-close-btn" class="modal-close-btn">&times;</button>
+            <h2 class="text-2xl font-bold mb-4">How to Play</h2>
+            <p id="tutorial-text" class="mb-4"></p>
+            <div class="flex justify-center">
+                <button id="tutorial-ok-btn" class="btn bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Got it!</button>
+            </div>
         </div>
     </div>
 
-<!-- SETTINGS -->
-    <div id="settings-modal-overlay" class="modal-overlay">
-        <div class="modal-content">
-            <button id="modal-close-btn" class="modal-close-btn">&times;</button>
-            <h2 class="text-2xl font-bold mb-4" style="text-align:center;">settings and such</h2>
-
-			<div class="settings-button-row">
-				<button id="dark-mode-toggle-btn" class="icon-btn" title="Toggle Dark Mode">&#9728;</button>
-				<button id="hintBtn" class="icon-btn" title="Hint">💡</button>
-				<!--<button id="new-game-modal-btn" title="Start New Game">&#x21BB;</button> -->
-				<!--<button id="about-btn" title="About and Acknowledgements">&#x21BB;</button> -->
-				<button id="showAllRulesBtn" class="icon-btn" title="Show All Rules" >✅</button>
-				<button id="concedeButton" class="icon-btn" title="Concede">🏳️</button>
-
-			</div>
-			
-			<!-- Number of Rules Slider -->
-            <div class="modal-setting-item">
-                <label for="numRules-slider" class="setting-label">rules (Venn circles)</label>
-                <div class="slider-container">
-                    <input type="range" id="numRules-slider" min="2" max="4" value="3">
-                    <span id="numRules-modal" class="slider-value">3</span>
-                </div>
-            </div>
-			
-			<!-- I'm eventually going to want to let the player select a game mode, but this section is still under construction -->
-			<!-- Game Mode Selector -->
-			<div class="mode-selector" hidden>
-				<button class="mode-btn active" data-mode="classic">Classic</button>
-				<button class="mode-btn" data-mode="timed">Turn Limited</button>
-	    	</div>
-			
-            <!-- Number of Lives Slider -->
-            <div class="modal-setting-item">
-                <label for="difficulty-slider" class="setting-label">Lives:</label>
-                <div class="slider-container">
-                    <input type="range" id="difficulty-slider" min="1" max="5" value="3">
-                    <span id="lives-display-modal" class="slider-value">3</span>
-                </div>
-            </div>
-						
-			<!-- Number of Hand Cards Slider -->
-            <div class="modal-setting-item">
-                <label for="numCards-slider" class="setting-label">cards in hand</label>
-                <div class="slider-container">
-                    <input type="range" id="numCards-slider" min="3" max="7" value="5">
-                    <span id="numCards-modal" class="slider-value">5</span>
-                </div>
-            </div>
-			
-			<p class="mt-4 mb-6" id="settings-tutorial-text"></p>
-			
-			<p class="mt-4 mb-6" id="about-text"></p>
-
-			<div id="url-display" style="text-align:left;">something.something</div>
-			
-            <div id="version-display" style="text-align:right;">v0.XX</div>
+    <div id="rules-popup-overlay" class="modal-overlay">
+        <h3>All Possible Rules</h3>
+        <div id="rules-popup-content" class="modal-content"></div>
     </div>
 
-    
-<div id="tutorial-modal-overlay" class="modal-overlay">
-    <div class="modal-content">
-        <button id="tutorial-close-btn" class="modal-close-btn">&times;</button>
-        <h2 class="text-2xl font-bold mb-4">How to Play</h2>
-        <p id="tutorial-text" class="mb-4"></p>
-        <div class="flex justify-center">
-            <button id="tutorial-ok-btn" class="btn bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Got it!</button>
-        
-            </div>
-    </div>
-</div>
-
-
-
-<div id="rules-popup-overlay" class="modal-overlay">
-  <h3>All Possible Rules</h3>
-  <div id="rules-popup-content" class="modal-content">
-	<!-- I'll add this list in the script -->
-  </div>
-</div>
-
-<div id="zone-feedback-bubble" class="fixed text-white px-3 py-2 rounded shadow-lg text-sm z-[1001] transition-opacity duration-300 hidden pointer-events-none"></div>
-
-<!-- BYLINE Display always visible at the bottom of the screen -->
-<div id="byline-display"></div>
-
+    <div id="zone-feedback-bubble" class="fixed text-white px-3 py-2 rounded shadow-lg text-sm z-[1001] transition-opacity duration-300 hidden pointer-events-none"></div>
+    <div id="byline-display"></div>
 </body>
-
-
 </html>

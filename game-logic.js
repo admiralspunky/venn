@@ -5,7 +5,9 @@
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 //
 
-const CURRENT_VERSION = "1.23";
+
+//I'm working on my next big update, the one where I add the ability to switch game modes, but it's not finished yet. When I'm ready, I need to remember to upload game-logic, index, and style.css
+const CURRENT_VERSION = "2.00";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -19,7 +21,7 @@ function getTutorialText(mode) {
     
     const goals = {
         classic: "Your goal is to **empty your hand** of cards. If you place a card in the wrong zone, you must draw a replacement.",
-        turnLimit: "Your goal is to **place as many words as possible** within the turn limit.",
+        turnsLimit: "Your goal is to **place as many words as possible** within the turn limit.",
         timeAttack: "Your goal is to **clear your hand as fast as possible** before the clock runs out."
     };
 
@@ -41,9 +43,16 @@ const session = {
 	livesRemaining: 0,	// when the player makes an incorrect guess, he loses a life
 	dailyMode: false, // is this the player's first game today?
 	
+	// the user can decide his own end-game condtion
+	gameMode : localStorage.getItem('gameMode') || 'classic',
+	
+	// initial limits for the game end conditions, set by the user:
+	livesLimit : localStorage.getItem('userSetLives') || 3  ,
+	turnsLimit : localStorage.getItem('userSetTurns') || 10 ,
+	
 	// Board State
     wordsInPlay: [], //these words are somewhere on the board, think of it as a no-duplicate list
-	currentWordPool: [], //these words are still in the deck
+	currentWordPool: [], //currentWordPool is a carefully curated subset of the entire wordslist, that buildDeliberateWordPool ensures contains at least 3 words that could fit into every zone
 	currentHand: [], //these words are currently in your hand (duh)
 	activeRules: [], 
 	
@@ -64,6 +73,7 @@ const session = {
 let selectedWordId = null; // Used for click-to-place, will also be used for drag-and-drop
 let isDarkMode = localStorage.getItem('theme') === 'dark';
 
+
 // User's selected lives, retrieved from localStorage or defaulting to 3
 let userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
 // the user can also set how many rules (Venn circles) he wants:
@@ -77,24 +87,22 @@ let lastDailyCompletionDate = localStorage.getItem('lastDailyCompletionDate') ||
 
 const settingsModalOverlay = document.getElementById('settings-modal-overlay');
 const modalCloseBtn = document.getElementById('modal-close-btn');
+
+//TODO: maybe I can rewrite these with data-mode?
 const darkModeToggleBtn = document.getElementById('dark-mode-toggle-btn');
 const hintBtn = document.getElementById('hintBtn');
 const showAllRulesBtn = document.getElementById('showAllRulesBtn');
 const concedeButton = document.getElementById('concedeButton');
+
 const rulesPopupOverlay = document.getElementById('rules-popup-overlay');
 const rulesPopupContent = document.getElementById('rules-popup-content');
 
 const aboutBtn = document.getElementById('about-btn');
 
 // Get the difficulty sliders and display elements inside the modal
-const difficultySlider = document.getElementById('difficulty-slider');
-const livesDisplayModal = document.getElementById('lives-display-modal');
 
-const rulesSlider = document.getElementById('numRules-slider');
-const rulesDisplay = document.getElementById('numRules-modal');
 
-const cardsSliderSetting = document.getElementById('numCards-slider');
-const cardsDisplaySetting = document.getElementById('numCards-modal');
+
 
 
 const livesDisplay = document.getElementById('lives-display');
@@ -194,17 +202,41 @@ document.addEventListener("DOMContentLoaded", () => {
     // Safe theme setup, do we want to start in dark or light mode?
     applyTheme();
 
-    // Initialize difficulty slider and display
-    if (difficultySlider && livesDisplayModal) {
+    // Initialize difficulty sliders and displays
+	const livesSlider = document.getElementById('lives-slider');
+	const livesDisplayModal = document.getElementById('lives-display-modal');
+    if (livesSlider && livesDisplayModal) {
         userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
-        difficultySlider.value = userSetLives;
+        livesSlider.value = userSetLives;
         livesDisplayModal.textContent = userSetLives;
 
-        difficultySlider.addEventListener('input', (event) => {
-			console.log("Lives slider moved.");
-            updateLivesSetting(parseInt(event.target.value, 10));
+        livesSlider.addEventListener('input', (event) => {
+			//console.log("Lives slider moved.");
+            const val = parseInt(event.target.value, 10);
+			livesDisplayModal.textContent = val;
+			localStorage.setItem('userSetLives', val);
         });
     }
+	
+	// Initialize turns slider and display
+	const turnsSlider = document.getElementById('turns-slider');
+	const turnsDisplayModal = document.getElementById('turns-display-modal');
+
+	if (turnsSlider && turnsDisplayModal) {
+		const userSetTurns = parseInt(localStorage.getItem('userSetTurns') || '15', 10);
+		turnsSlider.value = userSetTurns;
+		turnsDisplayModal.textContent = userSetTurns;
+
+		turnsSlider.addEventListener('input', (event) => {
+			const val = parseInt(event.target.value, 10);
+			turnsDisplayModal.textContent = val;
+			localStorage.setItem('userSetTurns', val);
+		});
+	}
+	
+	const rulesSlider = document.getElementById('numRules-slider');
+	const rulesDisplay = document.getElementById('numRules-modal');
+
 	
 	// Initialize rules slider and display
     if (rulesSlider && rulesDisplay) {
@@ -219,6 +251,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			localStorage.setItem('numRules',rulesSlider.value);
         });
     }
+
+	const cardsSliderSetting = document.getElementById('numCards-slider');
+	const cardsDisplaySetting = document.getElementById('numCards-modal');
 
 	// Initialize hand cards slider and display
     if (cardsSliderSetting && cardsDisplaySetting) {
@@ -251,9 +286,62 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem('dailyStreak', dailyStreak);
             console.log("Missed a day. Daily streak reset to 0.");
         }
-    }
+	}	
 	
-	document.getElementById('settings-tutorial-text').textContent = getTutorialText('classic');
+	// here's where I handle the mode switch buttons in Settings
+	// Grab the container, not every individual button
+    const modeSelector = document.querySelector('.mode-selector');
+    
+    // Safety check to prevent the console error if the element is missing
+    if (modeSelector) {
+        modeSelector.addEventListener('click', (event) => {
+			// Make sure we actually clicked a button, not the gap between them
+            const btn = event.target.closest('.mode-btn');
+            if (!btn) return;
+
+			// 1. Extract the mode directly from the data- attribute
+            const selectedMode = btn.dataset.mode;
+			
+			// 2. Update your state
+            session.gameMode = selectedMode;
+            localStorage.setItem('gameMode', selectedMode);
+
+			// 3. UI: Move the 'active' class to the clicked button
+            modeSelector.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+			
+			// 4. update the settings tutorial text
+			document.getElementById('settings-tutorial-text').textContent = getTutorialText(localStorage.getItem('gameMode') || 'classic');
+			
+			// 5. toggle between the settings specific to that game mode:
+			// Toggle Settings Sliders
+			const settingsContainer = document.getElementById('dynamic-settings-container');
+			if (settingsContainer) settingsContainer.className = `mode-${selectedMode}`;
+
+			// Toggle Status Bar Display
+			const livesCont = document.getElementById('lives-container');
+			const turnsCont = document.getElementById('turns-container');
+			
+			if (selectedMode === 'turnsLimit') {
+				if (livesCont) livesCont.style.display = 'none';
+				if (turnsCont) turnsCont.style.display = 'inline';
+			} else {
+				if (livesCont) livesCont.style.display = 'inline';
+				if (turnsCont) turnsCont.style.display = 'none';
+			}
+				
+				console.log(`System updated to: ${session.gameMode}`);
+			});
+
+        // Also sync the UI with the saved mode on load
+        const savedMode = localStorage.getItem('gameMode') || 'classic';
+        const activeBtn = modeSelector.querySelector(`.mode-btn[data-mode="${savedMode}"]`);
+        if (activeBtn) {
+            activeBtn.click(); // This simulates a click to trigger all the logic
+        }
+    } //if (modeSelector)
+	
+	document.getElementById('settings-tutorial-text').textContent = getTutorialText(localStorage.getItem('gameMode') || 'classic');
 	document.getElementById('about-text').textContent = ABOUT_TEXT;
 	
 	// Tutorial Modal Logic (only on the first time you play)
@@ -262,29 +350,24 @@ document.addEventListener("DOMContentLoaded", () => {
 	const tutorialOkBtn = document.getElementById('tutorial-ok-btn');
 	const tutorialTextElement = document.getElementById('tutorial-text');
 	const bylineDisplayElement = document.getElementById('byline-display'); // Get the BYLINE element
-
 	if (tutorialTextElement && typeof getTutorialText === 'function') {
-		tutorialTextElement.textContent = getTutorialText('classic');
+		tutorialTextElement.textContent = getTutorialText(localStorage.getItem('gameMode') || 'classic');
 	}
-
 	if (bylineDisplayElement && typeof BYLINE !== 'undefined') {
 		bylineDisplayElement.textContent = BYLINE;
 	}
-
-
 	if (!localStorage.getItem('hasSeenTutorial')) {
 		setTimeout(() => {
 			tutorialModalOverlay.classList.add('visible');
 		}, 500);
 	}
-
 	function hideTutorial() {
 		tutorialModalOverlay.classList.remove('visible');
 		localStorage.setItem('hasSeenTutorial', 'true');
 	}
-
 	tutorialCloseBtn?.addEventListener('click', hideTutorial);
 	tutorialOkBtn?.addEventListener('click', hideTutorial);
+
     
 	//start game here
 	if (lastPlayed !== today) {
@@ -295,7 +378,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Starting regular game");
         startGame(false);
     }
-}); 
+}); //document.addEventListener("DOMContentLoaded"
  
  
 /**
@@ -385,6 +468,9 @@ async function startGame(isDaily) {
     updateDailyBadge(isDaily);
     resetGameState();
 	
+	//change what the Status Bar shows depending on the game mode
+	InitUpdateStatusBar();
+	
 	// changing the layout depending on how many rules the slider is set to
 	const linkElement = document.getElementById('layout-stylesheet');
     if (numRules === 2) {
@@ -445,7 +531,7 @@ async function startGame(isDaily) {
     renderHand();
 
 	//This message will remain on display until it gets overwritten
-	showMessage("Select a card in Your Hand, then play it in one of the other 8 zones.", displayTime = 0);
+	showMessage("Select a card in Your Hand, then play it in one of the other zones.", displayTime = 0);
 	
 	//the rules list popup in the settings menu
 	const rulesListContainer = document.getElementById('rules-list-container');
@@ -527,11 +613,17 @@ async function endGame(isWin) {
 
 
     // ✅ Show message box
-    const messageText = isWin
-        ? `🎉 You Win! Game Over in ${session.turns} turns!`
-        : `💀 Game Over! You ran out of guesses. Try the difficulty sliders in the Settings menu. Total turns: ${session.turns}`;
-    messageBox.textContent = messageText;
-    messageBox.classList.add("visible");
+	const lossMessages = {
+		classic: `💀 Game Over! You ran out of guesses. Try the difficulty sliders in the Settings menu. Total turns: ${session.turns}`,
+		turnsLimit: `Game Over! You ran out of turns. How did you do? Press the Share button.`
+	};
+
+	messageText = isWin 
+		? `🎉 You Win! Game Over in ${session.turns} turns!` 
+		: lossMessages[session.gameMode];
+
+	messageBox.textContent = messageText;
+	messageBox.classList.add("visible");
 
     // ✅ Clear hand visually
     zoneElements['hand'].wordsDiv.textContent = '';
@@ -703,8 +795,7 @@ function buildDeliberateWordPool(rules, seed) {
     const desiredCounts = {};
     
     // We can assume a single desired count for all zones in the same tier.
-    // Let's stick with 3 as your example. You can change this number later.
-    const defaultCount = 3; 
+    const defaultCount = 4; 
 
     // Generate the desiredCounts object based on the dynamically created zones
     for (const key in zoneConfigs) {
@@ -762,6 +853,7 @@ function buildDeliberateWordPool(rules, seed) {
         console.log(`  Zone ${zone}: ${actual} / ${target}`);
     }
 
+	console.log('buildDeliberateWordPool returns ' + selected.length);
     return selected;
 }
 
@@ -1068,7 +1160,7 @@ function getCorrectZoneKeyForWord(wordOrObject, rules) {
 
 
 function getZoneDisplayName(zoneKey) {
-	console.log('getZoneDisplayName called with ', zoneKey);
+//	console.log('getZoneDisplayName called with ', zoneKey);
     const zoneConfig = zoneConfigs[zoneKey];
     if (!zoneConfig) {
         console.error(`Attempted to get display name for unknown zoneKey: ${zoneKey}`);
@@ -1248,6 +1340,8 @@ function showZoneFeedback(message, targetElement, isError = false) {
     }, 3000);
 }
 */
+
+//every time I play a card, this function gets called
 function placeWordInRegion(targetZoneKey) {
     if (!selectedWordId) {
         showMessage('Please select a word first!', 'red');
@@ -1300,15 +1394,17 @@ function placeWordInRegion(targetZoneKey) {
     let newCardFromPool = null; 
 
     if (correctZoneKey === targetZoneKey) {
-        // Perfect match: Hand size decreases, NO new card is drawn.
+        // Perfect match: Hand size decreases, new card is drawn, but not in classic gameMode.
+		if ( session.gameMode != 'classic' ) newCardFromPool = drawCard(); // Draw a new card
+		
         isCorrectPlacement = true;
         selectedWordObj.correctZoneKey = correctZoneKey;
         message = `Correct! '${selectedWordObj.text}' belongs in this category.`;
         isErrorFeedback = false;
         console.log(`Outcome: Perfect Match ✅`); // Debug log
 		session.previousResults+="✅";  // that's a green check for the share results
-        
-    } else {
+        } 
+	else {
         // Incorrect placement - now determine if it's a near miss or far miss
 
 		// break the target and correct strings into parts and convert to numbers
@@ -1355,20 +1451,21 @@ function placeWordInRegion(targetZoneKey) {
             // Far miss: Lose a life and draw a new card.
             selectedWordObj.correctZoneKey = correctZoneKey; // Still mark with correct zone for visual placement
             session.livesRemaining--; // Lose a life
-            updateLivesDisplay();
+            
             newCardFromPool = drawCard(); // Draw a new card
 
             const correctCategoryName = getZoneDisplayName(correctZoneKey, false);
             message = `Oops! '${selectedWordObj.text}' belongs in "${correctCategoryName}". Draw a new card.`;
             if (session.currentWordPool.length <= 3) {
-                message += `   Only ${session.currentWordPool.length} card${session.currentWordPool.length === 1 ? '' : 's'} left!`;
+                console.log( `   Only ${session.currentWordPool.length} card${session.currentWordPool.length === 1 ? '' : 's'} left!`);
             }
-            message += ` Lives left: ${session.livesRemaining}.`;
+            if (session.gameMode=='classic') message += ` Lives left: ${session.livesRemaining}.`;
             isErrorFeedback = 'red'; // Definitely an error
             console.log(`Outcome: Far Miss ❌`); // Debug log
 			session.previousResults+="❌";  // that's a red X for the share results
         }
-    }
+		
+    } // Incorrect placement - now determine if it's a near miss or far miss
 
     // This block now only executes if newCardFromPool was assigned (meaning a miss occurred)
 	if (newCardFromPool) {
@@ -1381,7 +1478,7 @@ function placeWordInRegion(targetZoneKey) {
 	} else if (!isCorrectPlacement) {
         // This condition handles the case where it was a miss, but drawCard() returned null (deck empty)
         console.log("No new card drawn for a miss because currentWordPool is empty.");
-        message += " (No more cards to draw!)"; // Inform the player
+        //message += " (No more cards to draw!)"; // Inform the player
     }
 
 
@@ -1402,6 +1499,7 @@ function placeWordInRegion(targetZoneKey) {
     selectedWordId = null;
     renderHand(); // Re-render hand to show the updated hand (fewer cards on perfect, same on miss)
 
+	updateLivesDisplay(); //we've used a turn or lost a life, and the screen should reflect that
     checkGameEndCondition();
 }//function placeWordInRegion(targetZoneKey)
 
@@ -1461,13 +1559,26 @@ function copyToClipboard(text) {
     document.body.removeChild(textarea);
 }
 
-// Function to check for win or loss
+// Function to check for win or loss, called by placeWordInRegion
+// I will eventually want to change this function, to more gracefully handle multiple conditions, but it's fine for now
 async function checkGameEndCondition() { 
+    // 1. Check for a Win (Hand is empty)
     if (session.currentHand.length === 0) {
-        // Win condition (all cards placed correctly)
         endGame(true);
-    } else if (session.livesRemaining <= 0) { // Loss condition: lives run out
+        return; // Exit early so we don't trigger a loss simultaneously
+    } 
+
+    // 2. Check for Loss Condition A: Out of Lives (Classic Mode)
+    if (session.gameMode === 'classic' && session.livesRemaining <= 0) {
         endGame(false);
+        return;
+    }
+
+    // 3. Check for Loss Condition B: Out of Turns (Turns Limit Mode)
+    if (session.gameMode === 'turnsLimit' && session.turns >= session.turnsLimit) {
+        // In turnsLimit, you might want to check if they reached a specific score 
+        // or just end it as a "completion"
+        endGame(session.currentHand.length === 0); 
     }
 }
 
@@ -1502,20 +1613,25 @@ function resetGameState() {
     renderWordsInRegions();
 }
 
-// Function to update the lives display on the main game screen
+// this function is called by placeWordInRegion, to keep the status bar current
 function updateLivesDisplay() { 
-    if (livesDisplay) {
-        livesDisplay.textContent = session.livesRemaining;
+    if (session.gameMode === 'classic') {
+        document.getElementById('lives-display').textContent = `${session.livesRemaining} / ${session.livesLimit}`;
     }
+	
+	if (session.gameMode === 'turnsLimit') {
+		document.getElementById('turns-display').textContent = `${session.turns} / ${session.turnsLimit}`;
+	}
 }
 
+/* We're doing this inside DOMContentLoaded now
 // Function to update the lives setting and save to local storage
 function updateLivesSetting(value) {
     userSetLives = value;
     livesDisplayModal.textContent = userSetLives;
     localStorage.setItem('userSetLives', userSetLives);
 }
-
+*/
 
 function updateRuleBoxLabelsAndHints() {
 	console.log('Debug in updateRuleBoxLabelsAndHints: zoneConfigs=', zoneConfigs);
@@ -1753,3 +1869,24 @@ function updateTimer() {
     session.formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
     timerDisplay.textContent = session.formattedTime;
 }
+
+//I call this function in startGame to update the Status bar depending on what game mode you're in
+function InitUpdateStatusBar() {
+    const livesCont = document.getElementById('lives-container');
+    const turnsCont = document.getElementById('turns-container');
+    
+    if (session.gameMode === 'turnsLimit') {
+        livesCont.style.display = 'none';
+        turnsCont.style.display = 'inline';
+        document.getElementById('turns-display').textContent = `0 / ${session.turnsLimit}`;
+    } else {
+        livesCont.style.display = 'inline';
+        turnsCont.style.display = 'none';
+    }
+}
+
+
+//initializing the settings buttons, wrapped in a DOM to make sure that the page loads first
+document.addEventListener('DOMContentLoaded', () => {
+
+});
