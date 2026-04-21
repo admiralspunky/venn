@@ -7,7 +7,7 @@
 
 
 //I'm working on my next big update, the one where I add the ability to switch game modes, but it's not finished yet. When I'm ready, I need to remember to upload game-logic, index, and style.css
-const CURRENT_VERSION = "2.00";
+const CURRENT_VERSION = "2.01";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -173,8 +173,6 @@ function getZoneConfigs(numRules) {
 const zoneElements = getZoneElements(); //This object is a map of your HTML elements. Its job is to provide a quick reference to the physical parts of your game board.
 const zoneConfigs = getZoneConfigs(numRules); // This object holds all the logical data about each zone. It tells the game how a zone works.
 //console.log("at the start of the game, ", zoneConfigs);
-
-document.title = GAME_TITLE;
 
 // Dynamically generate zone weights based on the number of rules
 session.zoneWeights = {};
@@ -643,13 +641,20 @@ async function endGame(isWin) {
     shareButton.title = "Share Results";
     shareButton.addEventListener('click', () => {
         console.log("share button clicked, dailyMode =", session.dailyMode);
- 	    const dateLabel = session.dailyMode ? ` – ${getTodayDateString()}` : " (Anytime Mode)";
-        const gameLabel = GAME_TITLE + dateLabel;
+ 	    //const dateLabel = session.dailyMode ? ` – ${getTodayDateString()}` : " (Anytime Mode)";
+		const dateLabel = session.dailyMode ? ` – ${getTodayDateString()}` : "";
+		//TODO: I should eventually make a gameMode object, containing the gameover message, the human-readable label, the game over condition, whatnot
+		const gameModeLabel = {
+			classic: `Lives Limit`,
+			turnsLimit: `Turn Test`
+		};
+        const gameLabel = GAME_TITLE + dateLabel + " (" + gameModeLabel + ")";
         const winLossStatus = isWin ? "Won" : "Lost";
 	    // Calculate incorrect guesses directly from lives (I'm assuming that these two variables actually represent their names)
         const incorrectGuessesMade = userSetLives - session.livesRemaining;
 	    
-        let fullShareText = `${gameLabel}: ${winLossStatus} with ${numRules} rules, and ${userSetLives} lives, in ${session.formattedTime}!`;
+ //       let fullShareText = `${gameLabel}: ${winLossStatus} with ${numRules} rules, and ${userSetLives} lives, in ${session.formattedTime}!`;
+		let fullShareText = `${gameLabel}: with ${numRules} rules, in ${session.formattedTime}!`;
 		fullShareText+= '\n' + session.previousResults;
         if (session.dailyMode && isWin) {
             fullShareText += `\n${dailyStreak} Daily puzzles in a row!`;
