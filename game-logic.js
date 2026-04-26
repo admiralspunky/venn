@@ -24,7 +24,8 @@ function getTutorialText(mode) {
 
     const closing = "Check the settings for a list of all possible rules. Try the different game modes. Come back tomorrow for a new set of words and rules.";
     
-    return `${baseRules}\n\n${goals[mode]}\n\n${closing}`;
+	// I have to wrap the text in a <pre> tag because otherwise textContent collapses the newlines
+    return `<pre>${baseRules}\n\n${goals[mode]}\n\n${closing}\n\nhttps://www.youtube.com/watch?v=xQWNT3gHjAw</pre>`;
 	//return `There are three hidden spelling rules for you to deduce, by sorting words into the correct zones.  The rules are hidden, but there's a button in the Settings menu that will display all of the possible rules for your benefit. If you play a card in the wrong zone, you have to draw a card to replace it. You're trying to empty your hand of cards. https://www.youtube.com/watch?v=xQWNT3gHjAw`;
 	
 }
@@ -336,7 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     } //if (modeSelector)
 	
-	document.getElementById('settings-tutorial-text').textContent = getTutorialText(localStorage.getItem('gameMode') || 'classic');
+	document.getElementById('settings-tutorial-text').textContent = getTutorialText(localStorage.getItem('gameMode') || DEFAULT_GAME_MODE);
 	document.getElementById('about-text').textContent = ABOUT_TEXT;
 	
 	// Tutorial Modal Logic (only on the first time you play)
@@ -346,7 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const tutorialTextElement = document.getElementById('tutorial-text');
 	const bylineDisplayElement = document.getElementById('byline-display'); // Get the BYLINE element
 	if (tutorialTextElement && typeof getTutorialText === 'function') {
-		tutorialTextElement.textContent = getTutorialText(localStorage.getItem('gameMode') || 'classic');
+		tutorialTextElement.textContent = getTutorialText(localStorage.getItem('gameMode') || DEFAULT_GAME_MODE);
 	}
 	if (bylineDisplayElement && typeof BYLINE !== 'undefined') {
 		bylineDisplayElement.textContent = BYLINE;
