@@ -1,19 +1,16 @@
 // game-logic.js
 // Justin Smith, 2025
 
-//
 // Global Variables ('let' can be reassigned later; 'const' cannot)
-//
 
-
-//I'm working on my next big update, the one where I add the ability to switch game modes, but it's not finished yet. When I'm ready, I need to remember to upload game-logic, index, and style.css
-const CURRENT_VERSION = "2.01";
+const CURRENT_VERSION = "2.02";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
 
 const MESSAGE_DISPLAY_TIME = 5000;
 const MIN_RULE_MATCHING_WORDS_PER_CATEGORY = 1;
+const DEFAULT_GAME_MODE = 'turnsLimit';
 
 //I'm transitioning to having separate game modes, but now each mode needs to have its own, slightly different, tutorial text
 function getTutorialText(mode) {
@@ -44,7 +41,7 @@ const session = {
 	dailyMode: false, // is this the player's first game today?
 	
 	// the user can decide his own end-game condtion
-	gameMode : localStorage.getItem('gameMode') || 'classic',
+	gameMode : localStorage.getItem('gameMode') || DEFAULT_GAME_MODE,
 	
 	// initial limits for the game end conditions, set by the user:
 	livesLimit : localStorage.getItem('userSetLives') || 3  ,
@@ -309,7 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.classList.add('active');
 			
 			// 4. update the settings tutorial text
-			document.getElementById('settings-tutorial-text').textContent = getTutorialText(localStorage.getItem('gameMode') || 'classic');
+			document.getElementById('settings-tutorial-text').textContent = getTutorialText(localStorage.getItem('gameMode') || DEFAULT_GAME_MODE);
 			
 			// 5. toggle between the settings specific to that game mode:
 			// Toggle Settings Sliders
@@ -332,7 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			});
 
         // Also sync the UI with the saved mode on load
-        const savedMode = localStorage.getItem('gameMode') || 'classic';
+        const savedMode = localStorage.getItem('gameMode') || DEFAULT_GAME_MODE;
         const activeBtn = modeSelector.querySelector(`.mode-btn[data-mode="${savedMode}"]`);
         if (activeBtn) {
             activeBtn.click(); // This simulates a click to trigger all the logic
