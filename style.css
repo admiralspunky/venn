@@ -511,13 +511,11 @@ color: #9c7368;
 /* I think that this targets the tutorial text in the settings window, but not the popup on the first time you run the game */
 #settings-tutorial-text {
   white-space: pre-wrap; 
-  font-family: monospace; /* Optional: gives it that 'pre' look */
 }
 
 #tutorial-modal-overlay
 {
   white-space: pre-wrap; 
-  font-family: monospace; /* Optional: gives it that 'pre' look */
 }
 
 .modal-overlay {

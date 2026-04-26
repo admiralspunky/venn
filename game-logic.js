@@ -24,8 +24,12 @@ function getTutorialText(mode) {
 
     const closing = "Check the settings for a list of all possible rules. Try the different game modes. Come back tomorrow for a new set of words and rules.";
     
-	// I have to wrap the text in a <pre> tag because otherwise textContent collapses the newlines
-    return `<pre>${baseRules}\n\n${goals[mode]}\n\n${closing}\n\nhttps://www.youtube.com/watch?v=xQWNT3gHjAw</pre>`;
+	// I had to add white-space: pre-wrap; to the CSS for this tutorial text element, because otherwise textContent collapses the newlines
+    return `${baseRules}
+	\n${goals[mode]}
+	\n${closing}
+	\n<a href='https://www.youtube.com/watch?v=xQWNT3gHjAw' target='_blank'>demo video</a> `;
+	
 	//return `There are three hidden spelling rules for you to deduce, by sorting words into the correct zones.  The rules are hidden, but there's a button in the Settings menu that will display all of the possible rules for your benefit. If you play a card in the wrong zone, you have to draw a card to replace it. You're trying to empty your hand of cards. https://www.youtube.com/watch?v=xQWNT3gHjAw`;
 	
 }
@@ -186,7 +190,14 @@ document.addEventListener("DOMContentLoaded", () => {
 	
     // Safe DOM setup
 	const urlEl = document.getElementById('url-display');
-    if (urlEl) urlEl.textContent = URL; 
+    if (urlEl) {
+		urlEl.textContent = ''; // Clear any old text
+		const link = document.createElement('a');
+		link.href = URL;
+		link.textContent = URL; // Or "Watch Video"
+		link.target = "_blank"; // Opens in new tab
+		urlEl.appendChild(link);
+	}
     const versionEl = document.getElementById('version-display');
 	if (versionEl) versionEl.textContent = 'v' + CURRENT_VERSION; 
 
@@ -307,7 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.classList.add('active');
 			
 			// 4. update the settings tutorial text
-			document.getElementById('settings-tutorial-text').textContent = getTutorialText(localStorage.getItem('gameMode') || DEFAULT_GAME_MODE);
+			document.getElementById('settings-tutorial-text').innerHTML = getTutorialText(localStorage.getItem('gameMode') || DEFAULT_GAME_MODE);
 			
 			// 5. toggle between the settings specific to that game mode:
 			// Toggle Settings Sliders
@@ -337,8 +348,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     } //if (modeSelector)
 	
-	document.getElementById('settings-tutorial-text').textContent = getTutorialText(localStorage.getItem('gameMode') || DEFAULT_GAME_MODE);
-	document.getElementById('about-text').textContent = ABOUT_TEXT;
+	document.getElementById('settings-tutorial-text').innerHTML = getTutorialText(localStorage.getItem('gameMode') || DEFAULT_GAME_MODE);
+	document.getElementById('about-text').innerHTML = ABOUT_TEXT;
 	
 	// Tutorial Modal Logic (only on the first time you play)
 	const tutorialModalOverlay = document.getElementById('tutorial-modal-overlay');
@@ -347,10 +358,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	const tutorialTextElement = document.getElementById('tutorial-text');
 	const bylineDisplayElement = document.getElementById('byline-display'); // Get the BYLINE element
 	if (tutorialTextElement && typeof getTutorialText === 'function') {
-		tutorialTextElement.textContent = getTutorialText(localStorage.getItem('gameMode') || DEFAULT_GAME_MODE);
+		tutorialTextElement.innerHTML = getTutorialText(localStorage.getItem('gameMode') || DEFAULT_GAME_MODE);
 	}
 	if (bylineDisplayElement && typeof BYLINE !== 'undefined') {
-		bylineDisplayElement.textContent = BYLINE;
+		bylineDisplayElement.innerHTML = BYLINE;
 	}
 	if (!localStorage.getItem('hasSeenTutorial')) {
 		setTimeout(() => {
