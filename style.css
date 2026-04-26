@@ -234,9 +234,6 @@ padding: 0.875rem 1.125rem;
 font-size: 1.5rem;
 }
 
-#settings-tutorial-text {
-  white-space: pre-line;
-}
 
 /* these are the buttons for the various game modes */
 .mode-btn {
@@ -509,6 +506,18 @@ color: #991b1b;
 .message-box.warning {
 background-color: #f5f7dc;
 color: #9c7368;
+}
+
+/* I think that this targets the tutorial text in the settings window, but not the popup on the first time you run the game */
+#settings-tutorial-text {
+  white-space: pre-wrap; 
+  font-family: monospace; /* Optional: gives it that 'pre' look */
+}
+
+#tutorial-modal-overlay
+{
+  white-space: pre-wrap; 
+  font-family: monospace; /* Optional: gives it that 'pre' look */
 }
 
 .modal-overlay {
