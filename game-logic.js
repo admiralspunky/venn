@@ -3,7 +3,7 @@
 
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 
-const CURRENT_VERSION = "2.02";
+const CURRENT_VERSION = "2.03";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -653,11 +653,11 @@ async function endGame(isWin) {
  	    //const dateLabel = session.dailyMode ? ` – ${getTodayDateString()}` : " (Anytime Mode)";
 		const dateLabel = session.dailyMode ? ` – ${getTodayDateString()}` : "";
 		//TODO: I should eventually make a gameMode object, containing the gameover message, the human-readable label, the game over condition, whatnot
-		const gameModeLabel = {
+		const gameModeLabels = {
 			classic: `Lives Limit`,
 			turnsLimit: `Turn Test`
 		};
-        const gameLabel = GAME_TITLE + dateLabel + " (" + gameModeLabel + ")";
+        const gameLabel = GAME_TITLE + dateLabel + " (" + gameModeLabels[session.gameMode] + ")";
         const winLossStatus = isWin ? "Won" : "Lost";
 	    // Calculate incorrect guesses directly from lives (I'm assuming that these two variables actually represent their names)
         const incorrectGuessesMade = userSetLives - session.livesRemaining;
