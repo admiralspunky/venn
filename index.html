@@ -127,7 +127,7 @@
                     <div class="modal-setting-item toggle-turns">
                         <label for="turns-slider" class="setting-label">Turn Limit:</label>
                         <div class="slider-container">
-                            <input type="range" id="turns-slider" min="3" max="15" value="10">
+                            <input type="range" id="turns-slider" min="3" max="10" value="5">
                             <span id="turns-display-modal" class="slider-value">5</span>
                         </div>
                     </div>
@@ -151,10 +151,13 @@
         </div>
     </div>
 
-    <div id="rules-popup-overlay" class="modal-overlay">
-        <h3>All Possible Rules</h3>
-        <div id="rules-popup-content" class="modal-content"></div>
-    </div>
+	<div id="rules-popup-overlay" class="sidebar-hidden">
+		<div class="sidebar-header">
+			<h3>All Possible Rules</h3>
+			<button id="close-sidebar">&times;</button>
+		</div>
+		<div id="rules-sidebar-content"></div>
+	</div>
 
     <div id="zone-feedback-bubble" class="fixed text-white px-3 py-2 rounded shadow-lg text-sm z-[1001] transition-opacity duration-300 hidden pointer-events-none"></div>
     <div id="byline-display"></div>

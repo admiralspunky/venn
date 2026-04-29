@@ -3,7 +3,7 @@
 
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 
-const CURRENT_VERSION = "2.03";
+const CURRENT_VERSION = "2.04";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -1740,17 +1740,41 @@ function hideRulesPopup() {
 }
 */
 
-//when the Show Rules button is clicked, it calls this function, which opens the rules in a new tab
-function openRulesInNewTab() {
-  let rulesContent = 'All Rules\n';
-  rulesContent += allPossibleRules.map(rule => `- ${rule.name}`).join('\n');
-  rulesContent = rulesContent.trim();
-  
-  const newTab = window.open('', '_blank');
-  newTab.document.body.style.whiteSpace = 'pre-wrap';
-  newTab.document.body.textContent = rulesContent;
-  newTab.document.title = 'All Rules';
+
+
+
+
+// Function to show the sidebar
+function toggleRulesSidebar() {
+    const sidebar = document.getElementById('rules-popup-overlay');
+    const content = document.getElementById('rules-sidebar-content');
+
+	// hide the settings popup
+	hideModal();
+	
+    // Populate content if it's empty
+    if (content.innerHTML === "") {
+        const listItems = allPossibleRules.map(rule => 
+            `<div style="margin-bottom: 12px; border-bottom: 1px solid var(--border-rule-box-default); padding-bottom: 8px;">
+                <strong>${rule.name}</strong>
+             </div>`
+        ).join('');
+        content.innerHTML = listItems;
+    }
+
+    // Toggle the classes to trigger the CSS transition
+    sidebar.classList.remove('sidebar-hidden');
+    sidebar.classList.add('sidebar-visible');
 }
+
+// Function to close the sidebar
+function closeRulesSidebar() {
+    const sidebar = document.getElementById('rules-popup-overlay');
+    sidebar.classList.add('sidebar-hidden');
+    sidebar.classList.remove('sidebar-visible');
+}
+
+
 
 function applyTheme() {
     const htmlElement = document.documentElement;
@@ -1782,7 +1806,7 @@ function toggleDarkMode() {
     applyTheme();
 }
 
-// Event Listeners
+// Event Listeners (I believe I should TODO move all these up to my DOMContentLoaded
 settingsBtn.addEventListener('click', showModal); // Gear icon now opens settings modal
 modalCloseBtn.addEventListener('click', hideModal);
 //newGameModalBtn.addEventListener('click', () => { startGame(false); }); //start a new game, but not in Daily mode
@@ -1816,9 +1840,10 @@ if (showAllRulesBtn) {
     showAllRulesBtn.addEventListener('click', (event) => {
 
         console.log('Rules button clicked from settings modal.');
-		openRulesInNewTab();
+		toggleRulesSidebar();
     });
 }
+document.getElementById('close-sidebar').addEventListener('click', closeRulesSidebar);
 
 if (concedeButton) {
 	concedeButton.addEventListener('click', () => {
