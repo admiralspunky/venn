@@ -3,7 +3,7 @@
 
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 
-const CURRENT_VERSION = "2.04";
+const CURRENT_VERSION = "2.05";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -629,20 +629,21 @@ async function endGame(isWin) {
 		? `🎉 You Win! Game Over in ${session.turns} turns!` 
 		: lossMessages[session.gameMode];
 
-	messageBox.textContent = messageText;
-	messageBox.classList.add("visible");
 
-    // ✅ Clear hand visually
+	//messageBox.textContent = messageText;
+	//messageBox.classList.add("visible");
+
+    // Clear hand visually
     zoneElements['hand'].wordsDiv.textContent = '';
     zoneElements['hand'].container.classList.add("game-over-summary");
 
-    // ✅ Optional: also show message in hand area
+    // show message in hand area
     const summaryHeader = document.createElement('div');
     summaryHeader.classList.add("summary-header");
-    summaryHeader.textContent = messageText;
+    summaryHeader.textContent = messageText + " " + session.previousResults;
     zoneElements['hand'].wordsDiv.appendChild(summaryHeader);
 
-    // ✅ Build share button
+    // Build share button
     const shareButton = document.createElement('button');
     shareButton.classList.add("icon-btn", "share-results-btn");
     // Changed to direct Unicode character for clipboard
@@ -679,8 +680,10 @@ async function endGame(isWin) {
     newGameButton.textContent = `🔄`;
     newGameButton.title = "Start New Game";
     newGameButton.addEventListener('click', () => {
+		if (confirm("Start a new game? Current results will be cleared.")) {
         endButtonsContainer.classList.remove("visible"); // hide buttons
         startGame(false);
+    }
     });
 
     // ✅ Insert buttons into #end-screen-buttons and show it
@@ -1611,6 +1614,7 @@ function updateDailyBadge(isDaily) {
 //currently, every variable that resetGameState resets is already being reset when the page is refreshed, so I'm not sure if we even need this function
 function resetGameState() {
 	document.querySelectorAll('.word-cards-container').forEach(container => { container.replaceChildren(); });
+	session.previousResults = ""; // Reset the ✅❌🟡 string
     session.turns = 0;
     selectedWordId = null;
     // Initialize lives and update display using userSetLives
