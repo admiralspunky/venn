@@ -3,7 +3,7 @@
 
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 
-const CURRENT_VERSION = "2.05";
+const CURRENT_VERSION = "2.10";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -17,9 +17,9 @@ function getTutorialText(mode) {
     const baseRules = "Voozo is a logic puzzle where you sort words into zones based on hidden spelling rules. Place each word from your hand into the correct zone. If you're wrong, the card moves to the correct spot.";
     
     const goals = {
-        classic: "Your goal is to **empty your hand** of cards. If you place a card in the wrong zone, you must draw a replacement.",
-        turnsLimit: "Your goal is to **place as many words as possible** within the turn limit.",
-        timeAttack: "Your goal is to **clear your hand as fast as possible** before the clock runs out."
+        livesLimit: "Your goal is to *empty your hand* of cards. If you place a card in the wrong zone, you must draw a replacement.",
+        turnTest: "Your goal is to place as many words as possible *within the turn limit*.",
+        timeTrial: "Your goal is to clear your hand as fast as possible *before the clock runs out*."
     };
 
     const closing = "Check the settings for a list of all possible rules. Try the different game modes. Come back tomorrow for a new set of words and rules.";
@@ -48,9 +48,10 @@ const session = {
 	// the user can decide his own end-game condtion
 	gameMode : localStorage.getItem('gameMode') || DEFAULT_GAME_MODE,
 	
-	// initial limits for the game end conditions, set by the user:
+	// initial limits for the game end conditions, one for each of the game modes, set by the user:
 	livesLimit : localStorage.getItem('userSetLives') || 3  ,
 	turnsLimit : localStorage.getItem('userSetTurns') || 10 ,
+	timeLimit : localStorage.getItem('userSetTimer') || 60 ,
 	
 	// Board State
     wordsInPlay: [], //these words are somewhere on the board, think of it as a no-duplicate list
@@ -101,14 +102,10 @@ const rulesPopupContent = document.getElementById('rules-popup-content');
 
 const aboutBtn = document.getElementById('about-btn');
 
+
 // Get the difficulty sliders and display elements inside the modal
 
-
-
-
-
-const livesDisplay = document.getElementById('lives-display');
-const timerDisplay = document.getElementById('timer-display');
+const timerDisplay = document.getElementById('timer-container');
 const settingsBtn = document.getElementById('settings-btn');
 const messageBox = document.getElementById('message-box');
 const handContainer = document.getElementById('hand-container');
@@ -241,12 +238,28 @@ document.addEventListener("DOMContentLoaded", () => {
 		});
 	}
 	
+	// Initialize timer slider and display
+	const timerSlider = document.getElementById('timer-slider');
+	const timerDisplayModal = document.getElementById('timer-display-modal');
+
+	if (timerSlider && timerDisplayModal) {
+		const userSetTimer = parseInt(localStorage.getItem('userSetTimer') || '60', 10);
+		timerSlider.value = userSetTimer;
+		timerDisplayModal.textContent = userSetTimer;
+
+		timerSlider.addEventListener('input', (event) => {
+			const val = parseInt(event.target.value, 10);
+			timerDisplayModal.textContent = val;
+			localStorage.setItem('userSetTimer', val);
+		});
+	}
+	
+	
+	// Initialize rules slider and display
 	const rulesSlider = document.getElementById('numRules-slider');
 	const rulesDisplay = document.getElementById('numRules-modal');
 
-	
-	// Initialize rules slider and display
-    if (rulesSlider && rulesDisplay) {
+	if (rulesSlider && rulesDisplay) {
 		console.log("rules slider initialized.");
         
         rulesSlider.value = numRules;
@@ -259,10 +272,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+	// Initialize hand cards slider and display
 	const cardsSliderSetting = document.getElementById('numCards-slider');
 	const cardsDisplaySetting = document.getElementById('numCards-modal');
 
-	// Initialize hand cards slider and display
     if (cardsSliderSetting && cardsDisplaySetting) {
 		
 		console.log("hand card slider initialized.");
@@ -277,11 +290,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Existing DOMContentLoaded logic for starting game
+	// Check for missed daily puzzle and reset streak if necessary
     const today = getTodayDateString();
     const lastPlayed = localStorage.getItem("lastDailyDate");
-
-    // Check for missed daily puzzle and reset streak if necessary
+    
     if (lastPlayed && lastPlayed !== today) {
         const lastDate = new Date(lastPlayed);
         const currentDate = new Date(today);
@@ -294,6 +306,19 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Missed a day. Daily streak reset to 0.");
         }
 	}	
+	
+	//set up the containers in the Status bar (top-left of the main screen)
+	const livesCont = document.getElementById('lives-container');
+    const turnsCont = document.getElementById('turns-container');
+    
+    if (session.gameMode === 'turnsLimit') {
+        livesCont.style.display = 'none';
+        turnsCont.style.display = 'inline';
+        document.getElementById('turns-display').textContent = `0 / ${session.turnsLimit}`;
+    } else {
+        livesCont.style.display = 'inline';
+        turnsCont.style.display = 'none';
+    }
 	
 	// here's where I handle the mode switch buttons in Settings
 	// Grab the container, not every individual button
@@ -318,26 +343,49 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.classList.add('active');
 			
 			// 4. update the settings tutorial text
-			document.getElementById('settings-tutorial-text').innerHTML = getTutorialText(localStorage.getItem('gameMode') || DEFAULT_GAME_MODE);
+			document.getElementById('settings-tutorial-text').innerHTML = getTutorialText( localStorage.getItem('gameMode') || DEFAULT_GAME_MODE );
 			
 			// 5. toggle between the settings specific to that game mode:
-			// Toggle Settings Sliders
-			const settingsContainer = document.getElementById('dynamic-settings-container');
-			if (settingsContainer) settingsContainer.className = `mode-${selectedMode}`;
 
-			// Toggle Status Bar Display
+			// Status Bar Containers (Top of game screen)
 			const livesCont = document.getElementById('lives-container');
 			const turnsCont = document.getElementById('turns-container');
+			const timerCont = document.getElementById('timer-container');
+
+			// Settings Slider Containers (Inside the settings menu)
+			// We target the class of the wrapper div so the Label + Slider + Value all hide together
+			const livesSliderRow = document.querySelector('.toggle-lives');
+			const turnsSliderRow = document.querySelector('.toggle-turns');
+			const timerSliderRow = document.querySelector('.time-limit');
 			
-			if (selectedMode === 'turnsLimit') {
-				if (livesCont) livesCont.style.display = 'none';
-				if (turnsCont) turnsCont.style.display = 'inline';
-			} else {
-				if (livesCont) livesCont.style.display = 'inline';
-				if (turnsCont) turnsCont.style.display = 'none';
-			}
+			livesCont.style.display = 'none';
+			livesSliderRow.style.display = 'none';
+			turnsCont.style.display = 'none';
+			turnsSliderRow.style.display = 'none';
+			timerCont.style.display = 'none';
+			timerSliderRow.style.display = 'none';
+			
+			
+			switch(selectedMode) 
+			{
+				case 'livesLimit': 
+					livesCont.style.display = 'inline';
+					livesSliderRow.style.display = 'flex';
+					break;
 				
-				console.log(`System updated to: ${session.gameMode}`);
+				case 'timeTrial': 
+					timerCont.style.display = 'inline';
+					timerSliderRow.style.display = 'flex';
+					break;	
+				
+				case 'turnTest':
+				default:
+					turnsCont.style.display = 'inline';
+					turnsSliderRow.style.display = 'flex';
+					break;	
+			}
+
+				console.log(`mode changed to: ${session.gameMode}`);
 			});
 
         // Also sync the UI with the saved mode on load
@@ -445,13 +493,25 @@ async function startGame(isDaily) {
     console.log("startGame(isDaily)", isDaily);
     session.dailyMode = isDaily;
 
+	// Show a browser confirmation before we start the game, so the timer isn't running in the bg
+	const ready = confirm("Ready to start the game?");
+    if (!ready) return; // Exit if they click Cancel
+
     // Use the daily seed for ALL randomization steps in daily mode
     const seed = isDaily ? getDailySeed() : Math.floor(Math.random() * 100000);
 	
 	// winding up the timer
 	session.timerID = setInterval(updateTimer, 1000);
 	session.startTime = Date.now();
+    console.log('session.startTime='+session.startTime);
+	
+	//display the starting game time limit in the status bar (but it won't actually be displayed unless we're in that gameMode)
+    const minutes = Math.floor(session.timeLimit / 60);
+    const seconds = Math.floor(session.timeLimit % 60);
     
+    session.formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    timerDisplay.textContent = session.formattedTime;
+	
     // For now, let's give every zone an equal weight of 1.
     session.zoneKeys.forEach(key => {
         session.zoneWeights[key] = 1;
@@ -474,10 +534,8 @@ async function startGame(isDaily) {
 
     updateDailyBadge(isDaily);
     resetGameState();
-	
-	//change what the Status Bar shows depending on the game mode
-	InitUpdateStatusBar();
-	
+
+
 	// changing the layout depending on how many rules the slider is set to
 	const linkElement = document.getElementById('layout-stylesheet');
     if (numRules === 2) {
@@ -546,6 +604,8 @@ async function startGame(isDaily) {
 		rulesListContainer.innerHTML = buildRulesHTML();
 	}
 
+
+	//TODO: I'm going to want a Start game confirmation
 }//async function startGame(isDaily)
 
 
@@ -621,8 +681,9 @@ async function endGame(isWin) {
 
     // ✅ Show message box
 	const lossMessages = {
-		classic: `💀 Game Over! You ran out of guesses. Try the difficulty sliders in the Settings menu. Total turns: ${session.turns}`,
-		turnsLimit: `Game Over! You ran out of turns. How did you do? Press the Share button.`
+		livesLimit: `💀 Game Over! You ran out of guesses. Try the difficulty sliders in the Settings menu. Total turns: ${session.turns}`,
+		turnTest: `Game Over! You ran out of turns. How did you do? Press the Share button.`,
+		timeTrial: `Time's up! How did you do? Press the Share button.`
 	};
 
 	messageText = isWin 
@@ -655,8 +716,9 @@ async function endGame(isWin) {
 		const dateLabel = session.dailyMode ? ` – ${getTodayDateString()}` : "";
 		//TODO: I should eventually make a gameMode object, containing the gameover message, the human-readable label, the game over condition, whatnot
 		const gameModeLabels = {
-			classic: `Lives Limit`,
-			turnsLimit: `Turn Test`
+			livesLimit: 'Lives Limit',
+			turnTest: 'Turn Test',
+			timeTrial: 'Time Trial'
 		};
         const gameLabel = GAME_TITLE + dateLabel + " (" + gameModeLabels[session.gameMode] + ")";
         const winLossStatus = isWin ? "Won" : "Lost";
@@ -1411,8 +1473,8 @@ function placeWordInRegion(targetZoneKey) {
     let newCardFromPool = null; 
 
     if (correctZoneKey === targetZoneKey) {
-        // Perfect match: Hand size decreases, new card is drawn, but not in classic gameMode.
-		if ( session.gameMode != 'classic' ) newCardFromPool = drawCard(); // Draw a new card
+        // Perfect match: Hand size decreases, new card is drawn, but not in livesLimit gameMode.
+		if ( session.gameMode != 'livesLimit' ) newCardFromPool = drawCard(); // Draw a new card
 		
         isCorrectPlacement = true;
         selectedWordObj.correctZoneKey = correctZoneKey;
@@ -1476,7 +1538,7 @@ function placeWordInRegion(targetZoneKey) {
             if (session.currentWordPool.length <= 3) {
                 console.log( `   Only ${session.currentWordPool.length} card${session.currentWordPool.length === 1 ? '' : 's'} left!`);
             }
-            if (session.gameMode=='classic') message += ` Lives left: ${session.livesRemaining}.`;
+            if (session.gameMode=='livesLimit') message += ` Lives left: ${session.livesRemaining}.`;
             isErrorFeedback = 'red'; // Definitely an error
             console.log(`Outcome: Far Miss ❌`); // Debug log
 			session.previousResults+="❌";  // that's a red X for the share results
@@ -1579,24 +1641,28 @@ function copyToClipboard(text) {
 // Function to check for win or loss, called by placeWordInRegion
 // I will eventually want to change this function, to more gracefully handle multiple conditions, but it's fine for now
 async function checkGameEndCondition() { 
-    // 1. Check for a Win (Hand is empty)
-    if (session.currentHand.length === 0) {
-        endGame(true);
-        return; // Exit early so we don't trigger a loss simultaneously
-    } 
+    switch(session.gameMode)
+	{
+	case 'livesLimit':
+		if (session.currentHand.length === 0) {
+			endGame(true);
+			return; // Exit early so we don't trigger a loss simultaneously
+		}
+		else if (session.livesRemaining <= 0)
+		{
+			endGame(false);
+			return;
+		}
+		break;
+		
+	case 'turnTest':
+		if ( session.turns >= session.turnsLimit )
+			endGame(true); 
+		break;
+		
+	// we can't check the timeTrial end condition here; instead we check it down in updateTimer()
+	}
 
-    // 2. Check for Loss Condition A: Out of Lives (Classic Mode)
-    if (session.gameMode === 'classic' && session.livesRemaining <= 0) {
-        endGame(false);
-        return;
-    }
-
-    // 3. Check for Loss Condition B: Out of Turns (Turns Limit Mode)
-    if (session.gameMode === 'turnsLimit' && session.turns >= session.turnsLimit) {
-        // In turnsLimit, you might want to check if they reached a specific score 
-        // or just end it as a "completion"
-        endGame(session.currentHand.length === 0); 
-    }
 }
 
 
@@ -1633,11 +1699,11 @@ function resetGameState() {
 
 // this function is called by placeWordInRegion, to keep the status bar current
 function updateLivesDisplay() { 
-    if (session.gameMode === 'classic') {
+    if (session.gameMode === 'livesLimit') {
         document.getElementById('lives-display').textContent = `${session.livesRemaining} / ${session.livesLimit}`;
     }
 	
-	if (session.gameMode === 'turnsLimit') {
+	if (session.gameMode === 'turnTest') {
 		document.getElementById('turns-display').textContent = `${session.turns} / ${session.turnsLimit}`;
 	}
 }
@@ -1748,7 +1814,7 @@ function hideRulesPopup() {
 
 
 
-// Function to show the sidebar
+// Function to show the sidebar, called by Show All Rules button event listener
 function toggleRulesSidebar() {
     const sidebar = document.getElementById('rules-popup-overlay');
     const content = document.getElementById('rules-sidebar-content');
@@ -1903,33 +1969,30 @@ for (const key in zoneElements) {
     }
 }
 
+//this function gets called every second, and when session.gameMode == 'timeTrial' && timeLeft <= 0, it calls endGame
 function updateTimer() {
-    const elapsedTime = Date.now() - session.startTime;
-    const minutes = Math.floor(elapsedTime / 60000);
-    const seconds = Math.floor((elapsedTime % 60000) / 1000);
+    // 1. Calculate how much time has passed (ms)
+    const timePassed = Date.now() - session.startTime;
     
-    // Format the time to always show two digits for seconds
+    // 2. Subtract timePassed from the total limit (ensure limit is in ms)
+    // Assuming session.timeLimit is in milliseconds (e.g., 60000)
+    const timeLeft = (session.timeLimit*1000) - timePassed;
+	//console.log('timeLeft='+timeLeft);
+
+    // 3. Prevent the timer from showing negative numbers in the UI
+    const displayTime = Math.max(0, timeLeft);
+
+    // 4. Convert ms to minutes and seconds
+    const minutes = Math.floor(displayTime / 60000);
+    const seconds = Math.ceil((displayTime % 60000) / 1000);
+    
     session.formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
     timerDisplay.textContent = session.formattedTime;
-}
-
-//I call this function in startGame to update the Status bar depending on what game mode you're in
-function InitUpdateStatusBar() {
-    const livesCont = document.getElementById('lives-container');
-    const turnsCont = document.getElementById('turns-container');
-    
-    if (session.gameMode === 'turnsLimit') {
-        livesCont.style.display = 'none';
-        turnsCont.style.display = 'inline';
-        document.getElementById('turns-display').textContent = `0 / ${session.turnsLimit}`;
-    } else {
-        livesCont.style.display = 'inline';
-        turnsCont.style.display = 'none';
+	
+    // 5. End game logic (timeLeft <= 0 means time is up)
+    if (session.gameMode == 'timeTrial' && timeLeft <= 0) 
+    {
+        console.log('Timer expired');
+        endGame(true);
     }
 }
-
-
-//initializing the settings buttons, wrapped in a DOM to make sure that the page loads first
-document.addEventListener('DOMContentLoaded', () => {
-
-});
