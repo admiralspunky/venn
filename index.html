@@ -36,8 +36,8 @@
 
     <div id="status-bar">
         <span id="lives-container">Lives: <span id="lives-display">0</span></span>
-        <span id="turns-container" style="display: none;">Turns: <span id="turns-display">0</span></span>
-        <span id="timer-display">0:00</span>
+        <span id="turns-container">Turns: <span id="turns-display">0</span></span>
+        <span id="timer-container">0:00</span>
     </div>
 	
     <div class="game-container">
@@ -111,11 +111,12 @@
                 </div>
                 
                 <div class="mode-selector">
-                    <button class="mode-btn active" data-mode="classic">Lives Limit</button>
-                    <button class="mode-btn" data-mode="turnsLimit">Turn Test</button>
+                    <button class="mode-btn active" data-mode="livesLimit">Lives Limit</button>
+                    <button class="mode-btn" data-mode="turnTest">Turn Test</button>
+					<button class="mode-btn" data-mode="timeTrial">Time Trial</button>
                 </div>
 
-                <div id="dynamic-settings-container" class="mode-classic">
+                <div id="dynamic-settings-container" class="mode-livesLimit">
                     <div class="modal-setting-item toggle-lives">
                         <label for="lives-slider" class="setting-label">Lives:</label>
                         <div class="slider-container">
@@ -129,6 +130,14 @@
                         <div class="slider-container">
                             <input type="range" id="turns-slider" min="3" max="10" value="5">
                             <span id="turns-display-modal" class="slider-value">5</span>
+                        </div>
+                    </div>
+					
+					<div class="modal-setting-item time-limit">
+                        <label for="timer-slider" class="setting-label">Time Limit:</label>
+                        <div class="slider-container">
+                            <input type="range" id="timer-slider" min="30" max="180" value="60">
+                            <span id="timer-display-modal" class="slider-value">60</span>
                         </div>
                     </div>
                 </div>
