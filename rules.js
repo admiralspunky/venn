@@ -1,4 +1,4 @@
-// last updated: 2025-12-07
+// last updated: 2026-05-13
 
 //2025-08-20 - I previously used rules from three different categories: location, Characteristic, and Wordplay; but I've decided to switch to using three Spelling clues instead.
 //2025-12-07 - I've been using a diacritical ẏ in my wordlist to differentiate vowels and consonants, but apparently I forgot to change that in my rules somehow
@@ -115,18 +115,9 @@ const allPossibleRules = [
     test: (word) => /p/i.test(word)
   },
 */
-	
 {
-    name: 'Contains the vowel "ẏ"',
-    test: (word) => /ẏ/i.test(word)
-},	
-{
-    name: 'Contains the consonant "y"',
-    test: (word) => /y/i.test(word)
-},	
-{
-  name: 'Contains a Rare Letter (j, q, x, or z)',
-  test: (word) => /j|q|x|z/i.test(word)
+  name: 'Contains a Rare Letter (j, q, x, v, or z)',
+  test: (word) => /j|q|v|x|z/i.test(word)
 },
 {
   name: 'Contains 4 or fewer unique letters',
@@ -176,7 +167,6 @@ const allPossibleRules = [
   },
 */
 ];	
-
 
 
 
