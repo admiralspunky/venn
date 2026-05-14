@@ -1,4 +1,4 @@
-// last updated: 2026-05-13
+// last updated: 2026-05-14
 
 //I adapted this wordlist from a file in my Wordliness folder, google-100000-english-no-swears. I've tried to prune it for obvious non-words, and also for words that use 'y' as a vowel, because those words tend to screw with my rules.
 //I'm starting to add back in some words that use y as a vowel, but with a diacritical ẏ so the rules can differentiate.
@@ -1744,11 +1744,13 @@ const wordList = [
   "extensive",
   "extent",
   "exterior",
+  "exterminate",
   "external",
   "extra",
   "extract",
   "extrajudicial",
   "extras",
+  "extravagance",
   "extreme",
   "extremophile",
   "eye",
