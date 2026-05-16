@@ -1,4 +1,4 @@
-// last updated: 2026-05-14
+// last updated: 2026-05-16
 
 //I adapted this wordlist from a file in my Wordliness folder, google-100000-english-no-swears. I've tried to prune it for obvious non-words, and also for words that use 'y' as a vowel, because those words tend to screw with my rules.
 //I'm starting to add back in some words that use y as a vowel, but with a diacritical ẏ so the rules can differentiate.
@@ -268,6 +268,7 @@ const wordList = [
   "argentina",
   "argue",
   "argument",
+  "aria",
   "arise",
   "arising",
   "arizona",
@@ -560,6 +561,7 @@ const wordList = [
   "bond",
   "bone",
   "bonus",
+  "boob",
   "book",
   "booking",
   "bookmark",
@@ -2912,7 +2914,6 @@ const wordList = [
   "listen",
   "listening",
   "listing",
-  "listings",
   "lists",
   "literature",
   "lithuania",
@@ -3535,6 +3536,7 @@ const wordList = [
   "oracle",
   "oral",
   "orange",
+  "oratorio",
   "orchestra",
   "order",
   "ordinance",
@@ -3721,6 +3723,7 @@ const wordList = [
   "permit",
   "permits",
   "permitted",
+  "perp",
   "person",
   "personal",
   "personalized",
@@ -4019,6 +4022,7 @@ const wordList = [
   "promotions",
   "prompt",
   "proof",
+  "prop",
   "proper",
   "properties",
   "property",
