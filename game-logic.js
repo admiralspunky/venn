@@ -3,7 +3,7 @@
 
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 
-const CURRENT_VERSION = "2.10";
+const CURRENT_VERSION = "2.11";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -53,6 +53,13 @@ const session = {
 	turnsLimit : localStorage.getItem('userSetTurns') || 10 ,
 	timeLimit : localStorage.getItem('userSetTimer') || 60 ,
 	
+	// other settings
+	
+	 // the user can also set how many rules (Venn circles) he wants:
+	numRules : parseInt(localStorage.getItem('numRules') || '3', 10),
+	 // the user can also set how many cards he wants in his hand:
+	INITIAL_HAND_SIZE : parseInt(localStorage.getItem('numCards') || '5', 10),
+	
 	// Board State
     wordsInPlay: [], //these words are somewhere on the board, think of it as a no-duplicate list
 	currentWordPool: [], //currentWordPool is a carefully curated subset of the entire wordslist, that buildDeliberateWordPool ensures contains at least 3 words that could fit into every zone
@@ -70,6 +77,8 @@ const session = {
 	// Zones (areas where you can play a card)
 	zoneWeights: [],// If a word gets placed in a zone, make that zone likely to be chosen again, when we're drawing cards for the hand
 	zoneKeys: [], //this is the list of zones (or just their names, I'm not certain)
+	
+
 };
 
 
@@ -77,12 +86,7 @@ let selectedWordId = null; // Used for click-to-place, will also be used for dra
 let isDarkMode = localStorage.getItem('theme') === 'dark';
 
 
-// User's selected lives, retrieved from localStorage or defaulting to 3
-let userSetLives = parseInt(localStorage.getItem('userSetLives') || '3', 10);
-// the user can also set how many rules (Venn circles) he wants:
-let numRules = parseInt(localStorage.getItem('numRules') || '3', 10);
-// the user can also set how many cards he wants in his hand:
-let INITIAL_HAND_SIZE = parseInt(localStorage.getItem('numCards') || '5', 10);
+
 
 // Daily streak variables
 let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || '0', 10);
@@ -170,7 +174,7 @@ function getZoneConfigs(numRules) {
 
 // Call these functions to get your dynamic objects
 const zoneElements = getZoneElements(); //This object is a map of your HTML elements. Its job is to provide a quick reference to the physical parts of your game board.
-const zoneConfigs = getZoneConfigs(numRules); // This object holds all the logical data about each zone. It tells the game how a zone works.
+const zoneConfigs = getZoneConfigs(session.numRules); // This object holds all the logical data about each zone. It tells the game how a zone works.
 //console.log("at the start of the game, ", zoneConfigs);
 
 // Dynamically generate zone weights based on the number of rules
@@ -262,8 +266,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	if (rulesSlider && rulesDisplay) {
 		console.log("rules slider initialized.");
         
-        rulesSlider.value = numRules;
-        rulesDisplay.textContent = numRules;
+        rulesSlider.value = session.numRules;
+        rulesDisplay.textContent = session.numRules;
 
         rulesSlider.addEventListener('input', (event) => {
 			console.log("rules slider moved.");
@@ -280,8 +284,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		
 		console.log("hand card slider initialized.");
         
-        cardsSliderSetting.value = INITIAL_HAND_SIZE;
-        cardsDisplaySetting.textContent = INITIAL_HAND_SIZE;
+        cardsSliderSetting.value = session.INITIAL_HAND_SIZE;
+        cardsDisplaySetting.textContent = session.INITIAL_HAND_SIZE;
 
         cardsSliderSetting.addEventListener('input', (event) => {
 			console.log("card slider moved.");
@@ -521,7 +525,7 @@ async function startGame(isDaily) {
     if (session.zoneWeights['0']) {
         session.zoneWeights['0'] = 0.5; // Words are half as likely to land in the 'None' zone
     }
-    const allRulesKey = session.zoneKeys.find(key => key.split('-').length === numRules);
+    const allRulesKey = session.zoneKeys.find(key => key.split('-').length === session.numRules);
     if (allRulesKey) {
         session.zoneWeights[allRulesKey] = 2; // Words are twice as likely to land in the 'All' zone
     }
@@ -538,13 +542,13 @@ async function startGame(isDaily) {
 
 	// changing the layout depending on how many rules the slider is set to
 	const linkElement = document.getElementById('layout-stylesheet');
-    if (numRules === 2) {
+    if (session.numRules === 2) {
 		linkElement.href = 'layout-2-rules.css';
 	} 
-	else if (numRules === 3){
+	else if (session.numRules === 3){
 		linkElement.href = 'layout-3-rules.css';
 	}
-	else if (numRules === 4){
+	else if (session.numRules === 4){
 		linkElement.href = 'layout-4-rules.css';
 	}
 
@@ -559,7 +563,7 @@ async function startGame(isDaily) {
     session.currentWordPool = initialFullWordPool.filter(w => !session.wordsInPlay.some(obj => obj.text === w));
     shuffleArray(session.currentWordPool, seed + 2);
 
-    if (session.currentWordPool.length < INITIAL_HAND_SIZE) {
+    if (session.currentWordPool.length < session.INITIAL_HAND_SIZE) {
         showMessage("Critical Error: Not enough unique words for game. Please refresh.", true);
         return;
     }
@@ -568,12 +572,12 @@ async function startGame(isDaily) {
     const weightedHand = generateWordPoolWithProbabilities(
         session.activeRules,
         session.currentWordPool,
-        INITIAL_HAND_SIZE,
+        session.INITIAL_HAND_SIZE,
         createSeededRandom(seed + 3)
     );
     console.log("Weighted Hand GENERATED:", weightedHand);
 
-    if (weightedHand.length < INITIAL_HAND_SIZE) {
+    if (weightedHand.length < session.INITIAL_HAND_SIZE) {
         showMessage("Critical Error: Not enough unique words for game. Please refresh.", true);
         return;
     }
@@ -682,12 +686,17 @@ async function endGame(isWin) {
     // ✅ Show message box
 	const lossMessages = {
 		livesLimit: `💀 Game Over! You ran out of guesses. Try the difficulty sliders in the Settings menu. Total turns: ${session.turns}`,
-		turnTest: `Game Over! You ran out of turns. How did you do? Press the Share button.`,
-		timeTrial: `Time's up! How did you do? Press the Share button.`
+		turnTest: `There is no way to lose a game in turnTest mode, so you should never see this message.`,
+		timeTrial: `💀 Time's up! How did you do? Press the Share button.`
 	};
 
+	const winMessages = {
+		livesLimit: `You win! You emptied your hand of ${session.INITIAL_HAND_SIZE} words in ${session.turns} turns.`,
+		turnTest: `Game Over! You ran out of turns. How did you do? Press the Share button.`,
+		timeTrial: `You win! You emptied your hand of ${session.INITIAL_HAND_SIZE} words in ${session.turns} turns.`
+	};
 	messageText = isWin 
-		? `🎉 You Win! Game Over in ${session.turns} turns!` 
+		? winMessages[session.gameMode]
 		: lossMessages[session.gameMode];
 
 
@@ -726,7 +735,7 @@ async function endGame(isWin) {
         const incorrectGuessesMade = userSetLives - session.livesRemaining;
 	    
  //       let fullShareText = `${gameLabel}: ${winLossStatus} with ${numRules} rules, and ${userSetLives} lives, in ${session.formattedTime}!`;
-		let fullShareText = `${gameLabel}: with ${numRules} rules, in ${session.formattedTime}!`;
+		let fullShareText = `${gameLabel}: with ${session.numRules} rules`;
 		fullShareText+= '\n' + session.previousResults;
         if (session.dailyMode && isWin) {
             fullShareText += `\n${dailyStreak} Daily puzzles in a row!`;
@@ -758,7 +767,7 @@ async function endGame(isWin) {
 	//const singleCategoryKeys = ['1', '2', '3']; // This array helps me check which zones should have a single rule label.
 	//actually, let's make it dynamic:
 	let singleCategoryKeys = [];
-	for (let i =0; i<numRules ; i++ ) singleCategoryKeys.push(i+1);
+	for (let i =0; i<session.numRules ; i++ ) singleCategoryKeys.push(i+1);
 	console.log("singleCategoryKeys: ",singleCategoryKeys);
 	console.log("zoneConfigs: ",zoneConfigs);
 	
@@ -806,7 +815,7 @@ async function endGame(isWin) {
 // Returns: an array of N rules from rules.js, while guaranteeing that each set of rules contains overlapping rules, so each zone can be filled
 //
 function generateActiveRulesWithOverlap(seed, allRules, maxAttempts = 1000) {
-    console.log(`🔎 Attempting to find ${numRules} rules`);
+    console.log(`🔎 Attempting to find ${session.numRules} rules`);
 
     const spellingRules = allRules;
     const checkedCombinations = new Set(); // Stores combinations we've already checked
@@ -815,7 +824,7 @@ function generateActiveRulesWithOverlap(seed, allRules, maxAttempts = 1000) {
     while (attempt < maxAttempts) {
         // Shuffle the spelling rules and pick the first numRules
         const shuffledSpelling = shuffleArray([...spellingRules], seed + attempt);
-        const candidateSet = shuffledSpelling.slice(0, numRules);
+        const candidateSet = shuffledSpelling.slice(0, session.numRules);
 
         // Create a unique identifier for this combination
         const combinationId = candidateSet.map(rule => rule.name).sort().join('-');
@@ -830,7 +839,7 @@ function generateActiveRulesWithOverlap(seed, allRules, maxAttempts = 1000) {
         checkedCombinations.add(combinationId);
 
         // Your existing logic for checking for overlaps and word counts
-        const zoneConfigs = getZoneConfigs(numRules);
+        const zoneConfigs = getZoneConfigs(session.numRules);
         const zoneBuckets = sortWordListByZone(candidateSet);
         
         const allZonesHaveMinWords = Object.keys(zoneConfigs).every(zoneKey => {
@@ -855,7 +864,7 @@ function generateActiveRulesWithOverlap(seed, allRules, maxAttempts = 1000) {
     }
 
     console.warn(`⚠️ No sufficiently overlapping rule set found after max attempts. Falling back.`);
-    return spellingRules.slice(0, numRules);
+    return spellingRules.slice(0, session.numRules);
 }
 
 
@@ -986,9 +995,9 @@ function seedInitialZones(pool) {
     
     // Generate the correct data-zone-key based on the number of circles
     let allRulesKey = '';
-    for (let i = 1; i <= numRules; i++) {
+    for (let i = 1; i <= session.numRules; i++) {
         allRulesKey += i;
-        if (i < numRules) {
+        if (i < session.numRules) {
             allRulesKey += '-';
         }
     }
@@ -1111,7 +1120,7 @@ function generateWordPoolWithProbabilities(ruleResults, wordPool, count, rng) {
 	//first, we generate an array of desired zoneProbabilities, dynamically based on numRules
 	//TODO: we probably want to tweak these probabilities
 	const zoneProbabilities = {};
-    const totalCombinations = Math.pow(2, numRules);
+    const totalCombinations = Math.pow(2, session.numRules);
     
     // Calculate the number of combinations that are not the two "special" cases.
     const numberOfOtherCombinations = totalCombinations - 2;
@@ -1126,7 +1135,7 @@ function generateWordPoolWithProbabilities(ruleResults, wordPool, count, rng) {
     // Each number from 1 to (2^numRules - 1) represents a unique combination of rules.
     for (let i = 1; i < totalCombinations; i++) {
         const rulesInCombination = [];
-        for (let j = 0; j < numRules; j++) {
+        for (let j = 0; j < session.numRules; j++) {
             // If the j-th bit is set, it means the j-th rule is in the combination.
             if ((i >> j) & 1) {
                 rulesInCombination.push(j + 1);
@@ -1136,7 +1145,7 @@ function generateWordPoolWithProbabilities(ruleResults, wordPool, count, rng) {
         const key = rulesInCombination.join('-');
         
         // Assign the correct probability based on whether it's the all-match combination or not.
-        if (rulesInCombination.length === numRules) {
+        if (rulesInCombination.length === session.numRules) {
             zoneProbabilities[key] = specialProb;
         } else {
             zoneProbabilities[key] = otherProb;
@@ -1473,8 +1482,8 @@ function placeWordInRegion(targetZoneKey) {
     let newCardFromPool = null; 
 
     if (correctZoneKey === targetZoneKey) {
-        // Perfect match: Hand size decreases, new card is drawn, but not in livesLimit gameMode.
-		if ( session.gameMode != 'livesLimit' ) newCardFromPool = drawCard(); // Draw a new card
+        // Perfect match: Hand size decreases, and a new card is drawn, but only in turnTestgameMode.
+		if ( session.gameMode == 'turnTest' ) newCardFromPool = drawCard(); // Draw a new card
 		
         isCorrectPlacement = true;
         selectedWordObj.correctZoneKey = correctZoneKey;
@@ -1641,6 +1650,7 @@ function copyToClipboard(text) {
 // Function to check for win or loss, called by placeWordInRegion
 // I will eventually want to change this function, to more gracefully handle multiple conditions, but it's fine for now
 async function checkGameEndCondition() { 
+
     switch(session.gameMode)
 	{
 	case 'livesLimit':
@@ -1655,14 +1665,19 @@ async function checkGameEndCondition() {
 		}
 		break;
 		
+	case 'timeTrial':
+		if (session.currentHand.length === 0) {
+			endGame(true);
+			return; 
+		}
+		// we can't check the timeTrial loss condition here; instead we check it down in updateTimer()
+		break;
+		
 	case 'turnTest':
 		if ( session.turns >= session.turnsLimit )
 			endGame(true); 
 		break;
-		
-	// we can't check the timeTrial end condition here; instead we check it down in updateTimer()
 	}
-
 }
 
 
@@ -1708,14 +1723,6 @@ function updateLivesDisplay() {
 	}
 }
 
-/* We're doing this inside DOMContentLoaded now
-// Function to update the lives setting and save to local storage
-function updateLivesSetting(value) {
-    userSetLives = value;
-    livesDisplayModal.textContent = userSetLives;
-    localStorage.setItem('userSetLives', userSetLives);
-}
-*/
 
 function updateRuleBoxLabelsAndHints() {
 	console.log('Debug in updateRuleBoxLabelsAndHints: zoneConfigs=', zoneConfigs);
@@ -1993,6 +2000,6 @@ function updateTimer() {
     if (session.gameMode == 'timeTrial' && timeLeft <= 0) 
     {
         console.log('Timer expired');
-        endGame(true);
+        endGame(false);
     }
 }
