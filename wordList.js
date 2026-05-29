@@ -1639,6 +1639,7 @@ const wordList = [
   "era",
   "eric",
   "error",
+  "erudite",
   "escape",
   "escort",
   "essays",
