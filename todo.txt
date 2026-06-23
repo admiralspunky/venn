@@ -1,4 +1,5 @@
-look into using my lapel mic to make another Youtube playthrough video, or hire a content creator, or ask Bex to make a demo for me
+if the player finished yesterday's puzzle, re-use one of the categories?
+hire a content creator, or ask Bex to make a demo video for me
 
 centralized GameState object
 separate mobile CSS
