@@ -1,9 +1,9 @@
 // game-logic.js
-// Justin Smith, 2025
+// Justin Smith, 2025-2026
 
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 
-const CURRENT_VERSION = "2.11";
+const CURRENT_VERSION = "2.12";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -496,8 +496,11 @@ document.addEventListener("DOMContentLoaded", () => {
 async function startGame(isDaily) {
     console.log("startGame(isDaily)", isDaily);
     session.dailyMode = isDaily;
+	
+	
 
 	// Show a browser confirmation before we start the game, so the timer isn't running in the bg
+	// if the Dev Tools tries to give you crap about the DOM taking too long to load, it's actually not a problem with the DOM at all; this kind of Confirm blocks the rest of the thread.
 	const ready = confirm("Ready to start the game?");
     if (!ready) return; // Exit if they click Cancel
 
@@ -608,8 +611,6 @@ async function startGame(isDaily) {
 		rulesListContainer.innerHTML = buildRulesHTML();
 	}
 
-
-	//TODO: I'm going to want a Start game confirmation
 }//async function startGame(isDaily)
 
 
@@ -661,25 +662,35 @@ async function endGame(isWin) {
 	
     const endButtonsContainer = document.getElementById('end-screen-buttons');
 
-    // Handle daily streak logic
+    // Handle daily streak logic - you only get one shot at a daily streak per day, on your first attempt of the day
     if (session.dailyMode) {
         const today = getTodayDateString();
+		const yesterday = getYesterdayDateString(); // This handles the "today - 1" logic safely
+		
+		if (lastDailyCompletionDate === today) {
+						console.log("Daily puzzle already attempted today.");
+						return;
+					}
+		
         if (isWin) {
-            if (lastDailyCompletionDate !== today) {
-                dailyStreak++;
-                localStorage.setItem('dailyStreak', dailyStreak);
-                localStorage.setItem('lastDailyCompletionDate', today);
-                console.log(`Daily streak incremented to: ${dailyStreak}`);
-            } else {
-                console.log("Daily puzzle already completed today. Streak not incremented.");
-            }
+						
+			//only increment the dailyStreak if the puzzle was won, hasn't already been played today, and was played yesterday
+			if (lastDailyCompletionDate === yesterday || lastDailyCompletionDate === "") {
+				dailyStreak++;
+			} else {
+				dailyStreak = 1; // Resets a broken streak to 1 on a fresh win
+			}	
+
+            console.log(`Daily puzzle won! Daily streak set to: ${dailyStreak}`);
         } else {
             // If daily puzzle failed, reset streak
             dailyStreak = 0;
-            localStorage.setItem('dailyStreak', dailyStreak);
-            localStorage.setItem('lastDailyCompletionDate', ''); // Clear last completion date
+        
             console.log("Daily puzzle failed. Streak reset to 0. Try the difficulty sliders in the Settings menu.");
         }
+		
+		localStorage.setItem('dailyStreak', dailyStreak);
+		localStorage.setItem('lastDailyCompletionDate', today); // Locks them out for the rest of today
     }
 
 
@@ -990,8 +1001,13 @@ function seedInitialZones(pool) {
 	console.log("weights in seedInitialZones:", session.zoneWeights);
 	
 	//at the start of the game, place a word into these zones, and also the All Rules zone
-//TODO: this list should maybe be created dynamically
-	let initialZoneKeys = ['1', '2', '3', '4', '0'];
+	let initialZoneKeys = [];
+
+	for (let i = 1; i <= session.numRules; i++) {
+		initialZoneKeys.push(i.toString());
+	}
+	initialZoneKeys.push('0');
+//	let initialZoneKeys = ['1', '2', '3', '4', '0'];
     
     // Generate the correct data-zone-key based on the number of circles
     let allRulesKey = '';
@@ -1077,6 +1093,12 @@ function seedInitialZones(pool) {
 function getTodayDateString() {
     const today = new Date();
     return today.toISOString().split("T")[0];
+}
+
+function getYesterdayDateString() {
+    const date = new Date();
+    date.setDate(date.getDate() - 1); // This is JavaScript's built-in "today - 1"
+    return date.toISOString().split('T')[0]; // Returns "YYYY-MM-DD"
 }
 
 function getDailySeed() {
@@ -2003,3 +2025,4 @@ function updateTimer() {
         endGame(false);
     }
 }
+
