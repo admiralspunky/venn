@@ -1,4 +1,5 @@
 if the player finished yesterday's puzzle, re-use one of the categories?
+we should stop accepting input after the end of the game
 hire a content creator, or ask Bex to make a demo video for me
 
 centralized GameState object
