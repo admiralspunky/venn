@@ -3,7 +3,7 @@
 
 // Global Variables ('let' can be reassigned later; 'const' cannot)
 
-const CURRENT_VERSION = "2.12";
+const CURRENT_VERSION = "2.13";
 const GAME_TITLE = "Voozo";
 // The address to the game, so we can post it in the Share dialog
 const URL = "https://admiralspunky.github.io/venn/";
@@ -90,7 +90,7 @@ let isDarkMode = localStorage.getItem('theme') === 'dark';
 
 // Daily streak variables
 let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || '0', 10);
-let lastDailyCompletionDate = localStorage.getItem('lastDailyCompletionDate') || '';
+let lastDailyDate = localStorage.getItem('lastDailyDate') || '';
 
 const settingsModalOverlay = document.getElementById('settings-modal-overlay');
 const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -298,6 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const today = getTodayDateString();
     const lastPlayed = localStorage.getItem("lastDailyDate");
     
+	/*I don't think this code should be here, aren't we checking the DailyMode logic in endgame()?
     if (lastPlayed && lastPlayed !== today) {
         const lastDate = new Date(lastPlayed);
         const currentDate = new Date(today);
@@ -310,6 +311,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Missed a day. Daily streak reset to 0.");
         }
 	}	
+	*/
 	
 	//set up the containers in the Status bar (top-left of the main screen)
 	const livesCont = document.getElementById('lives-container');
@@ -428,9 +430,15 @@ document.addEventListener("DOMContentLoaded", () => {
 	tutorialOkBtn?.addEventListener('click', hideTutorial);
 
     
+	// Show a browser confirmation before we start the game, so the timer isn't running in the bg
+	// if the Dev Tools tries to give you crap about the DOM taking too long to load, it's actually not a problem with the DOM at all; this kind of Confirm blocks the rest of the thread.
+	//this confirmation used to live at the top of startGame(), but I moved it into the DOM because otherwise it was breaking my Daily logic - I think?
+	const ready = confirm("Ready to start the game?");
+    if (!ready) return; // Exit if they click Cancel
+	
 	//start game here
 	if (lastPlayed !== today) {
-        localStorage.setItem("lastDailyDate", today);
+
         console.log("Starting Daily Game for", today);
         startGame(true);
     } else {
@@ -498,11 +506,6 @@ async function startGame(isDaily) {
     session.dailyMode = isDaily;
 	
 	
-
-	// Show a browser confirmation before we start the game, so the timer isn't running in the bg
-	// if the Dev Tools tries to give you crap about the DOM taking too long to load, it's actually not a problem with the DOM at all; this kind of Confirm blocks the rest of the thread.
-	const ready = confirm("Ready to start the game?");
-    if (!ready) return; // Exit if they click Cancel
 
     // Use the daily seed for ALL randomization steps in daily mode
     const seed = isDaily ? getDailySeed() : Math.floor(Math.random() * 100000);
@@ -611,6 +614,16 @@ async function startGame(isDaily) {
 		rulesListContainer.innerHTML = buildRulesHTML();
 	}
 
+	//we've played a game today
+	localStorage.setItem("lastDailyDate", getTodayDateString());
+	
+	//if the player is on a streak, start him off with a bonus hint
+	if (isDaily && dailyStreak>=1)
+	{
+		console.log("startGame called with streak ", dailyStreak);
+		showHint();
+	}
+	
 }//async function startGame(isDaily)
 
 
@@ -667,7 +680,7 @@ async function endGame(isWin) {
         const today = getTodayDateString();
 		const yesterday = getYesterdayDateString(); // This handles the "today - 1" logic safely
 		
-		if (lastDailyCompletionDate === today) {
+		if (lastDailyDate === today) {
 						console.log("Daily puzzle already attempted today.");
 						return;
 					}
@@ -675,7 +688,7 @@ async function endGame(isWin) {
         if (isWin) {
 						
 			//only increment the dailyStreak if the puzzle was won, hasn't already been played today, and was played yesterday
-			if (lastDailyCompletionDate === yesterday || lastDailyCompletionDate === "") {
+			if (lastDailyDate === yesterday || lastDailyDate === "") {
 				dailyStreak++;
 			} else {
 				dailyStreak = 1; // Resets a broken streak to 1 on a fresh win
@@ -690,7 +703,7 @@ async function endGame(isWin) {
         }
 		
 		localStorage.setItem('dailyStreak', dailyStreak);
-		localStorage.setItem('lastDailyCompletionDate', today); // Locks them out for the rest of today
+		localStorage.setItem('lastDailyDate', today); // Locks them out for the rest of today
     }
 
 
@@ -749,7 +762,7 @@ async function endGame(isWin) {
 		let fullShareText = `${gameLabel}: with ${session.numRules} rules`;
 		fullShareText+= '\n' + session.previousResults;
         if (session.dailyMode && isWin) {
-            fullShareText += `\n${dailyStreak} Daily puzzles in a row!`;
+            fullShareText += `\n$🔥 {dailyStreak}-day streak`;
         }
 		if (session.dailyMode) fullShareText += `\nCome back tomorrow for another puzzle.`;
         fullShareText += `\n${URL}`;
@@ -1709,7 +1722,7 @@ function updateDailyBadge(isDaily) {
     const badge = document.getElementById("daily-badge");
     if (badge && isDaily ) {
         badge.style.display = 'inline-block';
-		badge.textContent = `daily for ${getTodayDateString()}`;
+		badge.textContent =  `Daily Puzzle • 🔥 ${dailyStreak}`;
     }
 	else badge.style.display = 'none';
 }
@@ -1905,6 +1918,21 @@ function toggleDarkMode() {
     applyTheme();
 }
 
+//this function is called by the eventListener on the Show Hint button in the settings menu, but also at the beginning of the game, when you've played at least once in a row, to encourage retention
+function showHint() {
+	    // Pick a random card from the hand
+		const randIndex = Math.floor(Math.random() * session.currentHand.length);
+        const card = session.currentHand[randIndex];
+
+        // Get its correct zone (assuming your card object or helper function provides this)
+        const targetZone = getCorrectZoneKeyForWord(card, session.activeRules); // or card.target if already stored
+
+        // Show the hint
+        const hintMessage = `Hint: One of your cards, "${card.text}", should go into Zone ${targetZone}.`;
+        showMessage(hintMessage, null, 0); // displayTime = 0 keeps it until overwritten
+
+}
+
 // Event Listeners (I believe I should TODO move all these up to my DOMContentLoaded
 settingsBtn.addEventListener('click', showModal); // Gear icon now opens settings modal
 modalCloseBtn.addEventListener('click', hideModal);
@@ -1917,21 +1945,9 @@ if (darkModeToggleBtn) {
 
 if (hintBtn) {
     hintBtn.addEventListener('click', (event) => {
-
         console.log('Hint button clicked from settings modal.');
-		
-        // Pick a random card from the hand
-        const randIndex = Math.floor(Math.random() * session.currentHand.length);
-        const card = session.currentHand[randIndex];
-
-        // Get its correct zone (assuming your card object or helper function provides this)
-        const targetZone = getCorrectZoneKeyForWord(card, session.activeRules); // or card.target if already stored
-
-        // Show the hint
-        const hintMessage = `Hint: One of your cards, "${card.text}", should go into Zone ${targetZone}.`;
-        showMessage(hintMessage, null, 0); // displayTime = 0 keeps it until overwritten
-
 		hideModal();
+		showHint();
     });
 }
 
