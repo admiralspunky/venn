@@ -1,6 +1,17 @@
-if the player finished yesterday's puzzle, re-use one of the categories?
 we should stop accepting input after the end of the game
 hire a content creator, or ask Bex to make a demo video for me
+use more gentle hints: add "const allPossibleRules = [
+  {
+    id: "ends_with_vowel",
+    validate: (word) => /[aeiou]$/i.test(word),
+    hintText: "Look at the very last letter of the words."
+  },
+  {
+    id: "double_letter",
+    validate: (word) => /([a-z])\1/i.test(word),
+    hintText: "Check for double or repeating letters."
+  }
+];"
 
 centralized GameState object
 separate mobile CSS
